@@ -1,2 +1,91 @@
-# LearnHub
-This is the final project for the Internet Computing course at Software Institute, Nanjing University. LearnHub is an intelligent online learning platform developed as a course project, showcasing full-stack web development skills.
+# LearnHub - 智能在线学习平台
+
+> 南京大学软件学院《互联网计算》课程大作业
+
+LearnHub 是一个智能在线学习平台，用户可以浏览课程、观看视频、记录学习进度，并通过 AI 助手获得个性化学习建议。该项目展示了前后端开发能力、数据交互和功能集成。
+
+---
+
+## 🛠 技术栈
+
+* **前端**：React + Ant Design + Redux + Recharts
+* **后端**：Node.js + Express
+* **数据库**：MongoDB
+* **其他**：Socket.io（实时功能）、OpenAI API（智能问答）
+
+---
+
+## 👥 团队成员与分工
+
+### 成员A：前端主力 + UI/UX负责人
+
+**职责**：
+
+* 前端架构设计、界面设计、用户体验优化
+* 开发通用组件和业务组件
+* 页面开发：首页、课程中心、学习空间、个人中心
+* 前端优化和响应式设计
+
+**主要任务**：
+
+* 搭建 React 项目、安装依赖、配置目录
+* 开发 Header、Sidebar、Footer、CourseCard、VideoPlayer、ProgressBar、CommentList
+* 实现页面布局、课程展示、视频播放、笔记与评论功能
+* 性能优化：懒加载、API 防抖、错误边界处理、移动端适配
+
+---
+
+### 成员B：后端主力 + 数据库架构师
+
+**职责**：
+
+* 设计数据库模型和服务器架构
+* 开发后端 API 接口
+* 部署服务器和数据库
+
+**主要任务**：
+
+* 数据库模型：用户（User）、课程（Course）、课时（Lesson）、评论（Comment）、订单（Order）
+* API 接口：用户认证、课程管理、学习进度
+* 文件上传与管理：封面图片、视频
+* 搜索与推荐算法、热门排行榜
+* 性能优化、安全加固（JWT、XSS、SQL 注入防护）
+* 部署至服务器和数据库
+
+---
+
+### 成员C：全栈开发 + 功能集成
+
+**职责**：
+
+* 前后端数据对接与功能集成
+* 系统联调和用户操作流程优化
+
+**主要任务**：
+
+* 创建统一 API 服务层，封装请求与响应
+* 配置 Redux 状态管理，管理用户、课程、学习进度
+* 集成登录注册、课程列表、搜索、报名购买、视频播放、学习进度、笔记与评论
+* 实现数据同步、乐观更新、错误重试
+* 前后端联调测试、功能完整性、性能压力测试
+
+---
+
+### 成员D：项目经理 + 创新功能开发
+
+**职责**：
+
+* 项目管理、团队协调、文档编写
+* 创新功能开发（AI 助手、智能推荐、实时功能）
+
+**主要任务**：
+
+* Git 仓库管理、分支策略制定、项目看板管理、每日沟通
+* 编写需求文档、代码规范、部署手册
+* AI 助手：问答系统、对话界面、历史记录
+* 智能推荐：个性化课程推荐
+* 实时功能：实时评论、在线状态、学习进度同步
+* 数据分析与可视化：管理员面板、课程热度分析
+* 项目部署与展示：Vercel 前端、服务器后端、MongoDB 数据库、HTTPS 配置、演示 PPT 和录屏
+
+你希望我画吗？
