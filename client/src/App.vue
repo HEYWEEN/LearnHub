@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Navbar />
-    <router-view />
+    <main class="main-content">
+      <router-view />
+    </main>
   </div>
 </template>
 
@@ -10,8 +12,9 @@ import Navbar from './components/layout/Navbar.vue'
 </script>
 
 <style>
-#app {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #fafafa;
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>
