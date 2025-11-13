@@ -1,0 +1,8 @@
+
+function authenticate() {
+
+}
+
+function sync(){
+  
+}

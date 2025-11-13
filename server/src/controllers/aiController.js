@@ -1,0 +1,7 @@
+function askAI(){
+
+}
+
+function getRecommendations(){
+
+}
