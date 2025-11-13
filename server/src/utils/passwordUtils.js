@@ -1,0 +1,8 @@
+
+function hashPassword() {
+
+}
+
+function comparePassword() {
+
+}
