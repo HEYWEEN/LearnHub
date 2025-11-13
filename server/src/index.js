@@ -1,14 +1,20 @@
 const express = require('express');
+//const connectDB = require('./config/db');
 const app = express();
-const port = 5000;
+const port = process.env.port||5000;
 
-const routes = require('./routes'); // 自动加载 index.js
+//connectDB();
 
-// 将 auth 路由挂载到 /auth 路径下
-app.use('/auth', routes.auth);
+const routes = require('./routes');
+
+app.use('/api/auth'     , routes.authRouter);
+app.use('/api/learning' , routes.learningRouter);
+app.use('/api/courses'  , routes.coursesRouter);
+app.use('/api/users'    , routes.usersRouter);
+app.use('/api/ai'       , routes.aiRouter);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('LearnHub API is running...');
 });
 
 app.listen(port, () => {
