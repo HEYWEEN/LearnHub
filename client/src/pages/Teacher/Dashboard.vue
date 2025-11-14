@@ -1,0 +1,231 @@
+<template>
+  <div class="teacher-dashboard">
+    <div class="dashboard-header">
+      <h1>教师工作台</h1>
+      <p class="welcome-text">欢迎回来，{{ userName }}老师！</p>
+    </div>
+
+    <div class="dashboard-content">
+      <!-- 快捷操作 -->
+      <section class="quick-actions">
+        <h2>快捷操作</h2>
+        <div class="action-cards">
+          <div class="action-card" @click="handleAddCourse">
+            <div class="card-icon">➕</div>
+            <h3>添加课程</h3>
+            <p>创建新的课程内容</p>
+          </div>
+          <div class="action-card" @click="handleManageCourses">
+            <div class="card-icon">📚</div>
+            <h3>课程管理</h3>
+            <p>管理已有的课程</p>
+          </div>
+          <div class="action-card" @click="handleViewStudents">
+            <div class="card-icon">👥</div>
+            <h3>学生管理</h3>
+            <p>查看学生学习情况</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 我的课程 -->
+      <section class="my-courses">
+        <h2>我的课程</h2>
+        <div class="courses-placeholder">
+          <div class="placeholder-icon">📖</div>
+          <p class="placeholder-text">您还没有创建课程</p>
+          <el-button type="primary" @click="handleAddCourse">创建第一个课程</el-button>
+        </div>
+      </section>
+
+      <!-- 统计信息 -->
+      <section class="statistics">
+        <h2>数据概览</h2>
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">课程数量</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">学生人数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">课时总数</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/store/slices/user'
+
+const router = useRouter()
+const userStore = useUserStore()
+
+const userName = computed(() => userStore.user?.username || '教师')
+
+function handleAddCourse() {
+  ElMessage.info('添加课程功能正在开发中...')
+}
+
+function handleManageCourses() {
+  ElMessage.info('课程管理功能正在开发中...')
+}
+
+function handleViewStudents() {
+  ElMessage.info('学生管理功能正在开发中...')
+}
+</script>
+
+<style scoped>
+.teacher-dashboard {
+  min-height: calc(100vh - 64px);
+  background-color: #f5f7fa;
+  padding: 40px 20px;
+}
+
+.dashboard-header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.welcome-text {
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* 快捷操作 */
+.quick-actions h2,
+.my-courses h2,
+.statistics h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 24px;
+}
+
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.action-card {
+  background: white;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.action-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.action-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.action-card p {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+/* 我的课程 */
+.courses-placeholder {
+  background: white;
+  border-radius: 12px;
+  padding: 80px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.placeholder-text {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+}
+
+/* 统计信息 */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-value {
+  font-size: 48px;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 28px;
+  }
+
+  .welcome-text {
+    font-size: 16px;
+  }
+
+  .action-cards,
+  .stat-cards {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
