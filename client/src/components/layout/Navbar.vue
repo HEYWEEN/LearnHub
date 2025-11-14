@@ -84,8 +84,8 @@ const closeDropdown = () => {
 }
 
 // 处理退出登录
-const handleLogout = () => {
-  userStore.logout()
+const handleLogout = async () => {
+  await userStore.logoutUser()
   closeDropdown()
   router.push('/login')
 }
@@ -117,6 +117,8 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: var(--color-white);
   transition: background 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 1000;
 }
 
 .navbar.scrolled {
@@ -273,6 +275,7 @@ onUnmounted(() => {
   min-width: 160px;
   overflow: hidden;
   animation: fadeIn 0.2s ease;
+  z-index: 1001;
 }
 
 @keyframes fadeIn {
