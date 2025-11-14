@@ -5,7 +5,7 @@ const router = express.Router();
 //req 
 //请求头 Authorization: Bearer {token}
 router.get("/me", (req, res) => {
-  res.json({
+  res.send({
     success: true,
     data: {
       id: "user_123",
