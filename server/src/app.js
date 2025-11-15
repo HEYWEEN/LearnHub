@@ -1,11 +1,16 @@
 //src/app.js
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 const app = express();
 dotenv.config();
 
 app.use(express.json());
-
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 import routes from './routes/index.js';
 import errorHandler from './middleware/errorMiddleware.js';
 import loggerMiddleware from './middleware/loggerMiddleware.js';      
