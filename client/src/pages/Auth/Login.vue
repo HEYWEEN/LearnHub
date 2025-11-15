@@ -1,11 +1,11 @@
 <template>
-  <div class="login-page">
-    <el-card class="login-card">
+    <div class="login-page">
+      <el-card class="login-card">
       <h2>登录 LearnHub</h2>
       <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent="handleLogin">
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" placeholder="请输入邮箱地址" />
-        </el-form-item>
+          </el-form-item>
         
         <el-form-item label="密码" prop="password">
           <el-input 
@@ -14,7 +14,7 @@
             placeholder="请输入密码（至少6位，含大小写字母和数字）"
             show-password
           />
-        </el-form-item>
+          </el-form-item>
         
         <el-form-item label="身份" prop="role">
           <el-radio-group v-model="form.role">
@@ -31,20 +31,20 @@
           <span>没有账号？</span>
           <router-link to="/register" class="link">去注册</router-link>
         </div>
-      </el-form>
-    </el-card>
-  </div>
-</template>
-
-<script setup>
+        </el-form>
+      </el-card>
+    </div>
+  </template>
+  
+  <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/store/slices/user'
+  import { useUserStore } from '@/store/slices/user'
 import { getRedirectPathByRole } from '@/utils/authHelpers'
-
+  
 const router = useRouter()
-const userStore = useUserStore()
+  const userStore = useUserStore()
 const formRef = ref(null)
 
 const form = reactive({
@@ -68,8 +68,8 @@ const rules = {
 
 // 从 store 获取 loading 状态
 const loading = computed(() => userStore.loading)
-
-async function handleLogin() {
+  
+  async function handleLogin() {
   if (!formRef.value) return
   
   try {
@@ -87,21 +87,21 @@ async function handleLogin() {
   } catch (error) {
     // 错误信息由 store 处理，这里直接显示
     ElMessage.error(userStore.error || '登录失败，请检查账号或密码')
+    }
   }
-}
-</script>
-
-<style scoped>
-.login-page {
-  display: flex;
-  justify-content: center;
+  </script>
+  
+  <style scoped>
+  .login-page {
+    display: flex;
+    justify-content: center;
   align-items: center;
   min-height: calc(100vh - 64px);
   padding: 40px 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+  }
 
-.login-card {
+  .login-card {
   width: 100%;
   max-width: 420px;
   padding: 30px;
@@ -154,6 +154,6 @@ async function handleLogin() {
 :deep(.el-radio-group) {
   display: flex;
   gap: 20px;
-}
-</style>
+  }
+  </style>
   
