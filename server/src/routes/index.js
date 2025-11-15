@@ -1,13 +1,15 @@
-const authRouter = require('./authRoutes');
-const coursesRouter = require('./coursesRoutes');
-const learningRouter = require('./learningRoutes');
-const usersRouter = require('./usersRoutes');
-const aiRouter = require('./aiRoutes');
+import aiRouter from './aiRoutes.js';
+import authRouter from './authRoutes.js';
+import coursesRouter from './coursesRoutes.js';
+import learningRouter from './learningRoutes.js';
+import usersRouter from './usersRoutes.js';
 
-module.exports = {
+export default {
     aiRouter: aiRouter,
     authRouter: authRouter,
     coursesRouter:coursesRouter,
     learningRouter:learningRouter,
     usersRouter:usersRouter
 };
+
+

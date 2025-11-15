@@ -1,15 +1,13 @@
-const express = require('express');
-//const connectDB = require('./config/db');
+//src/app.js
+import express from 'express';
+import dotenv from 'dotenv';
 const app = express();
-const dotenv = require('dotenv');
 dotenv.config();
-
 
 app.use(express.json());
 
-//connectDB();
-
-const routes = require('./routes');
+import routes from './routes/index.js';
+import errorHandler from './middleware/errorMiddleware.js';      
 
 app.use('/api/auth'     , routes.authRouter);
 app.use('/api/learning' , routes.learningRouter);
@@ -21,4 +19,6 @@ app.get('/', (req, res) => {
     res.send('LearnHub API is running...');
 });
 
-module.exports = app;
+app.use(errorHandler);
+
+export default app;

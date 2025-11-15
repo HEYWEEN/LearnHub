@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 // 获取学习进度
@@ -53,4 +53,4 @@ router.post("/progress/:lessonId", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

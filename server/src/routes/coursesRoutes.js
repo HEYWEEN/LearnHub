@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 //查询参数:
@@ -132,4 +132,4 @@ router.post("/:courseId/teacher", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

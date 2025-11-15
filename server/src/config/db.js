@@ -1,6 +1,6 @@
-
-const mysql  = require('mysql2');
-const dotenv =  require('dotenv');
+//src/config/db.js
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
 dotenv.config(); // 确保能读取 .env
 
