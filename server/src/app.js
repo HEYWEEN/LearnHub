@@ -7,7 +7,10 @@ dotenv.config();
 app.use(express.json());
 
 import routes from './routes/index.js';
-import errorHandler from './middleware/errorMiddleware.js';      
+import errorHandler from './middleware/errorMiddleware.js';
+import loggerMiddleware from './middleware/loggerMiddleware.js';      
+
+app.use(loggerMiddleware);
 
 app.use('/api/auth'     , routes.authRouter);
 app.use('/api/learning' , routes.learningRouter);
