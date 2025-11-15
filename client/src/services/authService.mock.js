@@ -101,8 +101,8 @@ export async function register(username, email, password, role) {
   // 添加到模拟数据库
   mockUsers.push(newUser)
   
-  console.log('✅ 新用户已注册:', sanitizeUser(newUser))
-  console.log('📊 当前所有用户:', mockUsers.map(sanitizeUser))
+  console.log('新用户已注册:', sanitizeUser(newUser))
+  console.log('当前所有用户:', mockUsers.map(sanitizeUser))
   
   // 返回成功响应
   return {
@@ -145,9 +145,158 @@ export function resetMockUsers() {
   )
 }
 
+/**
+ * Mock 获取用户资料接口
+ */
+export async function getUserProfile() {
+  await delay(300)
+  
+  // 从 localStorage 获取当前用户
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  
+  if (!user) {
+    throw {
+      response: {
+        data: {
+          message: '请先登录'
+        }
+      }
+    }
+  }
+  
+  // 从 mockUsers 中找到完整的用户信息
+  const fullUser = mockUsers.find(u => u.id === user.id)
+  
+  if (!fullUser) {
+    throw {
+      response: {
+        data: {
+          message: '用户不存在'
+        }
+      }
+    }
+  }
+  
+  return {
+    user: sanitizeUser(fullUser)
+  }
+}
+
+/**
+ * Mock 更新用户资料接口
+ */
+export async function updateUserProfile(profileData) {
+  await delay(500)
+  
+  // 从 localStorage 获取当前用户
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  
+  if (!user) {
+    throw {
+      response: {
+        data: {
+          message: '请先登录'
+        }
+      }
+    }
+  }
+  
+  // 找到并更新用户信息
+  const userIndex = mockUsers.findIndex(u => u.id === user.id)
+  
+  if (userIndex === -1) {
+    throw {
+      response: {
+        data: {
+          message: '用户不存在'
+        }
+      }
+    }
+  }
+  
+  // 更新允许修改的字段（用户名和个人简介）
+  if (profileData.username) {
+    mockUsers[userIndex].username = profileData.username
+  }
+  if (profileData.bio !== undefined) {
+    mockUsers[userIndex].bio = profileData.bio
+  }
+  
+  console.log('用户资料已更新:', sanitizeUser(mockUsers[userIndex]))
+  
+  return {
+    user: sanitizeUser(mockUsers[userIndex])
+  }
+}
+
+/**
+ * Mock 修改密码接口
+ */
+export async function changePassword(passwordData) {
+  await delay(600)
+  
+  // 从 localStorage 获取当前用户
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  
+  if (!user) {
+    throw {
+      response: {
+        data: {
+          message: '请先登录'
+        }
+      }
+    }
+  }
+  
+  // 找到用户
+  const userIndex = mockUsers.findIndex(u => u.id === user.id)
+  
+  if (userIndex === -1) {
+    throw {
+      response: {
+        data: {
+          message: '用户不存在'
+        }
+      }
+    }
+  }
+  
+  // 验证当前密码
+  if (mockUsers[userIndex].password !== passwordData.currentPassword) {
+    throw {
+      response: {
+        data: {
+          message: '当前密码不正确'
+        }
+      }
+    }
+  }
+  
+  // 验证新密码强度：必须包含大小写字母和数字，至少6位
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/
+  if (!passwordPattern.test(passwordData.newPassword)) {
+    throw {
+      response: {
+        data: {
+          message: '密码必须至少6位，且包含大小写字母和数字'
+        }
+      }
+    }
+  }
+  
+  // 更新密码
+  mockUsers[userIndex].password = passwordData.newPassword
+  
+  console.log('密码已修改')
+  
+  return {
+    message: '密码修改成功'
+  }
+}
+
 // 在控制台输出测试账号信息
-console.log('🎭 Mock Service 已启用')
-console.log('📝 测试账号:')
-console.log('  学生: zhangsan@example.com / Test123')
-console.log('  教师: teacher@example.com / Teacher123')
+console.log('Mock Service 已启用')
+console.log('测试账号:')
+console.log('学生: zhangsan@example.com / Test123')
+console.log('教师: teacher@example.com / Teacher123')
 
