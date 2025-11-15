@@ -1,3 +1,32 @@
+
+# 安装依赖
+```
+npm install dotenv express mysql2
+```
+# 运行
+```
+npm start
+```
+或
+```
+node src/index.js
+```
+# 数据库配置
+
+运行initDatabase.sql初始化数据库
+
+可以在test/testData.sql中导入测试数据
+
+在.env文件中修改mysql账号和密码：
+```
+DB_HOST=localhost
+DB_USER=admin_user
+DB_PASS=123456
+DB_NAME=learnhub
+```
+
+# 函数
+
 | 模块                    | 文件                      | 主要函数                                   | 功能描述           |
 | --------------------- | ----------------------- | -------------------------------------- | -------------- |
 | **入口层**               | `src/index.js`          | `app.listen()`                         | 启动服务器，初始化数据库连接 |

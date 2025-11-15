@@ -1,4 +1,3 @@
--- 数据库初始化
 
 CREATE DATABASE IF NOT EXISTS learnhub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE learnhub;
@@ -94,6 +93,3 @@ CREATE TABLE ai_logs (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL
 );
-
-INSERT INTO users (id, username, email, password, role)
-VALUES (UUID(), 'admin', 'admin@learnhub.com', 'hashed_password_here', 'admin');

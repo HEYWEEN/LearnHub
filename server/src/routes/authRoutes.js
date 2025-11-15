@@ -26,7 +26,8 @@ router.get("/me", (req, res) => {
 //   "password": "string, 必填"
 // }
 router.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  //const { username, password } = req.body;
+  console.log(req.body);
   // Add authentication logic here
   res.json({
     success: true,
