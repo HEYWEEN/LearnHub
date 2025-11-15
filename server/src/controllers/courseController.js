@@ -1,4 +1,5 @@
 import pool from "../config/db.js";
+import STATUS from "../constants/httpStatus.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/response.js";
 
@@ -56,7 +57,7 @@ const getCourseById = asyncHandler(async(req,res)=>{
     );
     if(courseRow.length===0){
         const err = new Error('没有找到课程');
-        err.status = 401;
+        err.status = STATUS.NOT_FOUND;
         return err;
     }
     const course = courseRow[0];
