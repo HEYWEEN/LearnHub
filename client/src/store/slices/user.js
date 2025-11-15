@@ -72,6 +72,43 @@ export const useUserStore = defineStore('user', {
     async logoutUser() {
       this.clearAuth()
       this.error = null
+    },
+
+    // 更新用户资料
+    async updateProfile(profileData) {
+      this.loading = true
+      this.error = null
+      
+      try {
+        const data = await authService.updateUserProfile(profileData)
+        
+        // 更新本地用户信息
+        this.user = { ...this.user, ...data.user }
+        localStorage.setItem('user', JSON.stringify(this.user))
+        
+        return { success: true, user: data.user }
+      } catch (error) {
+        this.error = error.response?.data?.message || '更新失败，请稍后再试'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // 修改密码
+    async updatePassword(passwordData) {
+      this.loading = true
+      this.error = null
+      
+      try {
+        await authService.changePassword(passwordData)
+        return { success: true }
+      } catch (error) {
+        this.error = error.response?.data?.message || '密码修改失败'
+        throw error
+      } finally {
+        this.loading = false
+      }
     }
   }
 })
