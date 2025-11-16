@@ -1,4 +1,5 @@
 import pool from '../config/db.js';
+import { generateToken } from '../config/jwt.js';
 import STATUS from '../constants/httpStatus.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
@@ -20,7 +21,8 @@ const register = asyncHandler(async (req,res)=>{
     ,[rows.insertId]
   );
   const user = userRows[0];
-  return sendSuccess(res, "注册成功",{user, token:"temp-none"} );
+  const token = await generateToken(user);
+  return sendSuccess(res, "注册成功",{user, token} );
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -35,22 +37,12 @@ const login = asyncHandler(async (req, res) => {
     throw err;
   }
   const user = rows[0];
-  return sendSuccess(res, "登录成功", { user, token:"your-token" });
+  const token = await generateToken(user);
+  return sendSuccess(res, "登录成功", { user, token });
 });
 
 const getMe = (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      id: "user_123",
-      username: "刘小峰",
-      email: "xiaofengliu@smail.nju.edu.cn",
-      role: "student",
-      avatar: "/avatars/default.jpg",
-      createdAt: "2024-01-15T10:30:00Z",
-    },
-    code: 200,
-  });
+  return sendSuccess(res, "获取用户信息成功", { user: req.user });
 };
 
 export { register, login, getMe };

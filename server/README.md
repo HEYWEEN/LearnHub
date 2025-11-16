@@ -15,9 +15,11 @@ node src/index.js
 
 运行initDatabase.sql初始化数据库
 
-可以在test/testData.sql中导入测试数据
+可以在/test/testData.sql中导入测试数据
 
-在.env文件中修改mysql账号和密码：
+在/.env文件中修改mysql账号和密码
+
+可以参考.env.example
 ```
 DB_HOST=localhost
 DB_USER=admin_user
