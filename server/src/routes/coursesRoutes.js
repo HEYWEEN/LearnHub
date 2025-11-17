@@ -1,5 +1,5 @@
 import express from "express";
-import { addCourse, enrollCourse, getCourseById, getCourses,removeCourse } from "../controllers/courseController.js";
+import { addCourse, addLesson, enrollCourse, getCourseById, getCourses,modifyCourse,modifyLesson,removeCourse, removeLesson } from "../controllers/courseController.js";
 import verifyToken from "../middleware/authMiddleware.js";
 const router = express.Router();
 
@@ -29,17 +29,31 @@ router.post("/",verifyToken,addCourse);
 // Authorization: Bearer {token}
 router.delete("/:courseId",verifyToken,removeCourse);
 
-// 删除课时（teacher）
-// POST /courses/{courseId}/{lessonId}
+
+// 修改课程信息（teacher）
+// POST /courses/{courseId}
 // 请求头:
 // Authorization: Bearer {token}
-router.delete("/:courseId/:lessonId",verifyToken,removeCourse);
+router.post("/:courseId",verifyToken,modifyCourse);
+
+// 删除课时（teacher）
+// DELETE /courses/{courseId}/lesson/{lessonId}
+// 请求头:
+// Authorization: Bearer {token}
+router.delete("/:courseId/lesson/:lessonId",verifyToken,removeLesson);
 
 
 // 添加课时（teacher）
-// POST /courses/{courseId}/
+// POST /courses/{courseId}/lesson
 // 请求头:
 // Authorization: Bearer {token}
-router.delete("/:courseId",verifyToken,removeCourse);
+router.post("/:courseId/lesson",verifyToken,addLesson);
+
+
+// 修改课程信息（teacher）
+// POST /courses/{courseId}/lesson/{lessonId}
+// 请求头:
+// Authorization: Bearer {token}
+router.post("/:courseId/lesson/:lessonId",verifyToken,modifyLesson);
 
 export default router;

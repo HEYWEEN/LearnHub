@@ -20,9 +20,25 @@ const getProfile = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const { username = "", avatar = "", bio = "" } = req.body;
   const id = req.user.id;
+  let updtaeSql = "";
+  let updateParams = [];
+  if(username!==""){
+    updateSql += `username = ?,`;
+    updateParams.push(username);
+  }
+  if(avatar!==""){
+    updateSql += `avatar = ?,`;
+    updateParams.push(avatar);
+  }
+  if(bio!==""){
+    updateSql += `bio = ?,`;
+    updateParams.push(bio);
+  }
+  updtaeSql = updtaeSql.slice(0, -1);
+  updateParams.push(id);
   await pool.query(
-    "UPDATE users SET username = ?, avatar = ?, bio = ? WHERE id = ?",
-    [username, avatar, bio, id]
+    `UPDATE users SET ${updtaeSql} WHERE id = ?`,
+    updateParams
   );
   return sendSuccess(res, { message: "用户信息更新成功" ,user:{id,username,avatar,bio}});
 });

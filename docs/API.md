@@ -194,165 +194,229 @@ Authorization: Bearer {token}
 
 ## 课程模块
 
-### 获取课程列表
-**GET** `/courses`
+所有课程相关的接口均以以下路径开头：
 
-**查询参数:**
-- `page`: number, 页码, 默认1
-- `limit`: number, 每页数量, 默认12
-- `category`: string, 分类筛选
-- `search`: string, 搜索关键词
+/courses
 
-**成功响应:**
+### 目录
+
+获取课程列表 GET /courses
+
+获取课程详情 GET /courses/{courseId}
+
+报名课程 POST /courses/{courseId}/enroll
+
+添加课程 POST /courses
+
+删除课程 DELETE /courses/{courseId}
+
+修改课程信息 POST /courses/{courseId}
+
+添加课时 POST /courses/{courseId}/lesson
+
+删除课时 DELETE /courses/{courseId}/lesson/{lessonId}
+
+修改课时信息 POST /courses/{courseId}/lesson/{lessonId}
+
+### 获取课程列表 GET /courses
+请求参数（Query）
+|参数|	类型|	默认|	描述|
+|---|---|---|---|
+page	|number	|1|	页码
+limit	|number	|12|	每页数量
+category|	string|	空（可选）|	分类筛选
+search|	string|	空（可选）|	标题/描述 搜索
+响应示例
 ```json
 {
-  "success": true,
+  "message": "成功获取课程列表",
   "data": {
-    "courses": [
-      {
-        "id": "course_123",
-        "title": "React从入门到实战",
-        "description": "学习React核心概念和实战技巧",
-        "coverImage": "/covers/react-course.jpg",
-        "instructor": {
-          "id": "user_456",
-          "name": "王老师",
-          "avatar": "/avatars/instructor456.jpg"
-        },
-        "category": "前端开发",
-        "lessonCount": 24
-      }
-    ],
+    "courses": [...],
     "pagination": {
       "page": 1,
       "limit": 12,
-      "total": 156,
-      "pages": 13
+      "total": 128,
+      "pages": 11
     }
-  },
-  "code": 200
+  }
 }
 ```
+### 获取课程详情 
+GET /courses/{courseId}
 
-### 获取课程详情
-**GET** `/courses/{courseId}`
+响应数据
 
-**成功响应:**
+返回课程信息、课程章节、课程评论。
 ```json
 {
-  "success": true,
+  "message": "成功找到课程",
   "data": {
     "course": {
-      "id": "course_123",
-      "title": "React从入门到实战",
-      "description": "详细描述...",
-      "coverImage": "/covers/react-course.jpg",
-      "videoPreview": "/previews/react-preview.mp4",
-      "instructor": {
-        "id": "user_456",
-        "name": "王老师",
-        "avatar": "/avatars/instructor456.jpg",
-        "bio": "资深前端工程师，8年开发经验"
-      },
-      "category": "前端开发",
-      "lessons": [
-        {
-          "id": "lesson_1",
-          "title": "React基础概念",
-          "duration": 1800,
-          "videoUrl": "/videos/lesson1.mp4",
-          "isFree": true,
-          "description": "学习React核心概念"
-        }
-      ],
-      "reviews": [
-        {
-          "id": "review_1",
-          "user": {
-            "name": "学生A",
-            "avatar": "/avatars/student1.jpg"
-          },
-          "comment": "课程内容很棒！",
-          "createdAt": "2024-01-10T14:30:00Z"
-        }
-      ]
+      "id": 1,
+      "title": "...",
+      "description": "...",
+      "category": "...",
+      "lessons": [...],
+      "reviews": [...]
     }
-  },
-  "code": 200
+  }
 }
 ```
 
-### 报名课程（student）
-**POST** `/courses/{courseId}/enroll`
+若找不到课程：
 
-**请求头:**
-```
-Authorization: Bearer {token}
-```
+404 没有找到课程
 
-**成功响应:**
+### 报名课程 
+POST /courses/{courseId}/enroll
+
+需要登录（student）
+
+响应示例
 ```json
 {
-  "success": true,
   "message": "报名成功",
   "data": {
     "enrollment": {
-      "id": "enroll_123",
-      "userId": "user_123",
-      "courseId": "course_123"
+      "id": 12,
+      "user_id": 3,
+      "course_id": 1
     }
-  },
-  "code": 200
+  }
 }
 ```
 
-### 添加/删除课程（teacher）
+重复报名：
 
-**POST** `/courses/{courseId}/teacher`
+您已报名该课程
 
-**请求头:**
+### 添加课程 
+POST /courses
 
-```
-Authorization: Bearer {token}
-```
+需要角色：teacher / admin
 
-**成功响应:**
-
+Body 参数
+|字段|	类型	|必填|	描述|
+|---|---|---|---|
+title|	string	|是	|课程标题
+description	|string|	是|	课程描述
+category	|string|	是	|分类
+响应示例
 ```json
 {
-  "success": true,
-  "message": "添加成功",
+  "message": "课程添加成功",
   "data": {
-    "addition": {
-      "id": "addition_123",
-      "userId": "user_123",
-      "courseId": "course_123"
+    "course": {
+      "id": 18,
+      "title": "...",
+      "description": "...",
+      "category": "...",
+      "instructor_id": 2
     }
-  },
-  "code": 200
+  }
 }
 ```
+### 删除课程 
+DELETE /courses/{courseId}
 
-**
+需要角色：teacher / admin
+教师仅能删除自己创建的课程。
 
+响应示例
 ```json
 {
-  "success": true,
-  "message": "删除成功",
+  "message": "课程删除成功",
   "data": {
     "deletion": {
-      "id": "deletion_123",
-      "userId": "user_123",
-      "courseId": "course_123"
+      "courseId": "12",
+      "userId": 2
     }
-  },
-  "code": 200
+  }
+}
+```
+### 修改课程信息 
+POST /courses/{courseId}
+
+需要角色：teacher / admin
+
+Body（全可选）
+|字段	|类型	|描述|
+|---|---|---|
+title|	string|	新标题
+description	|string	|新描述
+category	|string|	新分类
+响应示例
+```json
+{
+  "message": "课程修改成功",
+  "data": { "course": {...} }
+}
+```
+### 添加课时 
+POST /courses/{courseId}/lesson
+
+需要角色：teacher / admin
+
+Body
+|字段|	类型|	必填	|描述|
+|---|---|---|---|
+title	|string	|是	|课时标题
+description|	string|	是|	课时内容
+isfree	|number|	否	|是否免费（0 或 1）
+响应示例
+```json
+{
+  "message": "章节添加成功",
+  "data": {
+    "lesson": {
+      "id": 99,
+      "course_id": 12,
+      "title": "...",
+      "description": "...",
+      "is_free": 0
+    }
+  }
+}
+```
+### 删除课时 
+DELETE /courses/{courseId}/lesson/{lessonId}
+
+需要角色：teacher / admin
+
+响应示例
+```json
+{
+  "message": "章节删除成功",
+  "data": {
+    "deletion": {
+      "lessonId": "18",
+      "userId": 2
+    }
+  }
 }
 ```
 
-### 
+### 修改课时信息 
+POST /courses/{courseId}/lesson/{lessonId}
 
+需要角色：teacher / admin
 
+**Body**（可选）
+
+|字段|类型|描述|
+|---|---|---|
+|title	|string	|新标题|
+|description	|string|	新描述|
+|isfree	|number|	是否免费（0 或 1）|
+响应示例
+```json
+{
+  "message": "章节修改成功",
+  "data": {
+    "lessons": [...]
+  }
+}
+```
 
 ## 学习模块
 

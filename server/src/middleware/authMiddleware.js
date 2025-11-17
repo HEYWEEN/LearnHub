@@ -8,6 +8,7 @@ function verifyToken(req, res, next) {
     if (!token) {
         return sendError(res, STATUS.FORBIDDEN, '需要身份验证的令牌');
     }
+    token  = token.split(' ')[1]; 
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
         req.user = decoded;
