@@ -1,9 +1,10 @@
-import pool from "../config/db.js";
+import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/response.js";
 
 const getCourses = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { page = 1, limit = 12, category = "", search = "" } = req.query;
   const offset = (page - 1) * limit;
   let where = [];
@@ -39,6 +40,7 @@ const getCourses = asyncHandler(async (req, res) => {
 });
 
 const getCourseById = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { courseId } = req.params;
   console.log(courseId);
   const [courseRow] = await pool.query("SELECT * FROM courses WHERE id=?", [
@@ -68,6 +70,7 @@ const getCourseById = asyncHandler(async (req, res) => {
 });
 
 const enrollCourse = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { courseId } = req.params;
   const userId = req.user.id;
   const [existCourse] = await pool.query("SELECT * FROM courses WHERE id=?", [
@@ -101,6 +104,7 @@ const enrollCourse = asyncHandler(async (req, res) => {
 });
 
 const removeCourse = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { courseId } = req.params;
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
@@ -135,6 +139,7 @@ const removeCourse = asyncHandler(async (req, res) => {
   });
 });
 const addCourse = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { title, description, category } = req.body;
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
@@ -159,8 +164,9 @@ const addCourse = asyncHandler(async (req, res) => {
 });
 
 const addLesson = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { courseId } = req.params;
-  const { title, description,isfree=0 } = req.body;//TODO:上传视频
+  const { title, description, isfree = 0 } = req.body; //TODO:上传视频
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
     const err = new Error("权限不足");
@@ -183,7 +189,7 @@ const addLesson = asyncHandler(async (req, res) => {
   }
   const [row] = await pool.query(
     "INSERT INTO lessons (course_id, title, description,is_free) VALUES (?, ?, ?, ?)",
-    [courseId, title, description,isfree]
+    [courseId, title, description, isfree]
   );
   const lessonId = row.insertId;
   return sendSuccess(res, "章节添加成功", {
@@ -192,12 +198,13 @@ const addLesson = asyncHandler(async (req, res) => {
       course_id: courseId,
       title,
       description,
-      is_free:isfree
+      is_free: isfree,
     },
   });
 });
 
 const removeLesson = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { lessonId } = req.params;
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
@@ -233,7 +240,8 @@ const removeLesson = asyncHandler(async (req, res) => {
 });
 
 const modifyCourse = asyncHandler(async (req, res) => {
-  const { title="", description="", category="" } = req.body;
+  const pool = getPool();
+  const { title = "", description = "", category = "" } = req.body;
   const { courseId } = req.params;
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
@@ -243,15 +251,15 @@ const modifyCourse = asyncHandler(async (req, res) => {
   }
   let updateSql = "";
   let updateParams = [];
-  if(title!==""){
+  if (title !== "") {
     updateSql += `title=?,`;
     updateParams.push(title);
   }
-  if(description!==""){
+  if (description !== "") {
     updateSql += `description=?,`;
     updateParams.push(description);
   }
-  if(category!==""){
+  if (category !== "") {
     updateSql += `category=?,`;
     updateParams.push(category);
   }
@@ -268,8 +276,9 @@ const modifyCourse = asyncHandler(async (req, res) => {
 });
 
 const modifyLesson = asyncHandler(async (req, res) => {
+  const pool = getPool();
   const { courseId } = req.params;
-  const { title="", description="",isfree=-1 } = req.body;//TODO:上传视频
+  const { title = "", description = "", isfree = -1 } = req.body; //TODO:上传视频
   const role = req.user.role;
   if (role !== "teacher" && role !== "admin") {
     const err = new Error("权限不足");
@@ -292,21 +301,24 @@ const modifyLesson = asyncHandler(async (req, res) => {
   }
   let updateSql = "";
   let updateParams = [];
-  if(title!==""){
+  if (title !== "") {
     updateSql += `title=?,`;
     updateParams.push(title);
   }
-  if(description!==""){
+  if (description !== "") {
     updateSql += `description=?,`;
     updateParams.push(description);
   }
-  if(isfree!==-1){
+  if (isfree !== -1) {
     updateSql += `is_free=?,`;
     updateParams.push(isfree);
   }
   updateSql = updateSql.slice(0, -1);
   updateParams.push(courseId);
-  await pool.query(`UPDATE lessons SET ${updateSql} WHERE course_id=?`, updateParams);
+  await pool.query(
+    `UPDATE lessons SET ${updateSql} WHERE course_id=?`,
+    updateParams
+  );
   const [updatedLessonRow] = await pool.query(
     "SELECT * FROM lessons WHERE course_id=?",
     [courseId]

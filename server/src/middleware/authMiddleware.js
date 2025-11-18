@@ -1,12 +1,13 @@
 import STATUS from "../constants/httpStatus.js";
 import { sendError } from "../utils/response.js";
 import jwt from 'jsonwebtoken';
-import { SECRET_KEY } from "../config/jwt.js";
+import { getSecretKey } from "../config/jwt.js";
 
 function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
+    const SECRET_KEY = getSecretKey();
+    let token = req.headers['authorization'];
     if (!token) {
-        return sendError(res, STATUS.FORBIDDEN, '需要身份验证的令牌');
+        return sendError(res,'需要身份验证的令牌',STATUS.FORBIDDEN );
     }
     token  = token.split(' ')[1]; 
     try {
@@ -14,7 +15,7 @@ function verifyToken(req, res, next) {
         req.user = decoded;
         next();
     } catch (err) {
-        return sendError(res, STATUS.UNAUTHORIZED, '无效的令牌');
+        return sendError(res,'无效的令牌',STATUS.UNAUTHORIZED);
     }
 }
 
