@@ -1,4 +1,6 @@
 import express from 'express';
+import { askAI } from '../controllers/aiController.js';
+import verifyToken from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 /* 智能问答
@@ -24,19 +26,7 @@ const router = express.Router();
 *   "code": 200
 * }
 */
-router.post("/ask", (req, res) => {
-  const { question, context } = req.body;
-  // 在这里添加智能问答处理逻辑
-  res.json({
-    success: true,
-    data: {
-      answer: "React是一个用于构建用户界面的JavaScript库...",
-      sources: ["React官方文档", "课程第三章"],
-      timestamp: "2024-01-15T11:35:00Z",
-    },
-    code: 200,
-  });
-});
+router.post("/ask", verifyToken,askAI);
 
 // 获取学习推荐
 // GET /ai/recommendations
