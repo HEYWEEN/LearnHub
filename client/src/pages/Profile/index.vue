@@ -7,7 +7,8 @@
           <h2>个人资料</h2>
         </div>
         
-        <div class="user-info-content">
+        <transition name="expand" mode="out-in">
+          <div class="user-info-content" :key="isEditing ? 'editing' : 'viewing'">
           <!-- 头像区域 -->
           <div class="avatar-section">
             <div class="avatar-wrapper">
@@ -23,9 +24,9 @@
             <!-- 用户名 -->
             <div class="info-item">
               <label class="info-label">用户名</label>
-              <div class="info-value" v-if="!isEditing">{{ userInfo.username }}</div>
+              <div class="info-value" v-show="!isEditing">{{ userInfo.username }}</div>
               <input
-                v-else
+                v-show="isEditing"
                 v-model="editForm.username"
                 type="text"
                 class="info-input"
@@ -53,11 +54,11 @@
             <!-- 个人简介 -->
             <div class="info-item bio-item">
               <label class="info-label">个人简介</label>
-              <div class="info-value bio-value" v-if="!isEditing">
+              <div class="info-value bio-value" v-show="!isEditing">
                 {{ userInfo.bio || '这个人很懒，什么都没写...' }}
               </div>
               <textarea
-                v-else
+                v-show="isEditing"
                 v-model="editForm.bio"
                 class="info-textarea"
                 placeholder="介绍一下你自己吧..."
@@ -71,7 +72,8 @@
               <div class="info-value">{{ formatDate(userInfo.createdAt) }}</div>
             </div>
           </div>
-        </div>
+          </div>
+        </transition>
 
         <!-- 操作按钮 -->
         <div class="card-actions">
@@ -88,7 +90,11 @@
               取消
             </button>
             <button @click="saveUserInfo" class="btn btn-primary" :disabled="saving">
-              {{ saving ? '保存中...' : '保存' }}
+              <span v-if="!saving">保存</span>
+              <span v-else class="btn-content">
+                <span class="loading-spinner"></span>
+                <span>保存中...</span>
+              </span>
             </button>
           </template>
         </div>
@@ -104,56 +110,63 @@
         <div class="settings-section">
           <h3 class="section-title">修改密码</h3>
           
-          <div class="password-form" v-if="showPasswordForm">
-            <div class="form-item">
-              <label>当前密码</label>
-              <input
-                v-model="passwordForm.currentPassword"
-                type="password"
-                class="form-input"
-                placeholder="请输入当前密码"
-              />
-            </div>
-            <div class="form-item">
-              <label>新密码</label>
-              <input
-                v-model="passwordForm.newPassword"
-                type="password"
-                class="form-input"
-                placeholder="请输入新密码（至少6位）"
-              />
-            </div>
-            <div class="form-item">
-              <label>确认新密码</label>
-              <input
-                v-model="passwordForm.confirmPassword"
-                type="password"
-                class="form-input"
-                placeholder="请再次输入新密码"
-              />
+          <transition name="expand" mode="out-in">
+            <div class="password-form" v-if="showPasswordForm" key="form">
+              <div class="form-item">
+                <label>当前密码</label>
+                <input
+                  v-model="passwordForm.currentPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请输入当前密码"
+                />
+              </div>
+              <div class="form-item">
+                <label>新密码</label>
+                <input
+                  v-model="passwordForm.newPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请输入新密码（至少6位）"
+                />
+              </div>
+              <div class="form-item">
+                <label>确认新密码</label>
+                <input
+                  v-model="passwordForm.confirmPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请再次输入新密码"
+                />
+              </div>
+
+              <div class="form-actions">
+                <button @click="cancelPasswordChange" class="btn btn-secondary">
+                  取消
+                </button>
+                <button
+                  @click="changePassword"
+                  class="btn btn-primary"
+                  :disabled="changingPassword"
+                >
+                  <span v-if="!changingPassword">确认修改</span>
+                  <span v-else class="btn-content">
+                    <span class="loading-spinner"></span>
+                    <span>修改中...</span>
+                  </span>
+                </button>
+              </div>
             </div>
 
-            <div class="form-actions">
-              <button @click="cancelPasswordChange" class="btn btn-secondary">
-                取消
-              </button>
-              <button
-                @click="changePassword"
-                class="btn btn-primary"
-                :disabled="changingPassword"
-              >
-                {{ changingPassword ? '修改中...' : '确认修改' }}
-              </button>
-            </div>
-          </div>
-
-          <button
-            v-else
-            @click="showPasswordForm = true"
-            class="btn btn-outline"
-          >
-            修改密码
-          </button>
+            <button
+              v-else
+              key="button"
+              @click="showPasswordForm = true"
+              class="btn btn-outline"
+            >
+              修改密码
+            </button>
+          </transition>
         </div>
 
         <!-- 退出登录 -->
@@ -667,6 +680,63 @@ onMounted(() => {
   background-color: #fef5f5;
 }
 
+
+
+/* 展开动画 - 用于整个内容区域 */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  transform: translateY(-15px);
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Loading Spinner 动画 */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 输入框切换时的平滑过渡 */
+.info-input,
+.info-textarea,
+.info-value {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.info-input[style*="display: none"],
+.info-textarea[style*="display: none"],
+.info-value[style*="display: none"] {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .profile-page {
@@ -724,4 +794,5 @@ onMounted(() => {
   }
 }
 </style>
+
 
