@@ -1,8 +1,39 @@
+# 依赖安装
+```
+npm install
+```
 
-# 安装依赖
+# 运行前配置
+
+**运行刚需mysql，并请准备好账号和密码**
+
+1. 初始化数据库
+
+运行initDatabase.sql
+
+2. 导入测试数据(可选)
+运行/test/testData.sql
+
+3. 配置config
+
+    在/.env文件中修改：
+
+- mysql账号和密码
+
+- 如果要开启/api/ai下的所有功能需要准备一个api密钥
+
+- 为了安全性考虑，建议给SECERT_KEY设置一个较复杂的字符串
+
+    可以参考.env.example
 ```
-npm install dotenv express mysql2
+DB_HOST=localhost
+DB_USER=admin_user
+DB_PASS=123456
+DB_NAME=learnhub
+SECRET_KEY=your_key
+DEEPSEEK_API_KEY=your_api
 ```
+
 # 运行
 ```
 npm start
@@ -11,47 +42,3 @@ npm start
 ```
 node src/index.js
 ```
-# 数据库配置
-
-运行initDatabase.sql初始化数据库
-
-可以在/test/testData.sql中导入测试数据
-
-在/.env文件中修改mysql账号和密码
-
-可以参考.env.example
-```
-DB_HOST=localhost
-DB_USER=admin_user
-DB_PASS=123456
-DB_NAME=learnhub
-```
-
-# 函数
-
-| 模块                    | 文件                      | 主要函数                                   | 功能描述           |
-| --------------------- | ----------------------- | -------------------------------------- | -------------- |
-| **入口层**               | `src/index.js`          | `app.listen()`                         | 启动服务器，初始化数据库连接 |
-| **配置层**               | `src/config/db.js`      | `sequelize.authenticate()`             | 测试数据库连接        |
-|                       |                         | `sequelize.sync()`                     | 同步模型至数据库       |
-| **模型层（Models）**       | 每个模型文件（如 `User.js`）     | 无函数（定义表结构）                             | 定义表字段、类型、约束、关联 |
-| **控制器层（Controllers）** | `authController.js`     | `register()`                           | 用户注册           |
-|                       |                         | `login()`                              | 用户登录并返回 JWT    |
-|                       |                         | `getMe()`                              | 获取当前登录用户信息     |
-|                       | `userController.js`     | `getProfile()`                         | 获取用户资料         |
-|                       |                         | `updateProfile()`                      | 更新用户资料         |
-|                       | `courseController.js`   | `getCourses()`                         | 获取课程列表         |
-|                       |                         | `getCourseById()`                      | 获取课程详情         |
-|                       |                         | `enrollCourse()`                       | 学生报名课程         |
-|                       |                         | `addOrRemoveCourse()`                  | 教师添加/删除课程      |
-|                       | `learningController.js` | `getProgress()`                        | 获取学习进度         |
-|                       |                         | `updateProgress()`                     | 更新学习进度         |
-|                       | `aiController.js`       | `askAI()`                              | 提问AI助手         |
-|                       |                         | `getRecommendations()`                 | 获取学习推荐         |
-| **中间件层（Middlewares）** | `authMiddleware.js`     | `verifyToken()`                        | 验证JWT有效性       |
-|                       | `errorHandler.js`       | `errorHandler()`                       | 捕获并格式化错误响应     |
-| **工具层（Utils）**        | `response.js`           | `success()` / `error()`                | 统一响应结构         |
-|                       | `password.js`           | `hashPassword()` / `comparePassword()` | 密码加密与验证        |
-|                       | `logger.js`             | `logRequest()`                         | 控制台请求日志输出      |
-| **服务层（Services）**     | `aiService.js`          | `generateAnswer()`                     | 调用AI模型生成回答     |
-|                       |                         | `generateRecommendations()`            | 智能推荐课程         |
