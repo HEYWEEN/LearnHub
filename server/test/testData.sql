@@ -94,15 +94,3 @@ VALUES
     '内容挺实用，不过希望多一些案例。', 4);
 
 
--- ======================================
--- AI Logs（可选）
--- ======================================
-
-INSERT INTO ai_logs (id, user_id, question, answer, course_id, lesson_id)
-VALUES
-(UUID(),
-    (SELECT id FROM users WHERE username='bob'),
-    'JS 的 let 和 var 有什么区别？',
-    'let 具有块级作用域，var 则是函数作用域。',
-    (SELECT id FROM courses WHERE title='JavaScript 基础课程'),
-    (SELECT id FROM lessons WHERE title='变量与数据类型'));

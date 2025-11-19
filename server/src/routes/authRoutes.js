@@ -2,10 +2,11 @@ import express from "express";
 const router = express.Router();
 
 import { getMe, login, register } from "../controllers/authController.js";
+import verifyToken from "../middleware/authMiddleware.js";
 
 //req 
 //请求头 Authorization: Bearer {token}
-router.get("/me", getMe);
+router.get("/me",verifyToken, getMe);
 
 //req 
 //请求参数:

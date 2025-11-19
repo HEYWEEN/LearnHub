@@ -1,4 +1,6 @@
-export function sendSuccess(res, message, data = null, code = 200) {
+import STATUS from "../constants/httpStatus.js";
+
+export function sendSuccess(res, message, data = null, code = STATUS.OK) {
   return res.status(code).json({
     success: true,
     message,
@@ -7,7 +9,7 @@ export function sendSuccess(res, message, data = null, code = 200) {
   });
 }
 
-export function sendError(res, message, code = 500) {
+export function sendError(res, message, code = STATUS.INTERNAL_SERVER_ERROR) {
   return res.status(code).json({
     success: false,
     message,

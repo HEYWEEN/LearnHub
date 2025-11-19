@@ -80,12 +80,11 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- AI记录表
-CREATE TABLE ai_logs (
+-- AI会话记录表
+CREATE TABLE ai_conversation (
     id VARCHAR(36) PRIMARY KEY,
+    title TEXT NOT NULL,
     user_id VARCHAR(36),
-    question TEXT NOT NULL,
-    answer TEXT,
     course_id VARCHAR(36),
     lesson_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -93,3 +92,12 @@ CREATE TABLE ai_logs (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL
 );
+
+CREATE TABLE ai_messages(
+    id VARCHAR(36) PRIMARY KEY,
+    conversation_id VARCHAR(36),
+    sender ENUM('user','assistant') NOT NULL,
+    context TEXT NOT NULL,
+    send_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(conversation_id) REFERENCES ai_conversation(id) ON DELETE CASCADE
+)

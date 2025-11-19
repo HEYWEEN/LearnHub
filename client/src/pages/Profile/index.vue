@@ -2,16 +2,20 @@
   <div class="profile-page">
     <div class="profile-container">
       <!-- 用户信息区 -->
-      <section class="user-info-card" :class="{ 'editing': isEditing }">
+      <section class="user-info-card">
         <div class="card-header">
           <h2>个人资料</h2>
         </div>
         
-        <div class="user-info-content">
+        <transition name="expand" mode="out-in">
+          <div class="user-info-content" :key="isEditing ? 'editing' : 'viewing'">
           <!-- 头像区域 -->
           <div class="avatar-section">
             <div class="avatar-wrapper">
               <img :src="userAvatar" alt="用户头像" class="user-avatar" />
+              <div v-if="isEditing" class="avatar-overlay">
+                <span class="change-avatar-text">更换头像</span>
+              </div>
             </div>
           </div>
 
@@ -20,12 +24,13 @@
             <!-- 用户名 -->
             <div class="info-item">
               <label class="info-label">用户名</label>
-              <div class="info-value" v-if="!isEditing">{{ userInfo.username }}</div>
-              <el-input
-                v-else
+              <div class="info-value" v-show="!isEditing">{{ userInfo.username }}</div>
+              <input
+                v-show="isEditing"
                 v-model="editForm.username"
+                type="text"
+                class="info-input"
                 placeholder="请输入用户名"
-                clearable
               />
             </div>
 
@@ -40,27 +45,25 @@
             <div class="info-item">
               <label class="info-label">身份</label>
               <div class="info-value">
-                <el-tag :type="userInfo.role === 'student' ? 'primary' : 'success'" effect="plain">
+                <span class="role-badge" :class="`role-${userInfo.role}`">
                   {{ roleText }}
-                </el-tag>
+                </span>
               </div>
             </div>
 
             <!-- 个人简介 -->
             <div class="info-item bio-item">
               <label class="info-label">个人简介</label>
-              <div class="info-value bio-value" v-if="!isEditing">
+              <div class="info-value bio-value" v-show="!isEditing">
                 {{ userInfo.bio || '这个人很懒，什么都没写...' }}
               </div>
-              <el-input
-                v-else
+              <textarea
+                v-show="isEditing"
                 v-model="editForm.bio"
-                type="textarea"
+                class="info-textarea"
                 placeholder="介绍一下你自己吧..."
-                :rows="4"
-                maxlength="200"
-                show-word-limit
-              />
+                rows="4"
+              ></textarea>
             </div>
 
             <!-- 注册时间 -->
@@ -69,24 +72,32 @@
               <div class="info-value">{{ formatDate(userInfo.createdAt) }}</div>
             </div>
           </div>
-        </div>
-
-        <!-- 操作按钮 -->
-        <transition name="slide-down" mode="out-in">
-          <div class="card-actions" :key="isEditing ? 'editing' : 'viewing'">
-            <template v-if="!isEditing">
-              <el-button type="primary" @click="startEdit" :icon="Edit">
-                编辑信息
-              </el-button>
-            </template>
-            <template v-else>
-              <el-button @click="cancelEdit">取消</el-button>
-              <el-button type="primary" @click="saveUserInfo" :loading="saving">
-                保存
-              </el-button>
-            </template>
           </div>
         </transition>
+
+        <!-- 操作按钮 -->
+        <div class="card-actions">
+          <button
+            v-if="!isEditing"
+            @click="startEdit"
+            class="btn btn-primary"
+          >
+            <span class="btn-icon">✏️</span>
+            编辑信息
+          </button>
+          <template v-else>
+            <button @click="cancelEdit" class="btn btn-secondary">
+              取消
+            </button>
+            <button @click="saveUserInfo" class="btn btn-primary" :disabled="saving">
+              <span v-if="!saving">保存</span>
+              <span v-else class="btn-content">
+                <span class="loading-spinner"></span>
+                <span>保存中...</span>
+              </span>
+            </button>
+          </template>
+        </div>
       </section>
 
       <!-- 账号设置区 -->
@@ -99,112 +110,73 @@
         <div class="settings-section">
           <h3 class="section-title">修改密码</h3>
           
-          <!-- 密码修改表单 -->
-          <transition name="slide-fade">
-            <div class="password-form" v-if="showPasswordForm">
-              <el-form :model="passwordForm" ref="passwordFormRef" label-width="100px">
-                <el-form-item label="当前密码" required>
-                  <el-input
-                    v-model="passwordForm.currentPassword"
-                    type="password"
-                    placeholder="请输入当前密码"
-                    show-password
-                    clearable
-                  />
-                </el-form-item>
-                
-                <el-form-item label="新密码" required>
-                  <el-input
-                    v-model="passwordForm.newPassword"
-                    type="password"
-                    placeholder="至少6位，需包含大小写字母和数字"
-                    show-password
-                    clearable
-                    @input="validatePasswordStrength"
-                  />
-                  <!-- 密码强度实时反馈 -->
-                  <div class="password-strength" v-if="passwordForm.newPassword">
-                    <div class="strength-bar">
-                      <div 
-                        class="strength-fill" 
-                        :class="passwordStrength.level"
-                        :style="{ width: passwordStrength.percentage + '%' }"
-                      ></div>
-                    </div>
-                    <div class="strength-tips">
-                      <el-icon v-if="passwordValidation.hasLower" color="#67c23a"><SuccessFilled /></el-icon>
-                      <el-icon v-else color="#909399"><CircleClose /></el-icon>
-                      <span :class="{ valid: passwordValidation.hasLower }">小写字母</span>
-                      
-                      <el-icon v-if="passwordValidation.hasUpper" color="#67c23a"><SuccessFilled /></el-icon>
-                      <el-icon v-else color="#909399"><CircleClose /></el-icon>
-                      <span :class="{ valid: passwordValidation.hasUpper }">大写字母</span>
-                      
-                      <el-icon v-if="passwordValidation.hasNumber" color="#67c23a"><SuccessFilled /></el-icon>
-                      <el-icon v-else color="#909399"><CircleClose /></el-icon>
-                      <span :class="{ valid: passwordValidation.hasNumber }">数字</span>
-                      
-                      <el-icon v-if="passwordValidation.hasLength" color="#67c23a"><SuccessFilled /></el-icon>
-                      <el-icon v-else color="#909399"><CircleClose /></el-icon>
-                      <span :class="{ valid: passwordValidation.hasLength }">至少6位</span>
-                    </div>
-                  </div>
-                </el-form-item>
-                
-                <el-form-item label="确认新密码" required>
-                  <el-input
-                    v-model="passwordForm.confirmPassword"
-                    type="password"
-                    placeholder="请再次输入新密码"
-                    show-password
-                    clearable
-                  />
-                  <!-- 密码匹配提示 -->
-                  <div 
-                    class="password-match-tip" 
-                    v-if="passwordForm.confirmPassword"
-                  >
-                    <el-icon v-if="passwordsMatch" color="#67c23a"><SuccessFilled /></el-icon>
-                    <el-icon v-else color="#f56c6c"><CircleClose /></el-icon>
-                    <span :class="{ valid: passwordsMatch, invalid: !passwordsMatch }">
-                      {{ passwordsMatch ? '密码一致' : '密码不一致' }}
-                    </span>
-                  </div>
-                </el-form-item>
+          <transition name="expand" mode="out-in">
+            <div class="password-form" v-if="showPasswordForm" key="form">
+              <div class="form-item">
+                <label>当前密码</label>
+                <input
+                  v-model="passwordForm.currentPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请输入当前密码"
+                />
+              </div>
+              <div class="form-item">
+                <label>新密码</label>
+                <input
+                  v-model="passwordForm.newPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请输入新密码（至少6位）"
+                />
+              </div>
+              <div class="form-item">
+                <label>确认新密码</label>
+                <input
+                  v-model="passwordForm.confirmPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="请再次输入新密码"
+                />
+              </div>
 
-                <el-form-item>
-                  <el-button @click="cancelPasswordChange">取消</el-button>
-                  <el-button 
-                    type="primary" 
-                    @click="changePassword" 
-                    :loading="changingPassword"
-                    :disabled="!isPasswordFormValid"
-                  >
-                    确认修改
-                  </el-button>
-                </el-form-item>
-              </el-form>
+              <div class="form-actions">
+                <button @click="cancelPasswordChange" class="btn btn-secondary">
+                  取消
+                </button>
+                <button
+                  @click="changePassword"
+                  class="btn btn-primary"
+                  :disabled="changingPassword"
+                >
+                  <span v-if="!changingPassword">确认修改</span>
+                  <span v-else class="btn-content">
+                    <span class="loading-spinner"></span>
+                    <span>修改中...</span>
+                  </span>
+                </button>
+              </div>
             </div>
-          </transition>
 
-          <el-button
-            v-if="!showPasswordForm"
-            type="primary"
-            plain
-            @click="showPasswordForm = true"
-            :icon="Lock"
-          >
-            修改密码
-          </el-button>
+            <button
+              v-else
+              key="button"
+              @click="showPasswordForm = true"
+              class="btn btn-outline"
+            >
+              修改密码
+            </button>
+          </transition>
         </div>
 
         <!-- 退出登录 -->
         <div class="settings-section logout-section">
           <h3 class="section-title">退出登录</h3>
           <p class="section-description">退出登录后，您将需要重新登录才能访问</p>
-          <el-button type="danger" @click="handleLogout" :icon="SwitchButton">
+          <button @click="handleLogout" class="btn btn-danger">
+            <span class="btn-icon">🚪</span>
             退出登录
-          </el-button>
+          </button>
         </div>
       </section>
     </div>
@@ -215,8 +187,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../store/slices/user'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Edit, Lock, SwitchButton, SuccessFilled, CircleClose } from '@element-plus/icons-vue'
 import defaultAvatar from '../../assets/images/default-avatar.png'
 import * as authService from '../../services/authService'
 
@@ -228,7 +198,6 @@ const isEditing = ref(false)
 const saving = ref(false)
 const showPasswordForm = ref(false)
 const changingPassword = ref(false)
-const passwordFormRef = ref(null)
 
 // 用户信息
 const userInfo = ref({
@@ -253,14 +222,6 @@ const passwordForm = ref({
   confirmPassword: ''
 })
 
-// 密码验证状态
-const passwordValidation = ref({
-  hasLower: false,
-  hasUpper: false,
-  hasNumber: false,
-  hasLength: false
-})
-
 // 计算属性
 const userAvatar = computed(() => {
   return userInfo.value.avatar || defaultAvatar
@@ -269,51 +230,6 @@ const userAvatar = computed(() => {
 const roleText = computed(() => {
   return userInfo.value.role === 'student' ? '学生' : '教师'
 })
-
-// 密码强度计算
-const passwordStrength = computed(() => {
-  const password = passwordForm.value.newPassword
-  if (!password) return { level: 'weak', percentage: 0 }
-  
-  let strength = 0
-  if (passwordValidation.value.hasLower) strength += 25
-  if (passwordValidation.value.hasUpper) strength += 25
-  if (passwordValidation.value.hasNumber) strength += 25
-  if (passwordValidation.value.hasLength) strength += 25
-  
-  if (strength <= 25) return { level: 'weak', percentage: strength }
-  if (strength <= 50) return { level: 'medium', percentage: strength }
-  if (strength <= 75) return { level: 'good', percentage: strength }
-  return { level: 'strong', percentage: strength }
-})
-
-// 密码匹配检查
-const passwordsMatch = computed(() => {
-  return passwordForm.value.newPassword === passwordForm.value.confirmPassword
-})
-
-// 密码表单是否有效
-const isPasswordFormValid = computed(() => {
-  return passwordForm.value.currentPassword &&
-         passwordForm.value.newPassword &&
-         passwordForm.value.confirmPassword &&
-         passwordValidation.value.hasLower &&
-         passwordValidation.value.hasUpper &&
-         passwordValidation.value.hasNumber &&
-         passwordValidation.value.hasLength &&
-         passwordsMatch.value
-})
-
-// 实时验证密码强度
-const validatePasswordStrength = () => {
-  const password = passwordForm.value.newPassword
-  passwordValidation.value = {
-    hasLower: /[a-z]/.test(password),
-    hasUpper: /[A-Z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasLength: password.length >= 6
-  }
-}
 
 // 格式化日期
 const formatDate = (dateString) => {
@@ -333,9 +249,12 @@ const loadUserInfo = async () => {
     if (userStore.user) {
       userInfo.value = { ...userStore.user }
     }
+    
+    // 可选：从后端获取最新的用户信息
+    // const data = await authService.getUserProfile()
+    // userInfo.value = data.user
   } catch (error) {
     console.error('加载用户信息失败:', error)
-    ElMessage.error('加载用户信息失败')
   }
 }
 
@@ -360,7 +279,7 @@ const cancelEdit = () => {
 // 保存用户信息
 const saveUserInfo = async () => {
   if (!editForm.value.username.trim()) {
-    ElMessage.warning('用户名不能为空')
+    alert('用户名不能为空')
     return
   }
 
@@ -376,17 +295,16 @@ const saveUserInfo = async () => {
     userInfo.value.username = editForm.value.username
     userInfo.value.bio = editForm.value.bio
 
-    // 更新 store 中的用户信息（store 内部会处理 localStorage）
-    await userStore.updateProfile({
-      username: editForm.value.username,
-      bio: editForm.value.bio
-    })
+    // 更新 store 中的用户信息
+    userStore.user.username = editForm.value.username
+    userStore.user.bio = editForm.value.bio
+    localStorage.setItem('user', JSON.stringify(userStore.user))
 
-    ElMessage.success('保存成功！')
+    alert('保存成功！')
     isEditing.value = false
   } catch (error) {
     const errorMessage = error.response?.data?.message || '保存失败，请稍后再试'
-    ElMessage.error(errorMessage)
+    alert(errorMessage)
   } finally {
     saving.value = false
   }
@@ -396,15 +314,19 @@ const saveUserInfo = async () => {
 const changePassword = async () => {
   // 验证表单
   if (!passwordForm.value.currentPassword) {
-    ElMessage.warning('请输入当前密码')
+    alert('请输入当前密码')
     return
   }
   if (!passwordForm.value.newPassword) {
-    ElMessage.warning('请输入新密码')
+    alert('请输入新密码')
     return
   }
-  if (!isPasswordFormValid.value) {
-    ElMessage.warning('请确保密码符合要求且两次输入一致')
+  if (passwordForm.value.newPassword.length < 6) {
+    alert('新密码至少需要6位')
+    return
+  }
+  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    alert('两次输入的新密码不一致')
     return
   }
 
@@ -416,11 +338,11 @@ const changePassword = async () => {
       newPassword: passwordForm.value.newPassword
     })
 
-    ElMessage.success('密码修改成功！')
+    alert('密码修改成功！')
     cancelPasswordChange()
   } catch (error) {
     const errorMessage = error.response?.data?.message || '密码修改失败，请检查当前密码是否正确'
-    ElMessage.error(errorMessage)
+    alert(errorMessage)
   } finally {
     changingPassword.value = false
   }
@@ -434,42 +356,21 @@ const cancelPasswordChange = () => {
     newPassword: '',
     confirmPassword: ''
   }
-  passwordValidation.value = {
-    hasLower: false,
-    hasUpper: false,
-    hasNumber: false,
-    hasLength: false
-  }
 }
 
 // 退出登录
 const handleLogout = async () => {
-  try {
-    await ElMessageBox.confirm(
-      '确定要退出登录吗？',
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-    
-    await userStore.logoutUser()
-    ElMessage.success('已退出登录')
-    router.push('/login')
-  } catch (error) {
-    // 用户取消操作
-    if (error !== 'cancel') {
-      console.error('退出登录失败:', error)
-    }
+  if (!confirm('确定要退出登录吗？')) {
+    return
   }
+
+  await userStore.logoutUser()
+  router.push('/login')
 }
 
 // 组件挂载时加载用户信息
 onMounted(() => {
   if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录')
     router.push('/login')
     return
   }
@@ -499,13 +400,6 @@ onMounted(() => {
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-/* 编辑状态高亮 */
-.user-info-card.editing {
-  box-shadow: 0 4px 30px rgba(102, 126, 234, 0.3);
-  border: 2px solid #667eea;
 }
 
 .card-header {
@@ -546,6 +440,32 @@ onMounted(() => {
   border: 4px solid #f0f0f0;
 }
 
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.change-avatar-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* 信息区域 */
 .info-section {
   flex: 1;
@@ -577,10 +497,49 @@ onMounted(() => {
   margin-top: 4px;
 }
 
+.info-input,
+.info-textarea {
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.info-input:focus,
+.info-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.info-textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
 .bio-value {
   color: #666;
   font-style: italic;
   line-height: 1.6;
+}
+
+/* 角色徽章 */
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.role-badge.role-student {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.role-badge.role-teacher {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
 }
 
 /* 卡片操作按钮 */
@@ -590,6 +549,68 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn-outline {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-outline:hover {
+  background: #667eea;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+}
+
+.btn-icon {
+  font-size: 18px;
 }
 
 /* 账号设置卡片 */
@@ -617,83 +638,41 @@ onMounted(() => {
 
 /* 密码表单 */
 .password-form {
-  margin-top: 20px;
-  max-width: 500px;
-}
-
-/* 密码强度指示器 */
-.password-strength {
-  margin-top: 8px;
-}
-
-.strength-bar {
-  height: 4px;
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.strength-fill {
-  height: 100%;
-  transition: all 0.3s ease;
-  border-radius: 2px;
-}
-
-.strength-fill.weak {
-  background-color: #f56c6c;
-}
-
-.strength-fill.medium {
-  background-color: #e6a23c;
-}
-
-.strength-fill.good {
-  background-color: #409eff;
-}
-
-.strength-fill.strong {
-  background-color: #67c23a;
-}
-
-.strength-tips {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  flex-wrap: wrap;
-  font-size: 13px;
-  color: #909399;
 }
 
-.strength-tips span {
+.form-item label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-actions {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.3s ease;
-}
-
-.strength-tips span.valid {
-  color: #67c23a;
-  font-weight: 500;
-}
-
-/* 密码匹配提示 */
-.password-match-tip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 12px;
   margin-top: 8px;
-  font-size: 13px;
-}
-
-.password-match-tip span.valid {
-  color: #67c23a;
-  font-weight: 500;
-}
-
-.password-match-tip span.invalid {
-  color: #f56c6c;
-  font-weight: 500;
 }
 
 /* 退出登录区域 */
@@ -701,39 +680,61 @@ onMounted(() => {
   background-color: #fef5f5;
 }
 
-/* 密码表单淡入动画 */
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+
+
+/* 展开动画 - 用于整个内容区域 */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
 }
 
-.slide-fade-leave-active {
-  transition: all 0.3s ease-in;
-}
-
-.slide-fade-enter-from {
-  transform: translateY(-20px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateY(-20px);
-  opacity: 0;
-}
-
-/* 按钮区域下拉动画 */
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.4s ease;
-}
-
-.slide-down-enter-from {
+.expand-enter-from,
+.expand-leave-to {
   opacity: 0;
   transform: translateY(-15px);
 }
 
-.slide-down-leave-to {
+.expand-enter-to,
+.expand-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Loading Spinner 动画 */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 输入框切换时的平滑过渡 */
+.info-input,
+.info-textarea,
+.info-value {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.info-input[style*="display: none"],
+.info-textarea[style*="display: none"],
+.info-value[style*="display: none"] {
   opacity: 0;
-  transform: translateY(-15px);
+  transform: translateY(-5px);
 }
 
 /* 响应式设计 */
@@ -770,6 +771,11 @@ onMounted(() => {
     flex-direction: column;
   }
 
+  .card-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .settings-section {
     padding: 24px 20px;
   }
@@ -777,18 +783,16 @@ onMounted(() => {
   .password-form {
     max-width: 100%;
   }
-}
 
-/* Element Plus 自定义样式 */
-:deep(.el-input__wrapper) {
-  border-radius: 8px;
-}
+  .form-actions {
+    flex-direction: column;
+  }
 
-:deep(.el-textarea__inner) {
-  border-radius: 8px;
-}
-
-:deep(.el-button) {
-  border-radius: 8px;
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
+
+
