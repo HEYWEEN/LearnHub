@@ -290,6 +290,31 @@ POST /courses/{courseId}/enroll
 
 您已报名该课程
 
+### 取消报名课程 
+
+POST /courses/{courseId}/cancel
+
+需要登录（student）
+
+响应示例
+
+```json
+{
+  "message": "退课成功，请缴纳168元退课费",
+  "data": {
+    "enrollment": {
+      "id": 12,
+      "user_id": 3,
+      "course_id": 1
+    }
+  }
+}
+```
+
+重复退课：
+
+您未报名该课程
+
 ### 添加课程 
 POST /courses
 
@@ -418,12 +443,59 @@ POST /courses/{courseId}/lesson/{lessonId}
 }
 ```
 
+### 发表评论
+
+POST /courses/{courseId}/submit
+
+角色：student/teacher
+
+**请求参数:**
+
+```json
+{
+  "content": "string, 必填, 评论内容(1-1000字符)",
+  "rating": "number, 必填, 评分(1-5星)",
+  "parentId": "string, 选填, 父评论ID(用于回复评论)"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "评论发表成功",
+  "data": {
+    "comment": {
+      "id": "comment_123",
+      "content": "这个课程讲解得很详细，老师讲得很好！",
+      "rating": 5,
+      "user": {
+        "id": "user_123",
+        "username": "刘小峰",
+        "avatar": "/avatars/user123.jpg",
+        "role": "student"
+      },
+      "courseId": "course_456",
+      "parentId": null,
+      "likes": 0,
+      "isEdited": false,
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z",
+      "replies": []
+    }
+  },
+  "code": 201
+}
+```
+
+
+
 ## 学习模块
 
 ### 获取学习进度
 **GET** `/learning/progress/{courseId}`
 
 **请求头:**
+
 ```
 Authorization: Bearer {token}
 ```
