@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+
+function verifyToken(req, res, next) {
+
+}
+=======
 import STATUS from "../constants/httpStatus.js";
 import { sendError } from "../utils/response.js";
 import jwt from 'jsonwebtoken';
@@ -20,3 +26,4 @@ function verifyToken(req, res, next) {
 }
 
 export default verifyToken;
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

@@ -124,7 +124,10 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+<<<<<<< HEAD
+=======
 .vscode
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 # yarn v3
 .pnp.*

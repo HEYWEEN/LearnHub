@@ -1,3 +1,25 @@
+<<<<<<< HEAD
+function getCourses() {
+
+}
+
+function getCourseById() {
+
+}
+
+
+function enrollCourse(){
+    
+}
+
+function createCourse() {
+
+}
+
+function removeCourse() {
+
+}
+=======
 import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -339,3 +361,4 @@ export {
   removeLesson,
   modifyLesson,
 };
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

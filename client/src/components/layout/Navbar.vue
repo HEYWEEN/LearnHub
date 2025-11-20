@@ -13,7 +13,11 @@
       <nav class="navbar-menu">
         <router-link to="/" class="nav-link">主页</router-link>
         <router-link to="/courses" class="nav-link">课程中心</router-link>
+<<<<<<< HEAD
+        <a @click="handleLearningSpaceClick" class="nav-link nav-link-clickable">学习空间</a>
+=======
         <router-link to="/space" class="nav-link">学习空间</router-link>
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
         <router-link to="/profile" class="nav-link">个人中心</router-link>
       </nav>
 
@@ -54,7 +58,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+<<<<<<< HEAD
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/slices/user'
+import { getRecentLearning } from '../../services/learningService'
+=======
+import { useUserStore } from '../../store/slices/user'
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 import defaultAvatar from '../../assets/images/default-avatar.png'
 
 const router = useRouter()
@@ -83,6 +93,42 @@ const closeDropdown = () => {
   showDropdown.value = false
 }
 
+<<<<<<< HEAD
+// 处理学习空间点击
+const handleLearningSpaceClick = async () => {
+  // 检查是否登录
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后访问学习空间')
+    router.push('/login')
+    return
+  }
+
+  try {
+    // 获取最近学习记录
+    const result = await getRecentLearning()
+    
+    if (result.data && result.data.courseId) {
+      // 有最近学习记录，跳转到最近学习的课程和章节
+      router.push({
+        name: 'Learning',
+        params: {
+          courseId: result.data.courseId,
+          chapterId: result.data.chapterId
+        }
+      })
+    } else {
+      // 没有学习记录，提示用户先选择课程
+      ElMessage.info('暂无学习记录，请先从课程中心选择课程开始学习')
+      router.push('/courses')
+    }
+  } catch (err) {
+    console.error('获取最近学习记录失败:', err)
+    ElMessage.error('获取学习记录失败')
+  }
+}
+
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 // 处理退出登录
 const handleLogout = async () => {
   await userStore.logoutUser()
@@ -185,6 +231,13 @@ onUnmounted(() => {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+<<<<<<< HEAD
+.nav-link-clickable {
+  cursor: pointer;
+}
+
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 /* 用户状态区域 */
 .navbar-user {
   position: relative;

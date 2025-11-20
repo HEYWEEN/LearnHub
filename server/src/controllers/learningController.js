@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+function getProgress(){
+
+}
+
+function updateProgress(){
+
+}
+=======
 import { asyncHandler } from "../utils/asyncHandler.js";
 import getPool from "../config/db.js";
 import { sendSuccess } from "../utils/response.js";
@@ -50,3 +59,4 @@ const updateProgress = asyncHandler(async (req, res) => {
 });
 
 export { getProgress, updateProgress };
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

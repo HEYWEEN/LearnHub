@@ -43,12 +43,38 @@
                 v-if="!isEnrolled"
                 type="primary"
                 size="large"
+<<<<<<< HEAD
+                class="action-button enroll-button"
+=======
                 class="enroll-button"
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
                 :loading="enrollLoading"
                 @click="handleEnroll"
               >
                 立即报名
               </el-button>
+<<<<<<< HEAD
+              <template v-else>
+                <el-button
+                  type="danger"
+                  size="large"
+                  plain
+                  class="action-button cancel-button"
+                  :loading="enrollLoading"
+                  @click="handleCancelEnroll"
+                >
+                  取消报名
+                </el-button>
+                <el-button
+                  type="primary"
+                  size="large"
+                  class="action-button start-button"
+                  @click="handleStartLearning(courseDetail.chapters[0])"
+                >
+                  开始学习
+                </el-button>
+              </template>
+=======
               <el-button
                 v-else
                 type="danger"
@@ -59,6 +85,7 @@
               >
                 取消报名
               </el-button>
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
             </div>
           </div>
         </div>
@@ -98,12 +125,48 @@
             </template>
             <div class="lessons-list">
               <div 
+<<<<<<< HEAD
+                v-for="(chapter, index) in courseDetail.chapters" 
+                :key="chapter.id"
+=======
                 v-for="(lesson, index) in courseDetail.lessons" 
                 :key="lesson.id"
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
                 class="lesson-item"
               >
                 <div class="lesson-number">{{ index + 1 }}</div>
                 <div class="lesson-info">
+<<<<<<< HEAD
+                  <div class="lesson-title">{{ chapter.title }}</div>
+                  <div class="lesson-meta">
+                    <span class="lesson-duration">
+                      <el-icon><Clock /></el-icon>
+                      {{ formatDuration(chapter.duration) }}
+                    </span>
+                    <span v-if="chapter.description" class="lesson-description">
+                      {{ chapter.description }}
+                    </span>
+                  </div>
+                </div>
+                <el-button
+                  v-if="isEnrolled"
+                  type="primary"
+                  size="small"
+                  class="start-learning-btn"
+                  @click="handleStartLearning(chapter)"
+                >
+                  开始学习
+                </el-button>
+                <el-button
+                  v-else
+                  type="info"
+                  size="small"
+                  class="start-learning-btn"
+                  disabled
+                >
+                  请先报名
+                </el-button>
+=======
                   <div class="lesson-title">{{ lesson.title }}</div>
                   <div class="lesson-meta">
                     <span class="lesson-duration">
@@ -112,6 +175,7 @@
                     </span>
                   </div>
                 </div>
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
               </div>
             </div>
           </el-card>
@@ -301,6 +365,22 @@ const handleEnroll = async () => {
   }
 }
 
+<<<<<<< HEAD
+// 处理开始学习
+const handleStartLearning = (chapter) => {
+  const courseId = route.params.id
+  // 跳转到学习空间页面，指定具体章节
+  router.push({
+    name: 'Learning',
+    params: {
+      courseId: courseId,
+      chapterId: chapter.id
+    }
+  })
+}
+
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 // 处理取消报名
 const handleCancelEnroll = async () => {
   enrollLoading.value = true
@@ -507,25 +587,57 @@ onMounted(() => {
   font-weight: bold;
 }
 
+<<<<<<< HEAD
+.action-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.action-button {
+  min-width: 140px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.enroll-button,
+.start-button {
+=======
 .enroll-button {
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
   background: white;
   color: #667eea;
   border: none;
 }
 
+<<<<<<< HEAD
+.enroll-button:hover,
+.start-button:hover {
+=======
 .enroll-button:hover {
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
   background: #f0f2ff;
   color: #667eea;
 }
 
 .cancel-button {
+<<<<<<< HEAD
+  background: transparent;
+=======
   background: rgba(255, 255, 255, 0.2);
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
   border: 2px solid white;
   color: white;
 }
 
 .cancel-button:hover {
+<<<<<<< HEAD
+  background: rgba(255, 255, 255, 0.15);
+  border-color: white;
+  color: white;
+=======
   background: rgba(255, 255, 255, 0.3);
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 }
 
 /* 主内容区域 */
@@ -643,8 +755,13 @@ onMounted(() => {
 
 .lesson-meta {
   display: flex;
+<<<<<<< HEAD
+  flex-direction: column;
+  gap: 4px;
+=======
   align-items: center;
   gap: 16px;
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
   font-size: 14px;
   color: #909399;
 }
@@ -655,6 +772,18 @@ onMounted(() => {
   gap: 4px;
 }
 
+<<<<<<< HEAD
+.lesson-description {
+  font-size: 13px;
+  color: #909399;
+}
+
+.start-learning-btn {
+  flex-shrink: 0;
+}
+
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 /* 评论区 */
 .review-form {
   margin-bottom: 24px;
