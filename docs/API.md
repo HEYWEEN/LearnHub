@@ -194,6 +194,7 @@ Authorization: Bearer {token}
 
 ## 课程模块
 
+<<<<<<< HEAD
 ### 获取课程列表
 **GET** `/courses`
 
@@ -351,6 +352,300 @@ Authorization: Bearer {token}
 ```
 
 ### 
+=======
+所有课程相关的接口均以以下路径开头：
+
+/courses
+
+### 目录
+
+获取课程列表 GET /courses
+
+获取课程详情 GET /courses/{courseId}
+
+报名课程 POST /courses/{courseId}/enroll
+
+添加课程 POST /courses
+
+删除课程 DELETE /courses/{courseId}
+
+修改课程信息 POST /courses/{courseId}
+
+添加课时 POST /courses/{courseId}/lesson
+
+删除课时 DELETE /courses/{courseId}/lesson/{lessonId}
+
+修改课时信息 POST /courses/{courseId}/lesson/{lessonId}
+
+### 获取课程列表 GET /courses
+请求参数（Query）
+|参数|	类型|	默认|	描述|
+|---|---|---|---|
+page	|number	|1|	页码
+limit	|number	|12|	每页数量
+category|	string|	空（可选）|	分类筛选
+search|	string|	空（可选）|	标题/描述 搜索
+响应示例
+```json
+{
+  "message": "成功获取课程列表",
+  "data": {
+    "courses": [...],
+    "pagination": {
+      "page": 1,
+      "limit": 12,
+      "total": 128,
+      "pages": 11
+    }
+  }
+}
+```
+### 获取课程详情 
+GET /courses/{courseId}
+
+响应数据
+
+返回课程信息、课程章节、课程评论。
+```json
+{
+  "message": "成功找到课程",
+  "data": {
+    "course": {
+      "id": 1,
+      "title": "...",
+      "description": "...",
+      "category": "...",
+      "lessons": [...],
+      "reviews": [...]
+    }
+  }
+}
+```
+
+若找不到课程：
+
+404 没有找到课程
+
+### 报名课程 
+POST /courses/{courseId}/enroll
+
+需要登录（student）
+
+响应示例
+```json
+{
+  "message": "报名成功",
+  "data": {
+    "enrollment": {
+      "id": 12,
+      "user_id": 3,
+      "course_id": 1
+    }
+  }
+}
+```
+
+重复报名：
+
+您已报名该课程
+
+### 取消报名课程 
+
+POST /courses/{courseId}/cancel
+
+需要登录（student）
+
+响应示例
+
+```json
+{
+  "message": "退课成功，请缴纳168元退课费",
+  "data": {
+    "enrollment": {
+      "id": 12,
+      "user_id": 3,
+      "course_id": 1
+    }
+  }
+}
+```
+
+重复退课：
+
+您未报名该课程
+
+### 添加课程 
+POST /courses
+
+需要角色：teacher / admin
+
+Body 参数
+|字段|	类型	|必填|	描述|
+|---|---|---|---|
+title|	string	|是	|课程标题
+description	|string|	是|	课程描述
+category	|string|	是	|分类
+响应示例
+```json
+{
+  "message": "课程添加成功",
+  "data": {
+    "course": {
+      "id": 18,
+      "title": "...",
+      "description": "...",
+      "category": "...",
+      "instructor_id": 2
+    }
+  }
+}
+```
+### 删除课程 
+DELETE /courses/{courseId}
+
+需要角色：teacher / admin
+教师仅能删除自己创建的课程。
+
+响应示例
+```json
+{
+  "message": "课程删除成功",
+  "data": {
+    "deletion": {
+      "courseId": "12",
+      "userId": 2
+    }
+  }
+}
+```
+### 修改课程信息 
+POST /courses/{courseId}
+
+需要角色：teacher / admin
+
+Body（全可选）
+|字段	|类型	|描述|
+|---|---|---|
+title|	string|	新标题
+description	|string	|新描述
+category	|string|	新分类
+响应示例
+```json
+{
+  "message": "课程修改成功",
+  "data": { "course": {...} }
+}
+```
+### 添加课时 
+POST /courses/{courseId}/lesson
+
+需要角色：teacher / admin
+
+Body
+|字段|	类型|	必填	|描述|
+|---|---|---|---|
+title	|string	|是	|课时标题
+description|	string|	是|	课时内容
+isfree	|number|	否	|是否免费（0 或 1）
+响应示例
+```json
+{
+  "message": "章节添加成功",
+  "data": {
+    "lesson": {
+      "id": 99,
+      "course_id": 12,
+      "title": "...",
+      "description": "...",
+      "is_free": 0
+    }
+  }
+}
+```
+### 删除课时 
+DELETE /courses/{courseId}/lesson/{lessonId}
+
+需要角色：teacher / admin
+
+响应示例
+```json
+{
+  "message": "章节删除成功",
+  "data": {
+    "deletion": {
+      "lessonId": "18",
+      "userId": 2
+    }
+  }
+}
+```
+
+### 修改课时信息 
+POST /courses/{courseId}/lesson/{lessonId}
+
+需要角色：teacher / admin
+
+**Body**（可选）
+
+|字段|类型|描述|
+|---|---|---|
+|title	|string	|新标题|
+|description	|string|	新描述|
+|isfree	|number|	是否免费（0 或 1）|
+响应示例
+```json
+{
+  "message": "章节修改成功",
+  "data": {
+    "lessons": [...]
+  }
+}
+```
+
+### 发表评论
+
+POST /courses/{courseId}/submit
+
+角色：student/teacher
+
+**请求参数:**
+
+```json
+{
+  "content": "string, 必填, 评论内容(1-1000字符)",
+  "rating": "number, 必填, 评分(1-5星)",
+  "parentId": "string, 选填, 父评论ID(用于回复评论)"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "评论发表成功",
+  "data": {
+    "comment": {
+      "id": "comment_123",
+      "content": "这个课程讲解得很详细，老师讲得很好！",
+      "rating": 5,
+      "user": {
+        "id": "user_123",
+        "username": "刘小峰",
+        "avatar": "/avatars/user123.jpg",
+        "role": "student"
+      },
+      "courseId": "course_456",
+      "parentId": null,
+      "likes": 0,
+      "isEdited": false,
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z",
+      "replies": []
+    }
+  },
+  "code": 201
+}
+```
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 
 
@@ -360,6 +655,10 @@ Authorization: Bearer {token}
 **GET** `/learning/progress/{courseId}`
 
 **请求头:**
+<<<<<<< HEAD
+=======
+
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 ```
 Authorization: Bearer {token}
 ```

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 -- 数据库初始化
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 CREATE DATABASE IF NOT EXISTS learnhub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE learnhub;
@@ -81,12 +84,20 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+<<<<<<< HEAD
 -- AI记录表
 CREATE TABLE ai_logs (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36),
     question TEXT NOT NULL,
     answer TEXT,
+=======
+-- AI会话记录表
+CREATE TABLE ai_conversation (
+    id VARCHAR(36) PRIMARY KEY,
+    title TEXT NOT NULL,
+    user_id VARCHAR(36),
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
     course_id VARCHAR(36),
     lesson_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -95,5 +106,16 @@ CREATE TABLE ai_logs (
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL
 );
 
+<<<<<<< HEAD
 INSERT INTO users (id, username, email, password, role)
 VALUES (UUID(), 'admin', 'admin@learnhub.com', 'hashed_password_here', 'admin');
+=======
+CREATE TABLE ai_messages(
+    id VARCHAR(36) PRIMARY KEY,
+    conversation_id VARCHAR(36),
+    sender ENUM('user','assistant') NOT NULL,
+    context TEXT NOT NULL,
+    send_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(conversation_id) REFERENCES ai_conversation(id) ON DELETE CASCADE
+)
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 const express = require("express");
+=======
+import express from "express";
+import verifyToken from "../middleware/authMiddleware.js";
+import { getProgress, updateProgress } from "../controllers/learningController.js";
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 const router = express.Router();
 
 // 获取学习进度
@@ -17,6 +23,7 @@ const router = express.Router();
 //   },
 //   "code": 200
 // }
+<<<<<<< HEAD
 router.get("/progress/:courseId", (req, res) => {
   res.json({
     success: true,
@@ -30,6 +37,9 @@ router.get("/progress/:courseId", (req, res) => {
     code: 200,
   });
 });
+=======
+router.get("/progress/:courseId", verifyToken ,getProgress);
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 // 更新学习进度
 // POST /learning/progress/{lessonId}
@@ -39,6 +49,7 @@ router.get("/progress/:courseId", (req, res) => {
 // {
 //   "completed": "boolean, 是否完成该课时"
 // }
+<<<<<<< HEAD
 router.post("/progress/:lessonId", (req, res) => {
   res.json({
     success: true,
@@ -54,3 +65,8 @@ router.post("/progress/:lessonId", (req, res) => {
 });
 
 module.exports = router;
+=======
+router.post("/progress/:lessonId", verifyToken,updateProgress);
+
+export default router;
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 //const connectDB = require('./config/db');
 const app = express();
@@ -20,3 +21,18 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Express server listening at http://localhost:${port}`);
 });
+=======
+import app from './app.js';
+import LOG_COLOR from './constants/logColor.js';
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(LOG_COLOR.FG_BLUE + `LearnHub API is listening at http://localhost:${PORT}` + LOG_COLOR.RESET);
+});
+
+
+
+
+
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

@@ -237,6 +237,7 @@ export const getCourseById = async (courseId) => {
     throw new Error('课程不存在')
   }
   
+<<<<<<< HEAD
   // 根据课程ID返回对应的章节（与学习模块保持一致）
   const chaptersMap = {
     'course_1': [
@@ -319,6 +320,8 @@ export const getCourseById = async (courseId) => {
     ]
   }
   
+=======
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
   // 返回详细信息（后续扩展）
   return {
     ...course,
@@ -327,7 +330,33 @@ export const getCourseById = async (courseId) => {
       ...course.instructor,
       bio: '资深讲师，拥有10年以上教学经验，专注于技术教育和人才培养。曾在多家知名企业担任技术负责人，善于将复杂的技术概念讲解得通俗易懂。'
     },
+<<<<<<< HEAD
     chapters: chaptersMap[courseId] || [],
+=======
+    lessons: [
+      {
+        id: 'lesson_1',
+        title: '第一章：基础概念',
+        duration: 1800,
+        videoUrl: '/videos/lesson1.mp4',
+        description: '学习核心概念'
+      },
+      {
+        id: 'lesson_2',
+        title: '第二章：进阶实战',
+        duration: 2400,
+        videoUrl: '/videos/lesson2.mp4',
+        description: '实战项目开发'
+      },
+      {
+        id: 'lesson_3',
+        title: '第三章：实战案例分析',
+        duration: 3000,
+        videoUrl: '/videos/lesson3.mp4',
+        description: '真实项目案例分析'
+      }
+    ],
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
     reviews: [
       {
         id: 'review_1',

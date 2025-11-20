@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require("express");
 const router = express.Router();
 
@@ -18,6 +19,17 @@ router.get("/me", (req, res) => {
     code: 200,
   });
 });
+=======
+import express from "express";
+const router = express.Router();
+
+import { getMe, login, register } from "../controllers/authController.js";
+import verifyToken from "../middleware/authMiddleware.js";
+
+//req 
+//请求头 Authorization: Bearer {token}
+router.get("/me",verifyToken, getMe);
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 //req 
 //请求参数:
@@ -25,6 +37,7 @@ router.get("/me", (req, res) => {
 //   "email": "string, 必填",
 //   "password": "string, 必填"
 // }
+<<<<<<< HEAD
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
   // Add authentication logic here
@@ -44,6 +57,9 @@ router.post("/login", (req, res) => {
     code: 200,
   });
 });
+=======
+router.post("/login", login);
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 
 //req
 //请求参数:
@@ -53,6 +69,7 @@ router.post("/login", (req, res) => {
 //   "password": "string, 必填, 最少6位",
 //   "role": "string, 选填, student/teacher, 默认student"
 // }
+<<<<<<< HEAD
 router.post("/register", (req, res) => {
   res.json({
     success: true,
@@ -79,3 +96,8 @@ router.post("/register", (req, res) => {
 });
 
 module.exports = router;
+=======
+router.post("/register", register);
+
+export default router;
+>>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
