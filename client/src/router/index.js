@@ -6,6 +6,7 @@ import TeacherDashboard from '../pages/Teacher/Dashboard.vue'
 import Profile from '../pages/Profile/index.vue'
 import Courses from '../pages/Courses/index.vue'
 import CourseDetail from '../pages/Courses/CourseDetail.vue'
+import Learning from '../pages/Learning/index.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -15,7 +16,13 @@ const routes = [
   { path: '/teacher', name: 'TeacherDashboard', component: TeacherDashboard },
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/courses', name: 'Courses', component: Courses },
-  { path: '/courses/:id', name: 'CourseDetail', component: CourseDetail }
+  { path: '/courses/:id', name: 'CourseDetail', component: CourseDetail },
+  { 
+    path: '/learning/:courseId/:chapterId?', 
+    name: 'Learning', 
+    component: Learning,
+    meta: { requiresAuth: true }
+  }
 ]
 
 const router = createRouter({

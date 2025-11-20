@@ -237,6 +237,88 @@ export const getCourseById = async (courseId) => {
     throw new Error('课程不存在')
   }
   
+  // 根据课程ID返回对应的章节（与学习模块保持一致）
+  const chaptersMap = {
+    'course_1': [
+      {
+        id: 'chapter_1',
+        title: '第1章：React基础概念',
+        duration: 1200,
+        videoUrl: '/1.mp4',
+        order: 1,
+        description: '学习React核心概念'
+      },
+      {
+        id: 'chapter_2',
+        title: '第2章：组件与Props',
+        duration: 1500,
+        videoUrl: '/2.mp4',
+        order: 2,
+        description: '深入理解组件和Props'
+      },
+      {
+        id: 'chapter_3',
+        title: '第3章：State与生命周期',
+        duration: 1800,
+        videoUrl: '/3.mp4',
+        order: 3,
+        description: '掌握State管理和组件生命周期'
+      }
+    ],
+    'course_2': [
+      {
+        id: 'chapter_1',
+        title: '第1章：Vue3新特性介绍',
+        duration: 1400,
+        videoUrl: '/1.mp4',
+        order: 1,
+        description: 'Vue3核心特性详解'
+      },
+      {
+        id: 'chapter_2',
+        title: '第2章：Composition API详解',
+        duration: 1600,
+        videoUrl: '/2.mp4',
+        order: 2,
+        description: 'Composition API实战'
+      },
+      {
+        id: 'chapter_3',
+        title: '第3章：TypeScript集成',
+        duration: 2000,
+        videoUrl: '/3.mp4',
+        order: 3,
+        description: 'Vue3与TypeScript完美结合'
+      }
+    ],
+    'course_3': [
+      {
+        id: 'chapter_1',
+        title: '第1章：Node.js环境搭建',
+        duration: 1000,
+        videoUrl: '/1.mp4',
+        order: 1,
+        description: 'Node.js开发环境配置'
+      },
+      {
+        id: 'chapter_2',
+        title: '第2章：Express框架基础',
+        duration: 1800,
+        videoUrl: '/2.mp4',
+        order: 2,
+        description: 'Express框架入门与实践'
+      },
+      {
+        id: 'chapter_3',
+        title: '第3章：RESTful API设计',
+        duration: 2200,
+        videoUrl: '/3.mp4',
+        order: 3,
+        description: 'RESTful API设计最佳实践'
+      }
+    ]
+  }
+  
   // 返回详细信息（后续扩展）
   return {
     ...course,
@@ -245,29 +327,7 @@ export const getCourseById = async (courseId) => {
       ...course.instructor,
       bio: '资深讲师，拥有10年以上教学经验，专注于技术教育和人才培养。曾在多家知名企业担任技术负责人，善于将复杂的技术概念讲解得通俗易懂。'
     },
-    lessons: [
-      {
-        id: 'lesson_1',
-        title: '第一章：基础概念',
-        duration: 1800,
-        videoUrl: '/videos/lesson1.mp4',
-        description: '学习核心概念'
-      },
-      {
-        id: 'lesson_2',
-        title: '第二章：进阶实战',
-        duration: 2400,
-        videoUrl: '/videos/lesson2.mp4',
-        description: '实战项目开发'
-      },
-      {
-        id: 'lesson_3',
-        title: '第三章：实战案例分析',
-        duration: 3000,
-        videoUrl: '/videos/lesson3.mp4',
-        description: '真实项目案例分析'
-      }
-    ],
+    chapters: chaptersMap[courseId] || [],
     reviews: [
       {
         id: 'review_1',
