@@ -13,11 +13,7 @@
       <nav class="navbar-menu">
         <router-link to="/" class="nav-link">主页</router-link>
         <router-link to="/courses" class="nav-link">课程中心</router-link>
-<<<<<<< HEAD
         <a @click="handleLearningSpaceClick" class="nav-link nav-link-clickable">学习空间</a>
-=======
-        <router-link to="/space" class="nav-link">学习空间</router-link>
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
         <router-link to="/profile" class="nav-link">个人中心</router-link>
       </nav>
 
@@ -58,13 +54,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-<<<<<<< HEAD
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/slices/user'
 import { getRecentLearning } from '../../services/learningService'
-=======
-import { useUserStore } from '../../store/slices/user'
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 import defaultAvatar from '../../assets/images/default-avatar.png'
 
 const router = useRouter()
@@ -93,7 +85,6 @@ const closeDropdown = () => {
   showDropdown.value = false
 }
 
-<<<<<<< HEAD
 // 处理学习空间点击
 const handleLearningSpaceClick = async () => {
   // 检查是否登录
@@ -127,8 +118,6 @@ const handleLearningSpaceClick = async () => {
   }
 }
 
-=======
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 // 处理退出登录
 const handleLogout = async () => {
   await userStore.logoutUser()
@@ -231,13 +220,10 @@ onUnmounted(() => {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-<<<<<<< HEAD
 .nav-link-clickable {
   cursor: pointer;
 }
 
-=======
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 /* 用户状态区域 */
 .navbar-user {
   position: relative;
