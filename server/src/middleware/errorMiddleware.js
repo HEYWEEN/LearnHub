@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-
-function errorHandler(err, req, res, next) {
-
-}
-=======
 // src/middleware/errorHandler.js
 import STATUS from "../constants/httpStatus.js";
 import LOG_COLOR from "../constants/logColor.js";
@@ -29,4 +23,3 @@ export function errorHandler(err, req, res, next) {
   );
 }
 export default errorHandler;
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

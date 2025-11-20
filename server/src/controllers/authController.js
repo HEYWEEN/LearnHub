@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-function register(){
-
-}
-
-function login(){
-
-}
-
-function getMe(){
-
-}
-=======
 import getPool from "../config/db.js";
 import { generateToken } from "../config/jwt.js";
 import STATUS from "../constants/httpStatus.js";
@@ -66,4 +53,3 @@ const getMe = (req, res) => {
 };
 
 export { register, login, getMe };
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

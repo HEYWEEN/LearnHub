@@ -1,29 +1,9 @@
-<<<<<<< HEAD
-function getCourses() {
-
-}
-
-function getCourseById() {
-
-}
-
-
-function enrollCourse(){
-    
-}
-
-function createCourse() {
-
-}
-
-function removeCourse() {
-
-}
-=======
+import { create } from "domain";
 import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/response.js";
+import { v4 as uuidv4 } from "uuid";
 
 const getCourses = asyncHandler(async (req, res) => {
   const pool = getPool();
@@ -95,14 +75,14 @@ const enrollCourse = asyncHandler(async (req, res) => {
   const pool = getPool();
   const { courseId } = req.params;
   const userId = req.user.id;
-  const [existCourse] = await pool.query("SELECT * FROM courses WHERE id=?", [
-    courseId,
-  ]);
-  if (existCourse.length === 0) {
-    const err = new Error("课程不存在");
-    err.status = STATUS.NOT_FOUND;
-    throw err;
-  }
+  // const [existCourse] = await pool.query("SELECT * FROM courses WHERE id=?", [
+  //   courseId,
+  // ]);
+  // if (existCourse.length === 0) {
+  //   const err = new Error("课程不存在");
+  //   err.status = STATUS.NOT_FOUND;
+  //   throw err;
+  // }
   const [existingEnrollment] = await pool.query(
     "SELECT * FROM enrollments WHERE user_id=? AND course_id=?",
     [userId, courseId]
@@ -122,6 +102,31 @@ const enrollCourse = asyncHandler(async (req, res) => {
   );
   return sendSuccess(res, "报名成功", {
     enrollment: newEnrollmentRow[0],
+  });
+});
+
+const cancelEnrollCourse = asyncHandler(async (req, res) => {
+  const pool = getPool();
+  const { courseId } = req.params;
+  const userId = req.user.id;
+  const [existingEnrollment] = await pool.query(
+    "SELECT * FROM enrollments WHERE user_id=? AND course_id=?",
+    [userId, courseId]
+  );
+  if (existingEnrollment.length > 0) {
+    return sendSuccess(res, "您没有报名该课程", {
+      enrollment: existingEnrollment[0],
+    });
+  }
+  const [result] = await pool.query(
+    "DELETE FROM enrollments WHERE user_id = ? AND course_id = ?",
+    [userId, courseId]
+  );
+  return sendSuccess(res, "退课成功", {
+    enrollment: {
+      user_id:userId,
+      course_id:courseId
+    }
   });
 });
 
@@ -181,6 +186,32 @@ const addCourse = asyncHandler(async (req, res) => {
       description,
       category,
       instructor_id: req.user.id,
+    },
+  });
+});
+
+const releaseReview = asyncHandler(async (req, res) => {
+  const pool = getPool();
+  const { courseId } = req.params;
+  const user = req.user;
+  const { content, rating, parentId = null } = req.body;
+  const id = uuidv4();
+  const createdAt = new Date().toISOString();
+  await pool.query(
+    "INSERT INTO reviews(id,course_id,user_id,comment,rating,parent_id,created_at) VALUES (?,?,?,?,?,?,?) ",
+    [id, courseId, user.id, content, rating, parentId, createdAt]
+  );
+  return sendSuccess(res, "评论发表成功", {
+    comment: {
+      id,
+      content,
+      rating,
+      user,
+      courseId,
+      parentId,
+      likes: 0,
+      createdAt,
+      replies: [],
     },
   });
 });
@@ -354,11 +385,12 @@ export {
   getCourses,
   getCourseById,
   enrollCourse,
+  cancelEnrollCourse,
   addCourse,
   removeCourse,
   modifyCourse,
   addLesson,
   removeLesson,
   modifyLesson,
+  releaseReview,
 };
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

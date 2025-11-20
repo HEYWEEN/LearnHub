@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-function askAI(){
-
-}
-
-function getRecommendations(){
-
-}
-=======
 import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { chatWithAi } from "../services/aiService.js";
@@ -83,4 +74,3 @@ const getRecommendations = asyncHandler((req, res) => {
 });
 
 export { askAI, getRecommendations };
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
