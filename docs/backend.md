@@ -34,6 +34,7 @@ server/
 │   ├── middleware/           # 中间件
 │   │   ├── authMiddleware.js  # JWT 验证
 │   │   ├── errorMiddleware.js # 错误处理
+│   │   ├── notFoundMiddleware.js # 处理不存在的路由
 │   │   └── loggerMiddleware.js
 │   │
 │   ├── repository/           # 持久层（DB CRUD 操作）
