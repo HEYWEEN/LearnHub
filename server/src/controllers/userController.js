@@ -1,7 +1,0 @@
-function getProfile() {
-
-}
-
-function updateProfile() {
-
-}

@@ -1,6 +1,9 @@
 import express from "express";
-import { addCourse, addLesson, cancelEnrollCourse, enrollCourse, getCourseById, getCourses,modifyCourse,modifyLesson,releaseReview,removeCourse, removeLesson } from "../controllers/courseController.js";
+
 import verifyToken from "../middleware/authMiddleware.js";
+import { addCourse, getCourseById, getCourses, modifyCourse, releaseReview, removeCourse } from "../controllers/courseController.js";
+import { cancelEnrollCourse, enrollCourse } from "../controllers/enrollController.js";
+import { addLesson, modifyLesson, removeLesson } from "../controllers/lessonController.js";
 const router = express.Router();
 
 //查询参数:

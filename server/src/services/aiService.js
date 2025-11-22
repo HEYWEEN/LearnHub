@@ -1,3 +1,63 @@
+import * as aiRepo from "../repository/aiRepository.js";
+import { v4 as uuidv4 } from "uuid";
+import STATUS from "../constants/httpStatus.js";
+
+export async function createConversation({ user, payload }) {
+  const id = uuidv4();
+  await aiRepo.createConversation({
+    id,
+    title: payload.title || null,
+    user_id: user?.id || null,
+    course_id: payload.courseId || null,
+  });
+  const conv = await aiRepo.findConversationById(id);
+  return conv;
+}
+
+export async function listConversations({ user, query }) {
+  const { page = 1, limit = 20 } = query || {};
+  const rows = await aiRepo.listConversationsByUser(user.id, { page, limit });
+  return {
+    conversations: rows,
+    pagination: { page: Number(page), limit: Number(limit) },
+  };
+}
+
+export async function getConversation({ conversationId, user }) {
+  const conv = await aiRepo.findConversationById(conversationId);
+  if (!conv) {
+    const e = new Error("会话不存在");
+    e.status = STATUS.NOT_FOUND;
+    throw e;
+  }
+  // 可加权限检查：只有创建者或管理员可查看
+  return conv;
+}
+
+export async function sendMessage({ conversationId, user, payload }) {
+  const conv = await aiRepo.findConversationById(conversationId);
+  if (!conv) {
+    const e = new Error("会话不存在");
+    e.status = STATUS.NOT_FOUND;
+    throw e;
+  }
+  const id = uuidv4();
+  await aiRepo.insertMessage({
+    id,
+    conversation_id: conversationId,
+    sender: payload.sender || "user",
+    context: payload.text || "",
+  });
+  const message = {
+    id,
+    conversation_id: conversationId,
+    sender: payload.sender || "user",
+    context: payload.text || "",
+    send_at: new Date(),
+  };
+  return message;
+}
+
 import OpenAI from "openai";
 import LOG_COLOR from "../constants/logColor.js";
 
@@ -24,4 +84,4 @@ async function chatWithAi(messages, think = false) {
   return completion.choices[0].message.content;
 }
 
-export {chatWithAi};
+export { chatWithAi };

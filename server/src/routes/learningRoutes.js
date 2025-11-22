@@ -1,6 +1,6 @@
 import express from "express";
 import verifyToken from "../middleware/authMiddleware.js";
-import { getProgress, updateProgress } from "../controllers/learningController.js";
+import { getProgress, markCompleted } from "../controllers/learningController.js";
 const router = express.Router();
 
 // 获取学习进度
@@ -29,6 +29,6 @@ router.get("/progress/:courseId", verifyToken ,getProgress);
 // {
 //   "completed": "boolean, 是否完成该课时"
 // }
-router.post("/progress/:lessonId", verifyToken,updateProgress);
+router.post("/progress/:lessonId", verifyToken,markCompleted);
 
 export default router;
