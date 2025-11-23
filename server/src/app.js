@@ -33,6 +33,7 @@ app.use('/api/learning' , routes.learningRouter);
 app.use('/api/courses'  , routes.coursesRouter);
 app.use('/api/users'    , routes.usersRouter);
 app.use('/api/ai'       , routes.aiRouter);
+app.use('/api/note'     , routes.noteRouter);
 
 app.get('/', (req, res) => {
     res.send('LearnHub API is running...');

@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 import verifyToken from "../middleware/authMiddleware.js";
-import { getMe, login, register } from "../controllers/authController.js";
+import { getMe, login, refreshToken, register } from "../controllers/authController.js";
 
 //req 
 //请求头 Authorization: Bearer {token}
@@ -26,5 +26,7 @@ router.post("/login", login);
 //   "role": "string, 选填, student/teacher, 默认student"
 // }
 router.post("/register", register);
+
+router.get("/refresh",verifyToken,refreshToken);
 
 export default router;

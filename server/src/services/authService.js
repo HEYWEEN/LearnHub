@@ -59,7 +59,6 @@ export async function login({ email, password }) {
   try {
     token = await generateToken(user);
   } catch (err) {
-    // ignore
   }
   return { user: safe, token };
 }
@@ -75,26 +74,13 @@ export async function getProfile({ user }) {
   return profile;
 }
 
-export async function refreshToken({ refreshToken }) {
-  if (!refreshToken) {
-    const e = new Error("缺少 refreshToken");
-    e.status = STATUS.BAD_REQUEST;
-    throw e;
-  }
-  try {
-    const SECRET = getSecretKey();
-    const payload = jwt.verify(refreshToken, SECRET);
-    const user = await authRepo.findUserById(payload.id);
-    if (!user) {
+export async function refreshToken({user }) {
+    const refreshedUser = await authRepo.findUserById(user.id);
+    if (!refreshedUser) {
       const e = new Error("用户不存在");
       e.status = STATUS.NOT_FOUND;
       throw e;
     }
-    const newToken = await generateToken(user);
+    const newToken = await generateToken(refreshedUser);
     return { token: newToken };
-  } catch (err) {
-    const e = new Error("refreshToken 无效或已过期");
-    e.status = STATUS.UNAUTHORIZED;
-    throw e;
-  }
 }

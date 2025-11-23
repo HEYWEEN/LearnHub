@@ -1,5 +1,5 @@
 import express from 'express';
-import { askAI } from '../controllers/aiController.js';
+import { askAI, createConversation, getConversation, listConversations, sendMessage } from '../controllers/aiController.js';
 import verifyToken from "../middleware/authMiddleware.js";
 const router = express.Router();
 
@@ -65,5 +65,13 @@ router.get("/recommendations", (req, res) => {
     code: 200,
   });
 });
+
+router.post("/conversation",verifyToken,createConversation);
+
+router.get("/conversation",verifyToken,listConversations);
+
+router.get("/conversation/:conversationId",verifyToken,getConversation);
+
+router.post("/conversation/:conversationId",verifyToken,sendMessage);
 
 export default router;

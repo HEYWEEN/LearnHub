@@ -26,6 +26,21 @@ export async function listUsers({ page = 1, limit = 20, role }) {
   return rows;
 }
 
+export async function countUsers({role}) {
+  const pool = getPool()
+  let rows = null;
+  if(role){
+    [rows]  = await pool.query(
+      "SELECT COUNT(*) as total FROM users where role = ?",[role]
+    );
+  }else{
+    [rows] = await pool.query(
+      "SELECT COUNT(*) as total FROM users"
+    );
+  }
+  return rows[0] ? rows[0].total : 0;
+}
+
 export async function updateUserRole(userId, role) {
   const pool = getPool();
   await pool.query(

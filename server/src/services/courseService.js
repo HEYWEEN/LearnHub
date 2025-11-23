@@ -2,7 +2,6 @@ import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { v4 as uuidv4 } from "uuid";
 
-// 使用 repository 层（如果已有 repository 文件可以改为 import * as repo from "../repository/coursesRepository.js")
 import * as repo from "../repository/coursesRepository.js";
 import * as lessonRepo from "../repository/lessonRepository.js";
 import * as reviewRepo from "../repository/reviewRepository.js";
@@ -38,7 +37,6 @@ export async function getCourseById({ courseId }) {
     throw err;
   }
   const lessons = await repo.findLessonsByCourseId(courseId);
-  // reviews repository (reviesRepository.js) 名称保留你现有文件里的一致性
   const reviews = (await reviewRepo.findReviewsByCourseId?.(courseId)) || [];
   return { ...course, lessons, reviews };
 }

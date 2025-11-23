@@ -22,9 +22,10 @@ export async function updateProfile({ user, payload }) {
 
 export async function listUsers({ page = 1, limit = 20, role }) {
   const rows = await usersRepo.listUsers({ page, limit, role });
+  const total = await usersRepo.countUsers({role});
   return {
     users: rows,
-    pagination: { page: Number(page), limit: Number(limit) },
+    pagination: { page: Number(page), limit: Number(limit),total,pages:Math.ceil( total/Number(limit)) },
   };
 }
 

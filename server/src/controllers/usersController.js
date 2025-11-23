@@ -16,7 +16,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 const listUsers = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 20, role } = req.query;
+  const { page = 1, limit = 20, role = null } = req.query;
   const result = await usersService.listUsers({ page, limit, role });
   return sendSuccess(res, "获取用户列表成功", result);
 });
