@@ -433,7 +433,12 @@ export const submitReview = async (courseId, reviewData) => {
     message: '评论发表成功！',
     review: {
       id: `review_${Date.now()}`,
-      ...reviewData,
+      user: {
+        name: '当前用户',
+        avatar: '/src/assets/images/default-avatar.png'
+      },
+      rating: reviewData.rating,
+      comment: reviewData.comment,
       createdAt: new Date().toISOString()
     }
   }
