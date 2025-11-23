@@ -495,10 +495,6 @@ POST /courses/{courseId}/submit
 **GET** `/learning/progress/{courseId}`
 
 **请求头:**
-<<<<<<< HEAD
-=======
-
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
 ```
 Authorization: Bearer {token}
 ```
