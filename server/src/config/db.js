@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-
-function authenticate() {
-
-}
-
-function sync(){
-  
-}
-=======
 //src/config/db.js
 import mysql from 'mysql2/promise';
 import LOG_COLOR from '../constants/logColor.js';
@@ -37,4 +27,3 @@ const getPool = ()=>{
 };
 
 export default getPool;
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653

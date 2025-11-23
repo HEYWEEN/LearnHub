@@ -1,18 +1,10 @@
-<<<<<<< HEAD
-function askAI(){
-
-}
-
-function getRecommendations(){
-
-}
-=======
 import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { chatWithAi } from "../services/aiService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendError, sendSuccess } from "../utils/response.js";
-import {v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import * as aiService from "../services/aiService.js";
 
 const askAI = asyncHandler(async (req, res) => {
   const pool = getPool();
@@ -52,11 +44,11 @@ const askAI = asyncHandler(async (req, res) => {
         };
       })
     );
-  }
-  else{
+  } else {
     conversation_id = uuidv4();
     const [row] = await pool.query(
-      "INSERT INTO ai_conversation (id,title, user_id,course_id,lesson_id ) VALUES (?,?, ?, ?, ?)",[conversation_id,title,req.user.id,course_id,lesson_id]
+      "INSERT INTO ai_conversation (id,title, user_id,course_id,lesson_id ) VALUES (?,?, ?, ?, ?)",
+      [conversation_id, title, req.user.id, course_id, lesson_id]
     );
   }
   message.push({
@@ -68,9 +60,10 @@ const askAI = asyncHandler(async (req, res) => {
     return sendError(res, "获取回复失败");
   }
   await pool.query(
-    "INSERT INTO ai_messages(id,conversation_id,sender,context) VALUES(UUID(),?,'user',?),(UUID(),?,'assistant',?)",[conversation_id,question,conversation_id,answer]
+    "INSERT INTO ai_messages(id,conversation_id,sender,context) VALUES(UUID(),?,'user',?),(UUID(),?,'assistant',?)",
+    [conversation_id, question, conversation_id, answer]
   );
-  return sendSuccess(res,"获取回复成功",{
+  return sendSuccess(res, "获取回复成功", {
     message,
     answer,
     conversation_id,
@@ -82,5 +75,44 @@ const getRecommendations = asyncHandler((req, res) => {
   const pool = getPool();
 });
 
-export { askAI, getRecommendations };
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
+const createConversation = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const payload = req.body;
+  const conv = await aiService.createConversation({ user, payload });
+  return sendSuccess(res, "会话创建成功", { conversation: conv });
+});
+
+const listConversations = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const result = await aiService.listConversations({ user, query: req.query });
+  return sendSuccess(res, "获取会话列表成功", result);
+});
+
+const getConversation = asyncHandler(async (req, res) => {
+  const { conversationId } = req.params;
+  const result = await aiService.getConversation({
+    conversationId,
+    user: req.user,
+  });
+  return sendSuccess(res, "获取会话成功", result);
+});
+
+const sendMessage = asyncHandler(async (req, res) => {
+  const { conversationId } = req.params;
+  const payload = req.body;
+  const message = await aiService.sendMessage({
+    conversationId,
+    user: req.user,
+    payload,
+  });
+  return sendSuccess(res, "消息发送成功", { message });
+});
+
+export {
+  askAI,
+  getRecommendations,
+  createConversation,
+  listConversations,
+  getConversation,
+  sendMessage,
+};

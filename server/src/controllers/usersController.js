@@ -1,48 +1,32 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import getPool from "../config/db.js";
-import STATUS from "../constants/httpStatus.js";
 import { sendSuccess } from "../utils/response.js";
+import * as usersService from "../services/usersService.js";
 
 const getProfile = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const userId = req.user.id;
-  const user = await pool.query(
-    "SELECT id, username, email, avatar,bio,created_at FROM users WHERE id = ?",
-    [userId]
-  );
-  if (user.length === 0) {
-    const err = new Error("没有找到用户");
-    err.status = STATUS.NOT_FOUND;
-    throw err;
-  }
-  return sendSuccess(res, { user: user[0] });
+  const { userId } = req.params;
+  const profile = await usersService.getProfile({ userId });
+  return sendSuccess(res, "获取用户信息成功", { profile });
 });
 
 const updateProfile = asyncHandler(async (req, res) => {
-  const pool = getPool();
-  const { username = "", avatar = "", bio = "" } = req.body;
-  const id = req.user.id;
-  let updtaeSql = "";
-  let updateParams = [];
-  if (username !== "") {
-    updateSql += `username = ?,`;
-    updateParams.push(username);
-  }
-  if (avatar !== "") {
-    updateSql += `avatar = ?,`;
-    updateParams.push(avatar);
-  }
-  if (bio !== "") {
-    updateSql += `bio = ?,`;
-    updateParams.push(bio);
-  }
-  updtaeSql = updtaeSql.slice(0, -1);
-  updateParams.push(id);
-  await pool.query(`UPDATE users SET ${updtaeSql} WHERE id = ?`, updateParams);
-  return sendSuccess(res, {
-    message: "用户信息更新成功",
-    user: { id, username, avatar, bio },
-  });
+  const user = req.user;
+  const payload = req.body;
+  const updated = await usersService.updateProfile({ user, payload });
+  return sendSuccess(res, "更新用户信息成功", { user: updated });
 });
 
-export { getProfile, updateProfile };
+const listUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 20, role } = req.query;
+  const result = await usersService.listUsers({ page, limit, role });
+  return sendSuccess(res, "获取用户列表成功", result);
+});
+
+const changeRole = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+  const admin = req.user;
+  const updated = await usersService.changeRole({ admin, userId, role });
+  return sendSuccess(res, "修改角色成功", { user: updated });
+});
+
+export { getProfile, updateProfile, listUsers, changeRole };

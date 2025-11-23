@@ -2,48 +2,74 @@
 server/
 │
 ├── package.json
-├── .env                      # 环境变量配置（数据库账号、JWT秘钥等）
+├── .env                      # 环境变量（DB credentials, SECRET_KEY 等）
 ├── .gitignore
-├── initDatabase.sql          # 创建数据库
+├── initDatabase.sql          # 数据库建表脚本
 ├── src/
-│   ├── index.js              # 入口文件（创建 Express 应用）
-│   ├── app.js                # 挂载中间件、路由
+│   ├── index.js              # 应用入口（创建并启动 Express）
+│   ├── app.js                # 挂载中间件、路由与全局错误处理
 │   │
-│   ├── config/
-│   │   ├── db.js             # 数据库连接配置（Sequelize）
-│   │   └── jwt.js            # JWT 配置与工具
+│   ├── config/               # 配置与工具
+│   │   ├── db.js             # MySQL 连接池配置（导出 getPool 或 pool）
+│   │   └── jwt.js            # JWT 工具：getSecretKey / generateToken
 │   │
-│   │
-│   ├── controllers/          # 控制器：业务逻辑（处理请求）
+│   ├── controllers/          # 控制器（Thin controllers -> 调用 services）
+│   │   ├── aiController.js
 │   │   ├── authController.js
-│   │   ├── usersController.js
 │   │   ├── courseController.js
+│   │   ├── enrollController.js
+│   │   ├── lessonController.js
 │   │   ├── learningController.js
-│   │   └── aiController.js
+│   │   ├── noteController.js
+│   │   └── usersController.js
 │   │
-│   ├── routes/               # 路由层（定义URL映射）
-│   │   ├── index.js          # 汇总所有子路由
+│   ├── routes/               # 路由层（定义 URL 映射）
+│   │   ├── index.js
+│   │   ├── aiRoutes.js
 │   │   ├── authRoutes.js
-│   │   ├── usersRoutes.js
-│   │   ├── courseRoutes.js
+│   │   ├── coursesRoutes.js
 │   │   ├── learningRoutes.js
-│   │   └── aiRoutes.js
+│   │   └── usersRoutes.js
 │   │
-│   ├── middlewares/          # 中间件
-│   │   ├── authMiddleware.js # JWT验证中间件
-│   │   └── errorHandler.js   # 全局错误处理
+│   ├── middleware/           # 中间件
+│   │   ├── authMiddleware.js  # JWT 验证
+│   │   ├── errorMiddleware.js # 错误处理
+│   │   ├── notFoundMiddleware.js # 处理不存在的路由
+│   │   └── loggerMiddleware.js
 │   │
-│   ├── services/             # 服务层（封装第三方接口、AI模块逻辑等）
-│   │   └── aiService.js
+│   ├── repository/           # 持久层（DB CRUD 操作）
+│   │   ├── aiRepository.js
+│   │   ├── authRepository.js
+│   │   ├── coursesRepository.js
+│   │   ├── enrollRepository.js
+│   │   ├── learningRepository.js
+│   │   ├── lessonRepository.js
+│   │   ├── noteRepository.js
+│   │   ├── reviewRepository.js
+│   │   └── usersRepository.js
 │   │
-│   ├── utils/                # 工具函数（密码加密、响应封装）
-│   │   ├── response.js
-│   │   ├── password.js
-│   │   └── logger.js
+│   ├── services/             # 服务层（业务逻辑、组合 repository、第三方集成）
+│   │   ├── aiService.js
+│   │   ├── authService.js
+│   │   ├── courseService.js
+│   │   ├── enrollService.js
+│   │   ├── lessonService.js
+│   │   ├── learningService.js
+│   │   ├── noteService.js
+│   │   └── usersService.js
 │   │
-│   └── constants/            # 常量、状态码定义
-│       └── httpStatus.js
+│   ├── utils/                # 工具函数
+│   │   ├── asyncHandler.js
+│   │   ├── configChecker.js
+│   │   ├── passwordUtils.js
+│   │   └── response.js
+│   │
+│   └── constants/            # 常量、状态码
+│       ├── httpStatus.js
+│       └── logColor.js
 │
-└── tests/
-    └── testData.sql
+└── uploads/                  # 文件上传目录
+└── Test/                     # 测试文件
+    └── testData.sql          # 数据库测试数据
+
 ```

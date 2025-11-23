@@ -24,6 +24,7 @@ app.use(express.json());
 import routes from './routes/index.js';
 import errorHandler from './middleware/errorMiddleware.js';
 import loggerMiddleware from './middleware/loggerMiddleware.js';      
+import notFound from './middleware/notFoundMiddleware.js';
 
 app.use(loggerMiddleware);
 
@@ -37,6 +38,7 @@ app.get('/', (req, res) => {
     res.send('LearnHub API is running...');
 });
 
+app.use(notFound);
 app.use(errorHandler);
 
 export default app;

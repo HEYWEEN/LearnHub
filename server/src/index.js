@@ -1,31 +1,31 @@
-<<<<<<< HEAD
-const express = require('express');
-//const connectDB = require('./config/db');
-const app = express();
-const port = process.env.port||5000;
-
-//connectDB();
-
-const routes = require('./routes');
-
-app.use('/api/auth'     , routes.authRouter);
-app.use('/api/learning' , routes.learningRouter);
-app.use('/api/courses'  , routes.coursesRouter);
-app.use('/api/users'    , routes.usersRouter);
-app.use('/api/ai'       , routes.aiRouter);
-
-app.get('/', (req, res) => {
-    res.send('LearnHub API is running...');
-});
-
-app.listen(port, () => {
-    console.log(`Express server listening at http://localhost:${port}`);
-});
-=======
 import app from './app.js';
-import LOG_COLOR from './constants/logColor.js';
 
 const PORT = process.env.PORT || 3000;
+
+import LOG_COLOR from './constants/logColor.js';
+console.log(
+LOG_COLOR.BG_YELLOW+"///////////////////////////////////////////////////////////////"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                          _ooOoo_                          //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                         o8888888o                         //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                         88\" . \"88                         //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                         (| ^_^ |)                         //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                         O\\  =  /O                         //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                      ____/`---'\\____                      //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                    .'  \\\\|     |//  `.                    //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                   /  \\\\|||  :  |||//  \\                   //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                  /  _||||| -:- |||||-  \\                  //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                  |   | \\\\\\  -  /// |   |                  //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                  | \\_|  ''\\---/''  |   |                  //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                  \\  .-\\__  `-`  ___/-. /                  //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                ___`. .'  /--.--\\  `. . ___                //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//               .\"\" '<  `.___\\_<|>_/___.'  >'\"\".            //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//            | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |            //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//            \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /            //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//     ========`-.____`-.___\\_____/___.-`____.-'========     //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//                          `=---='                          //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^     //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"//           佛祖保佑       永不宕机     永无BUG             //"+LOG_COLOR.RESET+'\n'+
+LOG_COLOR.BG_YELLOW+"///////////////////////////////////////////////////////////////"+LOG_COLOR.RESET+'\n');
 
 app.listen(PORT, () => {
     console.log(LOG_COLOR.FG_BLUE + `LearnHub API is listening at http://localhost:${PORT}` + LOG_COLOR.RESET);
@@ -35,4 +35,3 @@ app.listen(PORT, () => {
 
 
 
->>>>>>> 782526c0ec88ab7497ce607f9e84a2a3aab7d653
