@@ -38,7 +38,8 @@
               </div>
             </div>
 
-            <div class="action-section">
+            <div class="action-section" v-if="!userStore.isTeacher">
+              <!-- 学生显示报名和取消按钮 -->
               <el-button
                 v-if="!isEnrolled"
                 type="primary"
@@ -125,8 +126,19 @@
                     </span>
                   </div>
                 </div>
+                <!-- 教师显示查看视频按钮 -->
                 <el-button
-                  v-if="isEnrolled"
+                  v-if="userStore.isTeacher"
+                  type="primary"
+                  size="small"
+                  class="start-learning-btn"
+                  @click="handleStartLearning(chapter)"
+                >
+                  查看视频
+                </el-button>
+                <!-- 学生显示开始学习或请先报名 -->
+                <el-button
+                  v-else-if="isEnrolled"
                   type="primary"
                   size="small"
                   class="start-learning-btn"
