@@ -2,7 +2,7 @@
   <div class="profile-page">
     <div class="profile-container">
       <!-- 用户信息区 -->
-      <section class="user-info-card">
+      <section class="user-info-card fade-in">
         <div class="card-header">
           <h2>个人资料</h2>
         </div>
@@ -101,7 +101,7 @@
       </section>
 
       <!-- 账号设置区 -->
-      <section class="account-settings-card">
+      <section class="account-settings-card fade-in" style="animation-delay: 0.2s">
         <div class="card-header">
           <h2>账号设置</h2>
         </div>
@@ -792,6 +792,23 @@ onMounted(() => {
     width: 100%;
     justify-content: center;
   }
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 </style>
 

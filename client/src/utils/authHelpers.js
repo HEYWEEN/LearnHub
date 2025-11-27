@@ -9,7 +9,7 @@ export function getRedirectPathByRole(role) {
       return '/teacher'
     case 'student':
     default:
-      return '/home'
+      return '/'
   }
 }
 

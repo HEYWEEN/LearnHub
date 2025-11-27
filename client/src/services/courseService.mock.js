@@ -22,13 +22,13 @@ const mockCourses = [
     description: '全面掌握Vue3新特性和TypeScript类型系统，构建企业级应用',
     coverImage: '/src/assets/images/default-course.png',
     instructor: {
-      id: 'user_457',
-      name: '李老师',
+      id: 'user_002',
+      name: '李明',
       avatar: '/src/assets/images/default-teacher.jpg'
     },
     category: '前端开发',
-    lessonCount: 32,
-    enrollmentCount: 2340
+    lessonCount: 3,
+    enrollmentCount: 4
   },
   {
     id: 'course_3',
@@ -162,13 +162,13 @@ const mockCourses = [
     description: '学习前端性能优化技巧，提升网页加载速度和用户体验',
     coverImage: '/src/assets/images/default-course.png',
     instructor: {
-      id: 'user_467',
-      name: '杨老师',
+      id: 'user_002',
+      name: '李明',
       avatar: '/src/assets/images/default-teacher.jpg'
     },
     category: '前端开发',
-    lessonCount: 18,
-    enrollmentCount: 2100
+    lessonCount: 5,
+    enrollmentCount: 2
   },
   {
     id: 'course_13',
@@ -433,8 +433,98 @@ export const submitReview = async (courseId, reviewData) => {
     message: '评论发表成功！',
     review: {
       id: `review_${Date.now()}`,
-      ...reviewData,
+      user: {
+        name: '当前用户',
+        avatar: '/src/assets/images/default-avatar.png'
+      },
+      rating: reviewData.rating,
+      comment: reviewData.comment,
       createdAt: new Date().toISOString()
     }
+  }
+}
+
+// ==================== 教师专用API ====================
+
+// 获取教师的课程列表
+export const getTeacherCourses = async (teacherId) => {
+  await delay()
+  
+  const teacherCourses = mockCourses.filter(c => c.instructor.id === teacherId)
+  
+  return {
+    success: true,
+    courses: teacherCourses,
+    total: teacherCourses.length
+  }
+}
+
+// 创建新课程
+export const createCourse = async (courseData) => {
+  await delay(500)
+  
+  const newCourse = {
+    id: `course_${Date.now()}`,
+    title: courseData.title,
+    description: courseData.description,
+    coverImage: courseData.coverImage || '/src/assets/images/default-course.png',
+    instructor: courseData.instructor,
+    category: courseData.category,
+    lessonCount: 0,
+    enrollmentCount: 0,
+    createdAt: new Date().toISOString()
+  }
+  
+  mockCourses.push(newCourse)
+  
+  return {
+    success: true,
+    message: '课程创建成功！',
+    course: newCourse
+  }
+}
+
+// 更新课程信息
+export const updateCourse = async (courseId, courseData) => {
+  await delay(500)
+  
+  const courseIndex = mockCourses.findIndex(c => c.id === courseId)
+  
+  if (courseIndex === -1) {
+    throw new Error('课程不存在')
+  }
+  
+  // 更新课程信息
+  mockCourses[courseIndex] = {
+    ...mockCourses[courseIndex],
+    title: courseData.title || mockCourses[courseIndex].title,
+    description: courseData.description || mockCourses[courseIndex].description,
+    coverImage: courseData.coverImage || mockCourses[courseIndex].coverImage,
+    category: courseData.category || mockCourses[courseIndex].category,
+    updatedAt: new Date().toISOString()
+  }
+  
+  return {
+    success: true,
+    message: '课程更新成功！',
+    course: mockCourses[courseIndex]
+  }
+}
+
+// 删除课程
+export const deleteCourse = async (courseId) => {
+  await delay(300)
+  
+  const courseIndex = mockCourses.findIndex(c => c.id === courseId)
+  
+  if (courseIndex === -1) {
+    throw new Error('课程不存在')
+  }
+  
+  mockCourses.splice(courseIndex, 1)
+  
+  return {
+    success: true,
+    message: '课程删除成功！'
   }
 }

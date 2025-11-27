@@ -1,26 +1,26 @@
 <template>
   <div class="teacher-dashboard">
-    <div class="dashboard-header">
+    <div class="dashboard-header fade-in">
       <h1>教师工作台</h1>
-      <p class="welcome-text">欢迎回来，{{ userName }}老师！</p>
+      <p class="welcome-text">欢迎，{{ userName }}！</p>
     </div>
 
     <div class="dashboard-content">
       <!-- 快捷操作 -->
-      <section class="quick-actions">
+      <section class="quick-actions fade-in" style="animation-delay: 0.1s">
         <h2>快捷操作</h2>
         <div class="action-cards">
-          <div class="action-card" @click="handleAddCourse">
+          <div class="action-card" @click="handleAddCourse" style="animation-delay: 0.2s">
             <div class="card-icon">➕</div>
             <h3>添加课程</h3>
             <p>创建新的课程内容</p>
           </div>
-          <div class="action-card" @click="handleManageCourses">
+          <div class="action-card" @click="handleManageCourses" style="animation-delay: 0.3s">
             <div class="card-icon">📚</div>
             <h3>课程管理</h3>
             <p>管理已有的课程</p>
           </div>
-          <div class="action-card" @click="handleViewStudents">
+          <div class="action-card" @click="handleViewStudents" style="animation-delay: 0.4s">
             <div class="card-icon">👥</div>
             <h3>学生管理</h3>
             <p>查看学生学习情况</p>
@@ -29,7 +29,7 @@
       </section>
 
       <!-- 我的课程 -->
-      <section class="my-courses">
+      <section class="my-courses fade-in" style="animation-delay: 0.5s">
         <h2>我的课程</h2>
         <div class="courses-placeholder">
           <div class="placeholder-icon">📖</div>
@@ -39,19 +39,19 @@
       </section>
 
       <!-- 统计信息 -->
-      <section class="statistics">
+      <section class="statistics fade-in" style="animation-delay: 0.6s">
         <h2>数据概览</h2>
-        <div class="stat-cards">
+        <div class="stat-cards" v-loading="loading">
           <div class="stat-card">
-            <div class="stat-value">0</div>
+            <div class="stat-value">{{ statistics.courseCount }}</div>
             <div class="stat-label">课程数量</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">0</div>
+            <div class="stat-value">{{ statistics.studentCount }}</div>
             <div class="stat-label">学生人数</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">0</div>
+            <div class="stat-value">{{ statistics.totalLessons }}</div>
             <div class="stat-label">课时总数</div>
           </div>
         </div>
@@ -61,26 +61,56 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/slices/user'
+import { getTeacherStatistics } from '@/services/teacherService.mock'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 const userName = computed(() => userStore.user?.username || '教师')
 
+// 统计数据
+const statistics = ref({
+  courseCount: 0,
+  studentCount: 0,
+  totalLessons: 0
+})
+
+const loading = ref(false)
+
+// 加载统计数据
+const loadStatistics = async () => {
+  loading.value = true
+  try {
+    const result = await getTeacherStatistics(userStore.user?.id)
+    if (result.success) {
+      statistics.value = result.data
+    }
+  } catch (error) {
+    console.error('获取统计数据失败:', error)
+    ElMessage.error('加载数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadStatistics()
+})
+
 function handleAddCourse() {
-  ElMessage.info('添加课程功能正在开发中...')
+  router.push('/teacher/courses/create')
 }
 
 function handleManageCourses() {
-  ElMessage.info('课程管理功能正在开发中...')
+  router.push('/teacher/courses/manage')
 }
 
 function handleViewStudents() {
-  ElMessage.info('学生管理功能正在开发中...')
+  router.push('/teacher/students')
 }
 </script>
 
@@ -210,6 +240,28 @@ function handleViewStudents() {
 .stat-label {
   font-size: 16px;
   color: #7f8c8d;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.action-card {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 /* 响应式设计 */

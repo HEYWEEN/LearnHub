@@ -9,11 +9,19 @@
         </router-link>
       </div>
 
-      <!-- 导航菜单 -->
-      <nav class="navbar-menu">
+      <!-- 学生导航菜单 -->
+      <nav class="navbar-menu" v-if="userStore.isStudent">
         <router-link to="/" class="nav-link">主页</router-link>
         <router-link to="/courses" class="nav-link">课程中心</router-link>
         <a @click="handleLearningSpaceClick" class="nav-link nav-link-clickable">学习空间</a>
+        <router-link to="/profile" class="nav-link">个人中心</router-link>
+      </nav>
+
+      <!-- 教师导航菜单 -->
+      <nav class="navbar-menu" v-else-if="userStore.isTeacher">
+        <router-link to="/teacher" class="nav-link">工作台</router-link>
+        <router-link to="/teacher/courses/manage" class="nav-link">课程管理</router-link>
+        <router-link to="/teacher/students" class="nav-link">学生管理</router-link>
         <router-link to="/profile" class="nav-link">个人中心</router-link>
       </nav>
 
@@ -133,7 +141,12 @@ const handleClickOutside = (event) => {
 }
 
 const onScroll = () => {
-  isScrolled.value = window.scrollY > 80
+  // 只在主页应用滚动变色效果
+  if (router.currentRoute.value.path === '/') {
+    isScrolled.value = window.scrollY > 80
+  } else {
+    isScrolled.value = false
+  }
 }
 
 onMounted(() => {
@@ -152,8 +165,10 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: var(--color-white);
   transition: background 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 1000;
+  width: 100%;
 }
 
 .navbar.scrolled {

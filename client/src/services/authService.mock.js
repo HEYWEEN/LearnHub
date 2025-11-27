@@ -16,12 +16,48 @@ const mockUsers = [
   },
   {
     id: 'user_002',
-    username: '李老师',
+    username: '李明',
     email: 'teacher@example.com',
     password: 'Teacher123',
     role: 'teacher',
     avatar: null, // 使用默认头像
     createdAt: '2024-01-10T08:00:00Z'
+  },
+  {
+    id: 'user_003',
+    username: '王芳',
+    email: 'wangfang@example.com',
+    password: 'Student123',
+    role: 'student',
+    avatar: null,
+    createdAt: '2024-01-20T09:00:00Z'
+  },
+  {
+    id: 'user_004',
+    username: '刘洋',
+    email: 'liuyang@example.com',
+    password: 'Student123',
+    role: 'student',
+    avatar: null,
+    createdAt: '2024-02-01T10:00:00Z'
+  },
+  {
+    id: 'user_005',
+    username: '赵敏',
+    email: 'zhaomin@example.com',
+    password: 'Student123',
+    role: 'student',
+    avatar: null,
+    createdAt: '2024-02-05T11:00:00Z'
+  },
+  {
+    id: 'user_006',
+    username: '陈峰',
+    email: 'chenfeng@example.com',
+    password: 'Student123',
+    role: 'student',
+    avatar: null,
+    createdAt: '2024-02-10T14:00:00Z'
   }
 ]
 
@@ -135,12 +171,48 @@ export function resetMockUsers() {
     },
     {
       id: 'user_002',
-      username: '李老师',
+      username: '李明',
       email: 'teacher@example.com',
       password: 'Teacher123',
       role: 'teacher',
       avatar: null,
       createdAt: '2024-01-10T08:00:00Z'
+    },
+    {
+      id: 'user_003',
+      username: '王芳',
+      email: 'wangfang@example.com',
+      password: 'Student123',
+      role: 'student',
+      avatar: null,
+      createdAt: '2024-01-20T09:00:00Z'
+    },
+    {
+      id: 'user_004',
+      username: '刘洋',
+      email: 'liuyang@example.com',
+      password: 'Student123',
+      role: 'student',
+      avatar: null,
+      createdAt: '2024-02-01T10:00:00Z'
+    },
+    {
+      id: 'user_005',
+      username: '赵敏',
+      email: 'zhaomin@example.com',
+      password: 'Student123',
+      role: 'student',
+      avatar: null,
+      createdAt: '2024-02-05T11:00:00Z'
+    },
+    {
+      id: 'user_006',
+      username: '陈峰',
+      email: 'chenfeng@example.com',
+      password: 'Student123',
+      role: 'student',
+      avatar: null,
+      createdAt: '2024-02-10T14:00:00Z'
     }
   )
 }
@@ -298,5 +370,5 @@ export async function changePassword(passwordData) {
 console.log('Mock Service 已启用')
 console.log('测试账号:')
 console.log('学生: zhangsan@example.com / Test123')
-console.log('教师: teacher@example.com / Teacher123')
+console.log('教师(李明): teacher@example.com / Teacher123')
 

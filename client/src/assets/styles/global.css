@@ -72,6 +72,11 @@
   padding: 0;
 }
 
+html {
+  /* 强制显示滚动条，防止页面宽度跳动 */
+  overflow-y: scroll;
+}
+
 body {
   margin: 0;
   padding: 0;
