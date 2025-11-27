@@ -35,6 +35,8 @@ app.use('/api/users'    , routes.usersRouter);
 app.use('/api/ai'       , routes.aiRouter);
 app.use('/api/note'     , routes.noteRouter);
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.get('/', (req, res) => {
     res.send('LearnHub API is running...');
 });

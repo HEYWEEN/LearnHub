@@ -1,5 +1,14 @@
 import getPool from "../config/db.js";
 
+export async function findAllProgress(userId) {
+  const pool = getPool();
+  const [rows] = await pool.query(
+    "SELECT * FROM progress WHERE user_id = ? ORDER BY updated_at DESC",
+    [userId] 
+  );
+  return rows;
+}
+
 export async function findProgressByUserCourse(userId, courseId) {
   const pool = getPool();
   const [rows] = await pool.query(

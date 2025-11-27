@@ -1,6 +1,12 @@
 import express from "express";
-import { changeRole, getProfile, listUsers, updateProfile } from "../controllers/usersController.js";
-import verifyToken from "../middleware/authMiddleware.js";
+import {
+  changeRole,
+  getProfile,
+  listUsers,
+  updateAvatar,
+  updateProfile,
+} from "../controllers/usersController.js";
+import { authorize, verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 //req
@@ -15,10 +21,12 @@ router.get("/:userId", getProfile);
 //   "avatar": "string, 选填, 头像URL",
 //   "bio": "string, 选填, 个人简介"
 // }
-router.put("/:userId",verifyToken ,updateProfile);
+router.put("/:userId", verifyToken, updateProfile);
 
-router.get("/",listUsers);
+router.put("/:userId/avatar", verifyToken, updateAvatar);
 
-router.put("/:userId/role",verifyToken,changeRole);
+router.get("/", listUsers);
+
+router.put("/:userId/role", verifyToken,authorize(["admin"]), changeRole);
 
 export default router;

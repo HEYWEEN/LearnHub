@@ -4,11 +4,6 @@ import STATUS from "../constants/httpStatus.js";
 import { v4 as uuidv4 } from "uuid";
 
 export async function addLesson({ user, courseId, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await courseRepo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -35,11 +30,6 @@ export async function addLesson({ user, courseId, payload }) {
 }
 
 export async function removeLesson({ user, lessonId }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const lesson = await repo.findLessonById(lessonId);
   if (!lesson) {
     const err = new Error("章节不存在");
@@ -61,11 +51,6 @@ export async function removeLesson({ user, lessonId }) {
 }
 
 export async function modifyLesson({ user, courseId, lessonId, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await courseRepo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -86,6 +71,11 @@ export async function modifyLesson({ user, courseId, lessonId, payload }) {
   if (typeof payload.duration !== "undefined")
     update.duration = payload.duration;
   await repo.updateLessonById(lessonId, update);
+  const lessons = await repo.findLessonsByCourseId(courseId);
+  return lessons;
+}
+
+export async function getLessonByCourseId({courseId}) {
   const lessons = await repo.findLessonsByCourseId(courseId);
   return lessons;
 }

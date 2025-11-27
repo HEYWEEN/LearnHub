@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/response.js";
 import * as lessonService from "../services/lessonService.js";
+import fileService from "../services/fileService.js";
 
 const addLesson = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
@@ -30,4 +31,27 @@ const modifyLesson = asyncHandler(async (req, res) => {
   return sendSuccess(res, "章节修改成功", { lessons });
 });
 
-export { addLesson, removeLesson, modifyLesson };
+const updateVideo = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { courseId, lessonId } = req.params;
+  // 文件上传
+  await fileService.uploadFileAsync("video")(req, res);
+  // 获取上传后的文件路径
+  const coverVideoUrl = fileService.getUploadedFilePath(req.file);
+  // 更新课程封面
+  const updated = await lessonService.modifyLesson({
+    user,
+    courseId,
+    lessonId,
+    payload: { video_url: coverVideoUrl },
+  });
+  return sendSuccess(res, "更新成功", { course: updated });
+});
+
+const getLesson = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const lessons = await lessonService.getLessonByCourseId({ lessonId });
+  return sendSuccess(res, "获取章节成功", { lessons });
+});
+
+export { addLesson, removeLesson, modifyLesson, getLesson, updateVideo };

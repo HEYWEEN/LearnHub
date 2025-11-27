@@ -40,3 +40,23 @@ export async function getCourseLearning({ user, courseId }) {
   const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
   return { total, completed, rate, lessons, progress: progressRows };
 }
+
+export async function getRecentLearning({ user, page , limit }) {
+  const allProgress = await learningRepo.findAllProgress(user.id);
+  const total = allProgress.length;
+  let progress;
+  if (page * limit > total) {
+    progress = [];
+  } else {
+    progress = allProgress.splice((page - 1) * limit, page * limit);
+  }
+  return {
+    progress,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
+  };
+}

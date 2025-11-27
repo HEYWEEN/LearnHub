@@ -42,11 +42,6 @@ export async function getCourseById({ courseId }) {
 }
 
 export async function addCourse({ user, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const id = uuidv4();
   const course = {
     id,
@@ -62,11 +57,6 @@ export async function addCourse({ user, payload }) {
 }
 
 export async function removeCourse({ user, courseId }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await repo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -82,11 +72,6 @@ export async function removeCourse({ user, courseId }) {
 }
 
 export async function modifyCourse({ user, courseId, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await repo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -106,6 +91,7 @@ export async function modifyCourse({ user, courseId, payload }) {
     toUpdate.cover_image = payload.cover_image;
   if (typeof payload.video_preview !== "undefined")
     toUpdate.video_preview = payload.video_preview;
+  // 更新课程信息
   await repo.updateCourse(courseId, toUpdate);
   const updated = await repo.findCourseById(courseId);
   return updated;

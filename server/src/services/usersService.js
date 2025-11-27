@@ -30,11 +30,6 @@ export async function listUsers({ page = 1, limit = 20, role }) {
 }
 
 export async function changeRole({ admin, userId, role }) {
-  if (!admin || admin.role !== "admin") {
-    const e = new Error("需要管理员权限");
-    e.status = STATUS.FORBIDDEN;
-    throw e;
-  }
   await usersRepo.updateUserRole(userId, role);
   return await usersRepo.findUserById(userId);
 }
