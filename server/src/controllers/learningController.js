@@ -27,4 +27,11 @@ const getCourseLearning = asyncHandler(async (req, res) => {
   return sendSuccess(res, "获取课程学习数据成功", data);
 });
 
-export { getProgress, markCompleted, getCourseLearning };
+const getRecentLearning = asyncHandler(async (req,res)=>{
+  const user = req.user;
+  const { page = 1, limit = 12} = req.query;
+  const data = await learningService.getRecentLearning({user,page,limit});
+  return sendSuccess(res,"获取学习数据成功",data);
+})
+
+export { getProgress, markCompleted, getCourseLearning,getRecentLearning };

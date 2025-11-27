@@ -22,18 +22,14 @@ export async function updateProfile({ user, payload }) {
 
 export async function listUsers({ page = 1, limit = 20, role }) {
   const rows = await usersRepo.listUsers({ page, limit, role });
+  const total = await usersRepo.countUsers({role});
   return {
     users: rows,
-    pagination: { page: Number(page), limit: Number(limit) },
+    pagination: { page: Number(page), limit: Number(limit),total,pages:Math.ceil( total/Number(limit)) },
   };
 }
 
 export async function changeRole({ admin, userId, role }) {
-  if (!admin || admin.role !== "admin") {
-    const e = new Error("需要管理员权限");
-    e.status = STATUS.FORBIDDEN;
-    throw e;
-  }
   await usersRepo.updateUserRole(userId, role);
   return await usersRepo.findUserById(userId);
 }

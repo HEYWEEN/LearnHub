@@ -3,20 +3,36 @@ import { sendError } from "../utils/response.js";
 import jwt from "jsonwebtoken";
 import { getSecretKey } from "../config/jwt.js";
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
   const SECRET_KEY = getSecretKey();
   let token = req.headers["authorization"];
   if (!token) {
-    return sendError(res, "需要身份验证的令牌", STATUS.FORBIDDEN);
+    const err = new Error("需要身份验证的令牌");
+    err.status = STATUS.FORBIDDEN;
+    return next(err);
   }
   token = token.split(" ")[1];
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     req.user = decoded;
     next();
-  } catch (err) {
-    return sendError(res, "无效的令牌", STATUS.UNAUTHORIZED);
+  } catch (Err) {
+    const err = new Error("权限不足");
+    err.status = STATUS.UNAUTHORIZED;
+    return next(err);
   }
-}
+};
 
-export default verifyToken;
+const authorize = (roles = []) => {
+  return async (req, res, next) => {
+    const user = req.user;
+    if (!roles.includes(user.role)) {
+      const err = new Error("权限不足");
+      err.status = STATUS.FORBIDDEN;
+      return next(err);
+    }
+    next();
+  };
+};
+
+export { verifyToken, authorize };

@@ -1,4 +1,3 @@
--- 数据库初始化
 
 CREATE DATABASE IF NOT EXISTS learnhub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE learnhub;
@@ -77,6 +76,7 @@ CREATE TABLE reviews (
     comment TEXT NOT NULL,
     rating INT CHECK (rating BETWEEN 1 AND 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -101,4 +101,17 @@ CREATE TABLE ai_messages(
     context TEXT NOT NULL,
     send_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(conversation_id) REFERENCES ai_conversation(id) ON DELETE CASCADE
+)
+
+CREATE TABLE notes(
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36),
+    course_id VARCHAR(36),
+    lesson_id VARCHAR(36),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL
 )

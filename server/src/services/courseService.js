@@ -2,7 +2,6 @@ import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { v4 as uuidv4 } from "uuid";
 
-// 使用 repository 层（如果已有 repository 文件可以改为 import * as repo from "../repository/coursesRepository.js")
 import * as repo from "../repository/coursesRepository.js";
 import * as lessonRepo from "../repository/lessonRepository.js";
 import * as reviewRepo from "../repository/reviewRepository.js";
@@ -38,17 +37,11 @@ export async function getCourseById({ courseId }) {
     throw err;
   }
   const lessons = await repo.findLessonsByCourseId(courseId);
-  // reviews repository (reviesRepository.js) 名称保留你现有文件里的一致性
   const reviews = (await reviewRepo.findReviewsByCourseId?.(courseId)) || [];
   return { ...course, lessons, reviews };
 }
 
 export async function addCourse({ user, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const id = uuidv4();
   const course = {
     id,
@@ -64,11 +57,6 @@ export async function addCourse({ user, payload }) {
 }
 
 export async function removeCourse({ user, courseId }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await repo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -84,11 +72,6 @@ export async function removeCourse({ user, courseId }) {
 }
 
 export async function modifyCourse({ user, courseId, payload }) {
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    const err = new Error("权限不足");
-    err.status = STATUS.FORBIDDEN;
-    throw err;
-  }
   const course = await repo.findCourseById(courseId);
   if (!course) {
     const err = new Error("课程不存在");
@@ -108,6 +91,7 @@ export async function modifyCourse({ user, courseId, payload }) {
     toUpdate.cover_image = payload.cover_image;
   if (typeof payload.video_preview !== "undefined")
     toUpdate.video_preview = payload.video_preview;
+  // 更新课程信息
   await repo.updateCourse(courseId, toUpdate);
   const updated = await repo.findCourseById(courseId);
   return updated;

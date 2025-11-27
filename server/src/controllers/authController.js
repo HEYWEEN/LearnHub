@@ -21,8 +21,8 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.body;
-  const tokens = await authService.refreshToken({ refreshToken });
+  const user = req.user;
+  const tokens = await authService.refreshToken({ user });
   return sendSuccess(res, "刷新 token 成功", tokens);
 });
 
