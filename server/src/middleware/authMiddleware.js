@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (Err) {
-    const err = new Error("权限不足");
+    const err = new Error("令牌无效或过期");
     err.status = STATUS.UNAUTHORIZED;
     return next(err);
   }
