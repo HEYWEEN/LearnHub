@@ -1,4 +1,4 @@
-import upload from "../config/multer";
+import upload from "../config/multer.js";
 
 // const uploadFile = (fileType) => {
 //   return upload.single(fileType); // 动态决定上传文件类型
