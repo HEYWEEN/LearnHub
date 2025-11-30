@@ -9,6 +9,7 @@
 8. Learning 学习进度 API
 9. Notes 笔记 API
 10. AI 会话 API
+11. 关于如何获取静态文件
 
 1. 概览
 - 基础路径：/api（视项目路由挂载而定；若路由直接挂在根，请去掉 /api 前缀）
@@ -32,10 +33,10 @@
     {
       "email": "user@example.com",
       "password": "string",
-      "username": "display name"  // 可选
+      "username": "display name"  // 可选(不填就用邮箱当名字)
     }
     ```
-  - 成功：201 或 200
+  - 成功： 200
     ```
     {
       "success": true,
@@ -63,14 +64,20 @@
   - 成功：200 -> userdata
 
 - POST /api/auth/refresh
-  - 说明：刷新 token（若实现 refreshToken 机制）
-  - Body: { "refreshToken": "..." }
+  - 说明：刷新 token
+  - Body: { "token": "..." }
   - 成功：200 返回新 token；错误：401/400
 
 4. Users 用户 API
 - GET /api/users/:userId
   - 说明：获取指定用户档案
   - 鉴权：可选（视策略）
+  - 成功：200 返回用户信息（不包含密码）
+
+- POST /api/users/me/avatar
+  - 说明：上传自己的头像
+  - 鉴权：必须
+  - Body: {"image":(文件信息)}
   - 成功：200 返回用户信息（不包含密码）
 
 - PUT /api/users/me
@@ -83,9 +90,9 @@
   - 成功：200 返回更新后的用户
 
 - GET /api/users
-  - 说明：用户列表（管理员可用）
+  - 说明：用户列表
   - Query: page, limit, role
-  - 鉴权：可选/管理员
+  - 鉴权：无
   - 成功：200 { users: [...], pagination: {...} }
 
 - POST /api/users/:userId/role
@@ -119,9 +126,21 @@
   - 成功：200 返回删除确认
 
 - POST /api/courses/:courseId
-  - 说明：修改课程（作者或 admin）
+  - 说明：修改课程信息（作者或 admin）
   - 鉴权：必须
   - Body: 可包含 title/description/category/cover_image/video_preview
+  - 成功：200 返回更新后的课程
+
+- POST /api/courses/:courseId/cover-img
+  - 说明：修改课程封面（作者或 admin）
+  - 鉴权：必须
+  - Body: {"image":(文件信息)}
+  - 成功：200 返回更新后的课程
+
+- POST /api/courses/:courseId/video-preview
+  - 说明：修改课程导览视频（作者或 admin）
+  - 鉴权：必须
+  - Body: {"video":(文件信息)}
   - 成功：200 返回更新后的课程
 
 - POST /api/courses/:courseId/lesson
@@ -131,7 +150,7 @@
     ```
     { "title":"章节名", "description":"", "video_url":"", "duration": 120, "is_free": true }
     ```
-  - 成功：201 返回 lesson
+  - 成功：200 返回 lesson
 
 - DELETE /api/courses/:courseId/lesson/:lessonId
   - 说明：删除课时（teacher）
@@ -142,25 +161,22 @@
   - 说明：修改课时（teacher）
   - 鉴权：必须
   - Body: 同添加课时的字段
-  - 成功：200 返回更新后的课时或课程课时列表
+  - 成功：200 返回更新后的课程课时列表
 
-- POST /api/courses/:courseId/lesson/submit
-  - 说明：原项目中可能用于提交课时或作业；检查 controller 实现以确认行为
-  - 鉴权：必须（根据实现）
-
-- POST /api/courses/:courseId/submit 或 /courses/:courseId/review
-  - 说明：发布评论/评价
+- POST /api/courses/:courseId/lesson/:lessonId/video
+  - 说明：上传章节视频（teacher）
   - 鉴权：必须
+  - Body: {"video":(文件信息)}
+  - 成功：200 返回更新后的课程课时列表
+
+- POST /api/courses/:courseId/review
+  - 说明：发表评论
+  - 鉴权：必须（根据实现）
   - Body:
     ```
     { "content":"评论文本", "rating": 4, "parentId": null }
     ```
-  - 成功：201 返回评论
-
-6. Lessons 课时 API（若有独立路由）
-- 若单独存在，可支持：
-  - GET /api/lessons/:lessonId 获取课时信息（可能含 video_url）
-  - 其他操作参见课程相关课时接口
+  - 成功：200 返回发表评论信息
 
 7. Enroll 报名 API
 - POST /api/courses/:courseId/enroll
@@ -258,3 +274,10 @@
 }
 ```
 
+11. other
+
+如在user字段的avatar路径"/uploads/121313.jpg"
+
+要获取该图片访问http://localhost:3000/uploads/121313.jpg 即可
+
+同理，视频路径也可通过这个路径获取可下载的源文件
