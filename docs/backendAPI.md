@@ -152,6 +152,13 @@
     ```
   - 成功：200 返回 lesson
 
+6. Lessons课时api 
+
+
+- GET /api/courses/:courseId/lesson
+  - 获取课程所有课时
+  - 鉴权：无
+
 - DELETE /api/courses/:courseId/lesson/:lessonId
   - 说明：删除课时（teacher）
   - 鉴权：必须
@@ -177,6 +184,19 @@
     { "content":"评论文本", "rating": 4, "parentId": null }
     ```
   - 成功：200 返回发表评论信息
+
+-  GET /api/courses/:courseId/lesson/:lessonId/video/stream
+  - 说明： 流式播放视频
+  - 鉴权：无
+  - 支持 Range；返回文件流
+
+- POST /api/courses/:courseId/lesson/:lessonId/hls
+  - 说明：生成该课时的 HLS（m3u8 + ts 分片）
+  - 鉴权  无
+  - 成功：200 返回e.g. 
+```
+{ "playlistUrl": '/uploads/hls/<id>/index.m3u8' }
+```
 
 7. Enroll 报名 API
 - POST /api/courses/:courseId/enroll
@@ -280,4 +300,12 @@
 
 要获取该图片访问http://localhost:3000/uploads/121313.jpg 即可
 
-同理，视频路径也可通过这个路径获取可下载的源文件
+- 视频文件获取（补充）
+
+所有由 videoService 返回的路径，如：
+
+/uploads/xxx.mp4
+
+/uploads/hls/lesson-001/index.m3u8
+
+可直接访问
