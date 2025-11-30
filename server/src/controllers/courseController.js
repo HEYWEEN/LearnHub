@@ -46,9 +46,9 @@ const updateCoverImage = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId } = req.params;
   // 文件上传
-  await fileService.uploadFileAsync("image")(req, res);
+  const file = await fileService.uploadFileAsync("image")(req, res);
   // 获取上传后的文件路径
-  const coverImageUrl = fileService.getUploadedFilePath(req.file);
+  const coverImageUrl = fileService.getUploadedFilePath(file);
   // 更新课程封面
   const updated = await courseService.modifyCourse({
     user,
@@ -61,11 +61,9 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 const updateVideoPreview = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId } = req.params;
-  // 文件上传
-  await fileService.uploadFileAsync("video")(req, res);
-  // 获取上传后的文件路径
-  const coverVideoUrl = fileService.getUploadedFilePath(req.file);
-  // 更新课程封面
+  // 等待上传并获取文件对象
+  const file = await fileService.uploadFileAsync("video")(req, res);
+  const coverVideoUrl = fileService.getUploadedFilePath(file);
   const updated = await courseService.modifyCourse({
     user,
     courseId,

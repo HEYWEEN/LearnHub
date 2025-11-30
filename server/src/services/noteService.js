@@ -1,6 +1,10 @@
 import * as noteRepo from "../repository/noteRepository.js";
 import { v4 as uuidv4 } from "uuid";
 import STATUS from "../constants/httpStatus.js";
+import {
+  withConnection,
+  withTransaction,
+} from "../repository/transactionRepository.js";
 
 export async function createNote({ user, payload }) {
   const id = uuidv4();
@@ -11,12 +15,19 @@ export async function createNote({ user, payload }) {
     lesson_id: payload.lessonId || null,
     content: payload.content || "",
   };
-  await noteRepo.insertNote(note);
-  return await noteRepo.findNoteById(id);
+  // 确保把 pool/conn 传给 repository 并 await
+  await withConnection(async (pool) => {
+    await noteRepo.insertNote(pool, note);
+  });
+  return await withConnection(async (pool) => {
+    return await noteRepo.findNoteById(pool, id);
+  });
 }
 
 export async function updateNote({ user, noteId, payload }) {
-  const existing = await noteRepo.findNoteById(noteId);
+  const existing = await withConnection((pool) =>
+    noteRepo.findNoteById(pool, noteId)
+  );
   if (!existing) {
     const e = new Error("笔记不存在");
     e.status = STATUS.NOT_FOUND;
@@ -29,12 +40,16 @@ export async function updateNote({ user, noteId, payload }) {
   }
   const update = {};
   if (typeof payload.content !== "undefined") update.content = payload.content;
-  await noteRepo.updateNoteById(noteId, update);
-  return await noteRepo.findNoteById(noteId);
+  await withConnection(async (pool) => {
+    await noteRepo.updateNoteById(pool, noteId, update);
+  });
+  return await withConnection((pool) => noteRepo.findNoteById(pool, noteId));
 }
 
 export async function deleteNote({ user, noteId }) {
-  const existing = await noteRepo.findNoteById(noteId);
+  const existing = await withConnection((pool) =>
+    noteRepo.findNoteById(pool, noteId)
+  );
   if (!existing) {
     const e = new Error("笔记不存在");
     e.status = STATUS.NOT_FOUND;
@@ -45,7 +60,7 @@ export async function deleteNote({ user, noteId }) {
     e.status = STATUS.FORBIDDEN;
     throw e;
   }
-  await noteRepo.deleteNoteById(noteId);
+  await withConnection((pool) => noteRepo.deleteNoteById(pool, noteId));
 }
 
 export async function listNotes({
@@ -56,15 +71,30 @@ export async function listNotes({
   limit = 20,
 }) {
   const offset = (Number(page) - 1) * Number(limit);
-  const rows = await noteRepo.listNotes({
-    userId: user.id,
-    courseId,
-    lessonId,
-    offset,
-    limit,
-  });
+  // 在事务中使用同一个 connection
+  const [notes, total] = await withTransaction(async (conn) =>
+    Promise.all([
+      noteRepo.listNotes(conn, {
+        userId: user.id,
+        courseId,
+        lessonId,
+        offset,
+        limit,
+      }),
+      noteRepo.countNotes(conn, {
+        userId: user.id,
+        courseId,
+        lessonId,
+      }),
+    ])
+  );
   return {
-    notes: rows,
-    pagination: { page: Number(page), limit: Number(limit) },
+    notes,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
   };
 }

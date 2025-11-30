@@ -72,8 +72,8 @@ router.post("/:courseId/cover-img",verifyToken,authorize(["teacher","admin"]),up
 router.post("/:courseId/video-preview",verifyToken,authorize(["teacher","admin"]),updateVideoPreview);
 
 
-// POST /courses/{courseId}/submit
-router.post("/:courseId/lesson/submit", verifyToken, releaseReview);
+// POST /courses/{courseId}/review
+router.post("/:courseId/review", verifyToken, releaseReview);
 
 // 删除课时（teacher）
 // DELETE /courses/{courseId}/lesson/{lessonId}

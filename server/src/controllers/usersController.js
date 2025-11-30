@@ -16,15 +16,8 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res, next) => {
-  // 使用封装后的 uploadFileAsync，这样可以直接使用 async/await
-  await new Promise((resolve, reject) => {
-    fileService.uploadFileAsync("image")(req, res, (err) => {
-      if (err) return reject(err); // 上传错误时抛出异常
-      resolve(); // 上传成功，继续执行
-    });
-  });
-  // 获取上传后的文件路径
-  const coverImageUrl = fileService.getUploadedFilePath(req.file);
+  const file = await fileService.uploadFileAsync("image")(req, res);
+  const coverImageUrl = fileService.getUploadedFilePath(file);
   // 调用服务层更新用户的头像
   const updated = await usersService.updateProfile({
     payload: { avatar: coverImageUrl },

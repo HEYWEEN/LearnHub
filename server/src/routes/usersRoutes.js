@@ -7,6 +7,7 @@ import {
   updateProfile,
 } from "../controllers/usersController.js";
 import { authorize, verifyToken } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
 //req
@@ -21,9 +22,9 @@ router.get("/:userId", getProfile);
 //   "avatar": "string, 选填, 头像URL",
 //   "bio": "string, 选填, 个人简介"
 // }
-router.put("/:userId", verifyToken, updateProfile);
+router.put("/me", verifyToken, updateProfile);
 
-router.put("/:userId/avatar", verifyToken, updateAvatar);
+router.put("/me/avatar", verifyToken, updateAvatar);
 
 router.get("/", listUsers);
 

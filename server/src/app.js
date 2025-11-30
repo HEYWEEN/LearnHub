@@ -7,7 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
 
-connectDB();
+await connectDB();
 
 import checkConfig from './utils/configChecker.js';
 checkConfig();
@@ -41,7 +41,7 @@ app.use('/api/users'    , routes.usersRouter);
 app.use('/api/ai'       , routes.aiRouter);
 app.use('/api/note'     , routes.noteRouter);
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
     res.send('LearnHub API is running...');
