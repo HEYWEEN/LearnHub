@@ -35,9 +35,9 @@ const updateVideo = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId, lessonId } = req.params;
   // 文件上传
-  await fileService.uploadFileAsync("video")(req, res);
+  const file = await fileService.uploadFileAsync("video")(req, res);
   // 获取上传后的文件路径
-  const coverVideoUrl = fileService.getUploadedFilePath(req.file);
+  const coverVideoUrl = fileService.getUploadedFilePath(file);
   // 更新课程封面
   const updated = await lessonService.modifyLesson({
     user,

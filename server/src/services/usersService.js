@@ -33,3 +33,4 @@ export async function changeRole({ admin, userId, role }) {
   await usersRepo.updateUserRole(userId, role);
   return await usersRepo.findUserById(userId);
 }
+

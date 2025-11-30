@@ -1,7 +1,6 @@
 import getPool from "../config/db.js";
 
-export async function insertNote(note) {
-  const pool = getPool();
+export async function insertNote(pool, note) {
   const sql = `INSERT INTO notes (id, user_id, course_id, lesson_id, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`;
   await pool.query(sql, [
     note.id,
@@ -12,14 +11,12 @@ export async function insertNote(note) {
   ]);
 }
 
-export async function findNoteById(id) {
-  const pool = getPool();
+export async function findNoteById(pool, id) {
   const [rows] = await pool.query("SELECT * FROM notes WHERE id = ?", [id]);
   return rows[0];
 }
 
-export async function updateNoteById(id, fields = {}) {
-  const pool = getPool();
+export async function updateNoteById(pool, id, fields = {}) {
   const keys = Object.keys(fields);
   if (!keys.length) return;
   const sets = keys.map((k) => `${k} = ?`).join(", ");
@@ -29,19 +26,14 @@ export async function updateNoteById(id, fields = {}) {
   await pool.query(sql, params);
 }
 
-export async function deleteNoteById(id) {
-  const pool = getPool();
+export async function deleteNoteById(pool, id) {
   await pool.query("DELETE FROM notes WHERE id = ?", [id]);
 }
 
-export async function listNotes({
-  userId,
-  courseId,
-  lessonId,
-  offset = 0,
-  limit = 20,
-}) {
-  const pool = getPool();
+export async function listNotes(
+  pool,
+  { userId, courseId, lessonId, offset = 0, limit = 20 }
+) {
   const where = [];
   const params = [];
   if (userId) {
@@ -64,4 +56,25 @@ export async function listNotes({
     Number(limit),
   ]);
   return rows;
+}
+
+export async function countNotes(pool, { userId, courseId, lessonId }) {
+  const where = [];
+  const params = [];
+  if (userId) {
+    where.push("user_id = ?");
+    params.push(userId);
+  }
+  if (courseId) {
+    where.push("course_id = ?");
+    params.push(courseId);
+  }
+  if (lessonId) {
+    where.push("lesson_id = ?");
+    params.push(lessonId);
+  }
+  const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
+  const sql = `SELECT COUNT(*) as total FROM notes ${whereSQL}`;
+  const [rows] = await pool.query(sql, params);
+  return rows[0] ? rows[0].total : 0;
 }
