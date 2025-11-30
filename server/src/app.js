@@ -20,11 +20,18 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use((req, res, next) => {
+  // 允许所有域（仅开发环境）
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Credentials", "true");
+  // 处理 OPTIONS 预检
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 app.use(express.json());
 
 import routes from './routes/index.js';
