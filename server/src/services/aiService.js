@@ -142,9 +142,9 @@ export async function chatWithAi(messages, think = false) {
     return undefined;
   }
   const model = {
-    baseURL: "https://api.deepseek.com",
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    name: think ? "deepseek-reasoner" : "deepseek-chat",
+    baseURL: process.env.AI_URL,
+    apiKey: process.env.API_KEY,
+    name: process.env.AI_MODEL,
   };
   const openai = new OpenAI({
     baseURL: model.baseURL,

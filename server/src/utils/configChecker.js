@@ -13,12 +13,12 @@ export const checkEnvConfig = () => {
         "正在使用默认的SECRET_KEY,建议在.env中设置一个强随机性的SECRET_KEY。"
     );
   }
-  if (!process.env.DEEPSEEK_API_KEY) {
+  if (!process.env.API_KEY||!process.env.AI_URL||!process.env.AI_MODEL) {
     console.warn(
       LOG_COLOR.FG_RED +
         "[Warning]" +
         LOG_COLOR.RESET +
-        "没有设置deepseek的apikey(DEEPSEEK_API_KEY),无法启用相关功能"
+        "没有设置ai相关环境变量(API_KEY、AI_URL、AI_MODEL),无法启用相关功能"
     );
   }
   if (missingVars.length > 0) {

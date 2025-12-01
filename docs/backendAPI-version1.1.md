@@ -1,4 +1,11 @@
-新增路由：
+
+** 1.1 新增路由 **
+
+- GET /auth/refresh
+
+refreshToken
+
+** 1.0 ** ：
 
 - post api/auth/password
 
