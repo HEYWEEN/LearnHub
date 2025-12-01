@@ -1,16 +1,14 @@
 import getPool from "../config/db.js";
 
-export async function findAllProgress(userId) {
-  const pool = getPool();
+export async function findAllProgress(pool, userId) {
   const [rows] = await pool.query(
     "SELECT * FROM progress WHERE user_id = ? ORDER BY updated_at DESC",
-    [userId] 
+    [userId]
   );
   return rows;
 }
 
-export async function findProgressByUserCourse(userId, courseId) {
-  const pool = getPool();
+export async function findProgressByUserCourse(pool, userId, courseId) {
   const [rows] = await pool.query(
     "SELECT * FROM progress WHERE user_id = ? AND course_id = ? ORDER BY updated_at DESC",
     [userId, courseId]
@@ -18,8 +16,7 @@ export async function findProgressByUserCourse(userId, courseId) {
   return rows;
 }
 
-export async function findProgressByUserLesson(userId, lessonId) {
-  const pool = getPool();
+export async function findProgressByUserLesson(pool, userId, lessonId) {
   const [rows] = await pool.query(
     "SELECT * FROM progress WHERE user_id = ? AND lesson_id = ?",
     [userId, lessonId]
@@ -27,14 +24,10 @@ export async function findProgressByUserLesson(userId, lessonId) {
   return rows[0];
 }
 
-export async function upsertProgress({
-  id,
-  user_id,
-  course_id,
-  lesson_id,
-  completed,
-}) {
-  const pool = getPool();
+export async function upsertProgress(
+  pool,
+  { id, user_id, course_id, lesson_id, completed }
+) {
   // Try update first
   const [existing] = await pool.query(
     "SELECT id FROM progress WHERE user_id = ? AND lesson_id = ?",
@@ -51,4 +44,11 @@ export async function upsertProgress({
       [id, user_id, course_id, lesson_id, completed ? 1 : 0]
     );
   }
+}
+
+export async function deleteProgress(pool, userId, lessonId) {
+  await pool.query(
+    "DELETE FROM progress WHERE user_id = ? AND lesson_id = ?",
+    [userId, lessonId]
+  );
 }

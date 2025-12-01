@@ -1,7 +1,6 @@
 import getPool from "../config/db.js";
 
-export async function insertLesson(lesson) {
-  const pool = getPool();
+export async function insertLesson(pool, lesson) {
   const sql = `INSERT INTO lessons (id, course_id, title, description, video_url, duration, is_free, created_at, updated_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`;
   await pool.query(sql, [
@@ -15,21 +14,18 @@ export async function insertLesson(lesson) {
   ]);
 }
 
-export async function findLessonById(lessonId) {
-  const pool = getPool();
+export async function findLessonById(pool, lessonId) {
   const [rows] = await pool.query("SELECT * FROM lessons WHERE id = ?", [
     lessonId,
   ]);
   return rows[0];
 }
 
-export async function deleteLesson(lessonId) {
-  const pool = getPool();
+export async function deleteLesson(pool, lessonId) {
   await pool.query("DELETE FROM lessons WHERE id = ?", [lessonId]);
 }
 
-export async function updateLessonById(lessonId, fields = {}) {
-  const pool = getPool();
+export async function updateLessonById(pool, lessonId, fields = {}) {
   const keys = Object.keys(fields);
   if (!keys.length) return;
   const sets = keys.map((k) => `${k} = ?`).join(", ");
@@ -39,8 +35,7 @@ export async function updateLessonById(lessonId, fields = {}) {
   await pool.query(sql, params);
 }
 
-export async function findLessonsByCourseId(courseId) {
-  const pool = getPool();
+export async function findLessonsByCourseId(pool, courseId) {
   const [rows] = await pool.query(
     "SELECT * FROM lessons WHERE course_id = ? ORDER BY created_at",
     [courseId]

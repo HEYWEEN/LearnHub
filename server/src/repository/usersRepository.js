@@ -1,7 +1,6 @@
 import getPool from "../config/db.js";
 
-export async function findUserById(id) {
-  const pool = getPool();
+export async function findUserById(pool, id) {
   const [rows] = await pool.query(
     "SELECT id, username, email, avatar, bio, role, created_at, updated_at FROM users WHERE id = ?",
     [id]
@@ -9,8 +8,7 @@ export async function findUserById(id) {
   return rows[0];
 }
 
-export async function listUsers({ page = 1, limit = 20, role }) {
-  const pool = getPool();
+export async function listUsers(pool, { page = 1, limit = 20, role }) {
   const offset = (Number(page) - 1) * Number(limit);
   const where = [];
   const params = [];
@@ -26,31 +24,27 @@ export async function listUsers({ page = 1, limit = 20, role }) {
   return rows;
 }
 
-export async function countUsers({role}) {
-  const pool = getPool()
+export async function countUsers(pool, { role }) {
   let rows = null;
-  if(role){
-    [rows]  = await pool.query(
-      "SELECT COUNT(*) as total FROM users where role = ?",[role]
-    );
-  }else{
+  if (role) {
     [rows] = await pool.query(
-      "SELECT COUNT(*) as total FROM users"
+      "SELECT COUNT(*) as total FROM users where role = ?",
+      [role]
     );
+  } else {
+    [rows] = await pool.query("SELECT COUNT(*) as total FROM users");
   }
   return rows[0] ? rows[0].total : 0;
 }
 
-export async function updateUserRole(userId, role) {
-  const pool = getPool();
+export async function updateUserRole(pool, userId, role) {
   await pool.query(
     "UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?",
     [role, userId]
   );
 }
 
-export async function updateUserProfile(userId, fields = {}) {
-  const pool = getPool();
+export async function updateUserProfile(pool, userId, fields = {}) {
   const keys = Object.keys(fields);
   if (!keys.length) return;
   const sets = keys.map((k) => `${k} = ?`).join(", ");

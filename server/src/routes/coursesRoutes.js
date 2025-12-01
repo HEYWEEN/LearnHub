@@ -9,10 +9,12 @@ import {
   removeCourse,
   updateCoverImage,
   updateVideoPreview,
+  
 } from "../controllers/courseController.js";
 import {
   cancelEnrollCourse,
   enrollCourse,
+  checkEnrollStatus
 } from "../controllers/enrollController.js";
 import {
   addLesson,
@@ -35,21 +37,22 @@ const router = express.Router();
 // search: string, 搜索关键词
 router.get("/", getCourses);
 
-router.get("/:courseId", getCourseById);
-
-//报名课程（student）
-// 请求头:
-// Authorization: Bearer {token}
-router.post("/:courseId/enroll", verifyToken, enrollCourse);
-
-// POST /courses/{courseId}/cancel
-router.post("/:courseId/cancel", verifyToken, cancelEnrollCourse);
-
 // 添加课程（teacher）
 // POST /courses/
 // 请求头:
 // Authorization: Bearer {token}
 router.post("/", verifyToken, authorize(["teacher", "admin"]), addCourse);
+
+// 修改课程信息（teacher）
+// POST /courses/{courseId}
+// 请求头:
+// Authorization: Bearer {token}
+router.post(
+  "/:courseId",
+  verifyToken,
+  authorize(["teacher", "admin"]),
+  modifyCourse
+);
 
 // 删除课程（teacher）
 // DELETE /courses/{courseId}
@@ -62,16 +65,26 @@ router.delete(
   removeCourse
 );
 
-// 修改课程信息（teacher）
-// POST /courses/{courseId}
+router.get("/:courseId", getCourseById);
+
+//=检测报名状态（student）
 // 请求头:
 // Authorization: Bearer {token}
-router.post(
-  "/:courseId",
-  verifyToken,
-  authorize(["teacher", "admin"]),
-  modifyCourse
-);
+router.get("/:courseId/enroll-status", verifyToken, checkEnrollStatus);
+
+//报名课程（student）
+// 请求头:
+// Authorization: Bearer {token}
+router.post("/:courseId/enroll", verifyToken, enrollCourse);
+
+// POST /courses/{courseId}/cancel
+router.post("/:courseId/cancel", verifyToken, cancelEnrollCourse);
+
+
+
+
+
+
 
 // 修改课程封面（teacher）
 // POST /courses/{courseId}/cover-img

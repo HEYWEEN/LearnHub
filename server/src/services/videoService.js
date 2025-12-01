@@ -5,6 +5,9 @@ import { spawn } from "child_process";
 import mime from "mime"; // 在粘贴后请确保安装：npm i mime
 import * as coursesRepo from "../repository/coursesRepository.js";
 import * as lessonsRepo from "../repository/lessonRepository.js";
+import { withConnection } from "../repository/transactionRepository.js";
+import { sendError } from "../utils/response.js";
+import STATUS from "../constants/httpStatus.js";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads"); // 以运行目录为准（通常为 server 根）
 
@@ -17,14 +20,18 @@ function normalizeStoredPath(stored) {
 }
 
 export async function getCourseVideoPath(courseId) {
-  const course = await coursesRepo.findCourseById(courseId);
+  const course = await withConnection((conn) =>
+    coursesRepo.findCourseById(conn, courseId)
+  );
   if (!course) return null;
   const stored = course.video_preview || course.video || null;
   return stored ? normalizeStoredPath(stored) : null;
 }
 
 export async function getLessonVideoPath(lessonId) {
-  const lesson = await lessonsRepo.findLessonById(lessonId);
+  const lesson = await withConnection((conn) =>
+    lessonsRepo.findLessonById(conn, lessonId)
+  );
   if (!lesson) return null;
   const stored = lesson.video_url || lesson.video || null;
   return stored ? normalizeStoredPath(stored) : null;
@@ -37,18 +44,22 @@ export async function getLessonVideoPath(lessonId) {
  */
 export async function streamFileByRange(filePath, req, res) {
   if (!filePath) {
-    res.status(404).json({ success: false, message: "视频文件未配置" });
-    return;
+    const err = new Error("视频文件未配置");
+    err.status = STATUS.NOT_FOUND;
+    throw err;
   }
 
   // 文件是否存在
   let stats;
   try {
     stats = await fs.promises.stat(filePath);
-    if (!stats.isFile()) throw new Error("不是文件");
+    if (!stats.isFile()){ 
+      throw new Error("不是文件");
+    }
   } catch (err) {
-    res.status(404).json({ success: false, message: "视频文件未找到" });
-    return;
+    const Err = new Error("视频文件未找到:"+filePath);
+    Err.status = STATUS.NOT_FOUND;
+    throw Err;
   }
 
   const fileSize = stats.size;
@@ -58,7 +69,7 @@ export async function streamFileByRange(filePath, req, res) {
 
   if (!range) {
     // 没有 range，直接返回完整文件（注意：大文件可能无法一次性加载）
-    res.writeHead(200, {
+    res.writeHead(STATUS.OK, {
       "Content-Length": fileSize,
       "Content-Type": contentType,
       AcceptRanges: "bytes",

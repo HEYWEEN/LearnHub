@@ -1,7 +1,6 @@
 import getPool from "../config/db.js";
 
-export async function findCourses({ offset = 0, limit = 12, filters = {} }) {
-  const pool = getPool();
+export async function findCourses(pool,{ offset = 0, limit = 12, filters = {} }) {
   const where = [];
   const params = [];
   if (filters.category) {
@@ -23,8 +22,7 @@ export async function findCourses({ offset = 0, limit = 12, filters = {} }) {
   return rows;
 }
 
-export async function countCourses({ filters = {} }) {
-  const pool = getPool();
+export async function countCourses(pool,{ filters = {} }) {
   const where = [];
   const params = [];
   if (filters.category) {
@@ -42,16 +40,14 @@ export async function countCourses({ filters = {} }) {
   return rows[0] ? rows[0].total : 0;
 }
 
-export async function findCourseById(courseId) {
-  const pool = getPool();
+export async function findCourseById(pool,courseId) {
   const [rows] = await pool.query("SELECT * FROM courses WHERE id = ?", [
     courseId,
   ]);
   return rows[0];
 }
 
-export async function insertCourse(course) {
-  const pool = getPool();
+export async function insertCourse(pool,course) {
   const sql = `INSERT INTO courses (id, title, description, cover_image, category, instructor_id, video_preview, created_at, updated_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`;
   await pool.query(sql, [
@@ -65,8 +61,7 @@ export async function insertCourse(course) {
   ]);
 }
 
-export async function updateCourse(courseId, fields = {}) {
-  const pool = getPool();
+export async function updateCourse(pool,courseId, fields = {}) {
   const keys = Object.keys(fields);
   if (!keys.length) return;
   const sets = keys.map((k) => `${k} = ?`).join(", ");
@@ -76,26 +71,11 @@ export async function updateCourse(courseId, fields = {}) {
   await pool.query(sql, params);
 }
 
-export async function deleteCourseCascade(courseId) {
-  const pool = getPool();
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-    await conn.query("DELETE FROM lessons WHERE course_id = ?", [courseId]);
-    await conn.query("DELETE FROM enrollments WHERE course_id = ?", [courseId]);
-    await conn.query("DELETE FROM reviews WHERE course_id = ?", [courseId]);
-    await conn.query("DELETE FROM courses WHERE id = ?", [courseId]);
-    await conn.commit();
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+export async function deleteCourse(pool,courseId) {
+  await pool.query("DELETE FROM courses WHERE id = ?", [courseId]);
 }
 
-export async function findLessonsByCourseId(courseId) {
-  const pool = getPool();
+export async function findLessonsByCourseId(pool,courseId) {
   const [rows] = await pool.query(
     "SELECT * FROM lessons WHERE course_id = ? ORDER BY created_at",
     [courseId]

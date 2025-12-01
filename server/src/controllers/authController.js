@@ -26,4 +26,18 @@ const refreshToken = asyncHandler(async (req, res) => {
   return sendSuccess(res, "刷新 token 成功", tokens);
 });
 
-export { register, login, getMe, refreshToken };
+const changePassword = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { oldPassword, newPassword } = req.body;
+  await authService.changePassword({ user, oldPassword, newPassword });
+  return sendSuccess(res, "修改密码成功");
+});
+
+const deleteAccount = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { password } = req.body;
+  await authService.deleteAccount({ user,password });
+  return sendSuccess(res, "删除账号成功");
+});
+
+export { register, login, getMe, refreshToken,changePassword,deleteAccount };

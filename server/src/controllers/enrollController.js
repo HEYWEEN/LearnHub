@@ -21,4 +21,11 @@ const cancelEnrollCourse = asyncHandler(async (req, res) => {
   return sendSuccess(res, "退课成功", { userId: user.id, courseId });
 });
 
-export { enrollCourse, cancelEnrollCourse };
+const checkEnrollStatus = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const user = req.user;
+  const isEnrolled = await enrollService.checkEnrollStatus({ user, courseId });
+  return sendSuccess(res, "查询成功", { isEnrolled });
+});
+
+export { enrollCourse, cancelEnrollCourse, checkEnrollStatus };

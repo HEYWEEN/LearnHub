@@ -153,8 +153,36 @@
         <button onclick="refreshToken()">刷新 JWT Token</button>
 
         <pre id="refreshResult">刷新结果将显示在这里</pre>
+        <hr />
+        <!-- 修改密码 -->
+        <h3>2.6 修改密码 POST /api/auth/password</h3>
+
+        <label>旧密码 oldPassword</label>
+        <input id="auth_old_password" type="password" />
+
+        <label>新密码 newPassword</label>
+        <input id="auth_new_password" type="password" />
+
+        <button onclick="authChangePassword()">修改密码</button>
+
+        <pre id="auth_changePass_result">修改结果将显示在这里</pre>
 
         <hr />
+
+        <!-- 删除账号 -->
+        <h3>2.7 删除账号 DELETE /api/auth/delete</h3>
+
+        <label>验证密码 password</label>
+        <input id="auth_delete_password" type="password" />
+
+        <button
+          onclick="authDeleteAccount()"
+          style="background: #c0392b; color: white"
+        >
+          删除账号（危险操作）
+        </button>
+
+        <pre id="auth_delete_result">删除结果将显示在这里</pre>
       </div>
     </div>
     <div class="collapse" id="sec-course">
@@ -635,6 +663,65 @@
           2
         );
         log("GET /me:", JSON.stringify(json));
+      }
+      /* ---------------- AUTH: Change Password ---------------- */
+
+      async function authChangePassword() {
+        const base = getBase();
+        const oldPassword = document
+          .getElementById("auth_old_password")
+          .value.trim();
+        const newPassword = document
+          .getElementById("auth_new_password")
+          .value.trim();
+
+        if (!oldPassword || !newPassword)
+          return alert("旧密码和新密码都不能为空");
+
+        const url = `${base}/api/auth/password`;
+        log("修改密码 ->", url);
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify({ oldPassword, newPassword }),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("auth_changePass_result").textContent =
+          prettyJSON(json);
+      }
+
+      /* ---------------- AUTH: Delete Account ---------------- */
+
+      async function authDeleteAccount() {
+        const base = getBase();
+        const password = document
+          .getElementById("auth_delete_password")
+          .value.trim();
+
+        if (!password) return alert("删除账号需要密码确认");
+
+        if (!confirm("⚠ 你确定要删除账号吗？此操作不可恢复！")) return;
+
+        const url = `${base}/api/auth/delete`;
+        log("删除账号 ->", url);
+
+        const res = await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify({ password }),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("auth_delete_result").textContent =
+          prettyJSON(json);
       }
 
       /* ---------------- 4. 播放 MP4 ---------------- */

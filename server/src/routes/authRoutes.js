@@ -7,6 +7,8 @@ import {
   login,
   refreshToken,
   register,
+  changePassword,
+  deleteAccount
 } from "../controllers/authController.js";
 
 //req
@@ -32,5 +34,9 @@ router.post("/login", login);
 router.post("/register", register);
 
 router.get("/refresh", verifyToken, refreshToken);
+
+router.post("/password",verifyToken,changePassword);
+
+router.delete("/delete",verifyToken,deleteAccount);
 
 export default router;
