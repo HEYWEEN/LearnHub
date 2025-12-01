@@ -50,7 +50,13 @@ npm start
 # 或直接
 node src/index.js
 ```
+# 测试
+```bash
+npm test
+```
+这个指令会打开一个用于测试视频流、hls和视频图片上传的测试界面
 
+需同时运行``npm start``或``node src/index.js``才能使用
 
 
 视频流（Range）与 HLS 使用

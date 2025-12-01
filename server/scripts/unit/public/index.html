@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <title>LearnHub 调试工具（登录 / 注册 / 视频 / HLS / 上传）</title>
+    <style>
+      body {
+        max-width: 880px;
+        margin: 28px auto;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+      }
+      h2,
+      h3 {
+        margin-top: 28px;
+      }
+      label {
+        font-weight: 600;
+        margin-top: 10px;
+        display: block;
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="email"],
+      input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 6px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #1666ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #666;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+      video,
+      img {
+        width: 100%;
+        margin-top: 10px;
+        background: #000;
+      }
+      pre {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 6px;
+        max-height: 240px;
+        overflow: auto;
+      }
+      .collapse {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin: 22px 0;
+        overflow: hidden;
+      }
+
+      .collapse-header {
+        background: #f0f0f0;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        user-select: none;
+      }
+
+      .collapse-header:hover {
+        background: #e7e7e7;
+      }
+
+      .collapse-content {
+        padding: 14px;
+        display: none;
+        background: white;
+      }
+
+      .collapse.open .collapse-content {
+        display: block;
+      }
+    </style>
+
+    <!-- HLS.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  </head>
+  <body>
+    <h2>LearnHub 一体化测试页面</h2>
+
+    <label>后端地址</label>
+    <input id="base" type="text" value="http://localhost:3000" />
+
+    <div class="collapse" id="sec-register">
+      <div class="collapse-header" onclick="toggleCollapse('sec-register')">
+        1. 注册
+      </div>
+      <div class="collapse-content">
+        <div class="row">
+          <div>
+            <label>用户名 username</label>
+            <input id="reg_username" type="text" placeholder="例如 小明123" />
+          </div>
+          <div>
+            <label>邮箱 email</label>
+            <input
+              id="reg_email"
+              type="email"
+              placeholder="例如 test@example.com"
+            />
+          </div>
+        </div>
+
+        <label>密码 password</label>
+        <input id="reg_password" type="password" />
+
+        <label>角色 role（student/teacher）</label>
+        <input id="reg_role" type="text" placeholder="student（留空默认）" />
+
+        <button onclick="registerUser()">注册用户</button>
+
+        <hr />
+
+        <h3>2. 登录</h3>
+        <label>登录邮箱</label>
+        <input id="login_email" type="email" />
+
+        <label>密码</label>
+        <input id="login_password" type="password" />
+
+        <button onclick="loginUser()">登录并获取 Token</button>
+
+        <label>当前 Token（自动填充）</label>
+        <input id="token" type="text" placeholder="登录后自动填入" />
+
+        <button onclick="fetchMe()">获取当前用户信息 (GET /auth/me)</button>
+        <pre id="me_area">用户信息将显示在这里</pre>
+
+        <hr />
+
+        <h3>2.5 刷新 Token (GET /api/auth/refresh)</h3>
+
+        <button onclick="refreshToken()">刷新 JWT Token</button>
+
+        <pre id="refreshResult">刷新结果将显示在这里</pre>
+
+        <hr />
+      </div>
+    </div>
+    <div class="collapse" id="sec-course">
+      <div class="collapse-header" onclick="toggleCollapse('sec-course')">
+        2. 课程
+      </div>
+      <div class="collapse-content">
+        <h3>3. 查询课程列表 GET /api/courses</h3>
+
+        <label>page</label>
+        <input id="coursesPage" value="1" />
+
+        <label>limit</label>
+        <input id="coursesLimit" value="12" />
+
+        <label>category（可空）</label>
+        <input id="coursesCategory" placeholder="如 programming" />
+
+        <label>search（可空）</label>
+        <input id="coursesSearch" placeholder="关键词" />
+
+        <button onclick="getCourses()">查询课程列表</button>
+
+        <div
+          id="coursesResult"
+          style="
+            margin-top: 12px;
+            padding: 10px;
+            background: #f7f7f7;
+            white-space: pre;
+            border-radius: 6px;
+          "
+        ></div>
+
+        <hr />
+
+        <h3>查询课程详情 GET /api/courses/:courseId</h3>
+
+        <label>courseId</label>
+        <input id="detailCourseId" placeholder="输入课程 ID" />
+
+        <button onclick="getCourseDetail()">查询课程详情</button>
+
+        <div
+          id="courseDetailResult"
+          style="
+            margin-top: 12px;
+            padding: 10px;
+            background: #fafafa;
+            white-space: pre-wrap;
+            border-radius: 6px;
+          "
+        ></div>
+
+        <hr />
+
+        <h3>4. 视频播放</h3>
+        <div class="row">
+          <div>
+            <label>课程 ID (courseId)</label>
+            <input id="courseId" type="text" />
+          </div>
+          <div>
+            <label>章节 ID (lessonId，可空)</label>
+            <input id="lessonId" type="text" />
+          </div>
+        </div>
+
+        <button onclick="playMp4()">▶ 播放 MP4</button>
+        <button onclick="generateAndPlayHls()">▶ 生成并播放 HLS</button>
+
+        <video id="player" controls></video>
+
+        <hr />
+
+        <h3>5. 上传封面</h3>
+        <input id="coverFile" type="file" accept="image/*" />
+        <button onclick="uploadCover()">上传封面</button>
+        <img id="coverPreview" />
+
+        <hr />
+
+        <h3>6. 上传预览视频</h3>
+        <input id="videoFile" type="file" accept="video/*" />
+        <button onclick="uploadPreview()">上传视频预览</button>
+        <video id="videoPreview" controls></video>
+
+        <hr />
+
+        <h3>7. 上传章节正式视频 lesson video</h3>
+        <input id="lessonVideoFile" type="file" accept="video/*" />
+        <button onclick="uploadLessonVideo()">
+          上传章节视频 (POST /lesson/:lessonId/video)
+        </button>
+        <video id="lessonVideoPreview" controls></video>
+
+        <hr />
+
+        <h3>静态文件访问（/uploads/...）</h3>
+
+        <label
+          >输入相对路径（例如 <b>/uploads/xxxx.png</b> 或
+          <b>/avatars/default.jpg</b>）</label
+        >
+        <input id="staticPath" type="text" placeholder="/uploads/xxx.jpg" />
+
+        <button onclick="fetchStaticFile()">访问静态资源</button>
+
+        <div
+          id="staticResult"
+          style="
+            margin-top: 12px;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 6px;
+          "
+        ></div>
+
+        <hr />
+      </div>
+    </div>
+    <div class="collapse" id="sec-user">
+      <div class="collapse-header" onclick="toggleCollapse('sec-user')">
+        3. 用户
+      </div>
+      <div class="collapse-content">
+        <h3>8. 获取用户列表 GET /api/users</h3>
+
+        <label>page</label>
+        <input id="usersPage" value="1" />
+
+        <label>limit</label>
+        <input id="usersLimit" value="10" />
+
+        <button onclick="getUsersList()">获取用户列表</button>
+
+        <pre id="usersListResult">结果将显示在这里</pre>
+
+        <hr />
+
+        <h3>9. 获取用户 Profile GET /api/users/:userId</h3>
+
+        <label>用户 ID</label>
+        <input id="userProfileId" placeholder="输入用户 ID" />
+
+        <button onclick="getUserProfile()">获取用户 Profile</button>
+
+        <pre id="userProfileResult">用户 Profile 将显示在这里</pre>
+
+        <hr />
+      </div>
+    </div>
+    <div class="collapse" id="sec-ai">
+      <div class="collapse-header" onclick="toggleCollapse('sec-ai')">
+        4. ai
+      </div>
+      <div class="collapse-content">
+        <!-- 创建会话 -->
+        <h3>1. 创建会话 POST /api/ai/conversation</h3>
+
+        <label>会话标题（可选）</label>
+        <input id="ai_conv_title" placeholder="例如：我的学习对话" />
+
+        <label>关联课程 courseId（可选）</label>
+        <input id="ai_conv_course" placeholder="可不填" />
+
+        <button onclick="aiCreateConversation()">创建会话</button>
+
+        <pre id="ai_create_result">{ 创建结果将显示在这里 }</pre>
+
+        <!-- 会话列表 -->
+        <h3>2. 获取会话列表 GET /api/ai/conversation</h3>
+
+        <label>page</label>
+        <input id="ai_list_page" value="1" />
+
+        <label>limit</label>
+        <input id="ai_list_limit" value="20" />
+
+        <button onclick="aiListConversations()">获取会话列表</button>
+
+        <pre id="ai_list_result">{ 会话列表将显示在这里 }</pre>
+
+        <!-- 获取单条会话 -->
+        <h3>3. 获取指定会话 GET /api/ai/conversation/:id</h3>
+
+        <label>conversationId</label>
+        <input id="ai_get_id" placeholder="填写会话 ID" />
+
+        <button onclick="aiGetConversation()">获取会话详情</button>
+
+        <pre id="ai_get_result">{ 会话详情将显示在这里 }</pre>
+
+        <!-- 发送消息 -->
+        <h3>4. 发送消息 POST /api/ai/conversation/:id</h3>
+
+        <label>conversationId</label>
+        <input id="ai_msg_conv_id" placeholder="填写会话 ID" />
+
+        <label>消息内容 text</label>
+        <input id="ai_msg_text" placeholder="例如：你好，我想学习 JS" />
+
+        <label>sender（可选，默认 user）</label>
+        <input id="ai_msg_sender" placeholder="user / system / assistant" />
+
+        <button onclick="aiSendMessage()">发送消息</button>
+
+        <pre id="ai_msg_result">{ 消息发送结果将显示在这里 }</pre>
+
+        <hr />
+      </div>
+    </div>
+    <div class="collapse" id="sec-learning">
+      <div class="collapse-header" onclick="toggleCollapse('sec-learning')">
+        5. 学习进度
+      </div>
+
+      <div class="collapse-content">
+        <h3>1. 获取课程进度 GET /api/learning/progress/:courseId</h3>
+        <label>courseId</label>
+        <input id="learn_progress_courseId" placeholder="课程 ID" />
+
+        <button onclick="learningGetProgress()">获取学习进度</button>
+        <pre id="learning_progress_result">结果将在此显示</pre>
+
+        <hr />
+
+        <h3>2. 标记课时完成 POST /api/learning/progress/:lessonId</h3>
+        <label>courseId（必须）</label>
+        <input id="learn_mark_courseId" />
+
+        <label>lessonId（必须）</label>
+        <input id="learn_mark_lessonId" />
+
+        <button onclick="learningMark()">标记完成</button>
+        <pre id="learning_mark_result">结果将在此显示</pre>
+
+        <hr />
+
+        <h3>3. 最近学习记录 GET /api/learning/recent</h3>
+        <label>page</label>
+        <input id="learn_recent_page" value="1" />
+
+        <label>limit</label>
+        <input id="learn_recent_limit" value="12" />
+
+        <button onclick="learningRecent()">获取最近学习数据</button>
+        <pre id="learning_recent_result">结果将在此显示</pre>
+      </div>
+    </div>
+
+    <div class="collapse" id="sec-note">
+      <div class="collapse-header" onclick="toggleCollapse('sec-note')">
+        6. Note
+      </div>
+
+      <div class="collapse-content">
+        <h3>1. 创建笔记 POST /api/note</h3>
+        <label>courseId（可选）</label>
+        <input id="note_courseId" placeholder="例如：7b22..." />
+
+        <label>lessonId（可选）</label>
+        <input id="note_lessonId" placeholder="例如：0885..." />
+
+        <label>content（笔记内容）</label>
+        <textarea
+          id="note_content"
+          style="width: 100%; height: 80px"
+        ></textarea>
+
+        <button onclick="noteCreate()">创建笔记</button>
+        <pre id="note_create_result">创建笔记结果会显示在这里</pre>
+
+        <hr />
+
+        <h3>2. 获取笔记列表 GET /api/note</h3>
+
+        <label>courseId（可选）</label>
+        <input id="note_list_courseId" />
+
+        <label>lessonId（可选）</label>
+        <input id="note_list_lessonId" />
+
+        <label>page</label>
+        <input id="note_list_page" value="1" />
+
+        <label>limit</label>
+        <input id="note_list_limit" value="20" />
+
+        <button onclick="noteList()">获取笔记列表</button>
+        <pre id="note_list_result">笔记列表将显示在这里</pre>
+
+        <hr />
+
+        <h3>3. 更新笔记 POST /api/note/:noteId</h3>
+
+        <label>noteId</label>
+        <input id="note_update_id" placeholder="填写要更新的 noteId" />
+
+        <label>新的 content（笔记内容）</label>
+        <textarea
+          id="note_update_content"
+          style="width: 100%; height: 80px"
+        ></textarea>
+
+        <button onclick="noteUpdate()">更新笔记</button>
+        <pre id="note_update_result">更新结果将显示在这里</pre>
+
+        <hr />
+
+        <h3>4. 删除笔记 DELETE /api/note/:noteId</h3>
+
+        <label>noteId</label>
+        <input id="note_delete_id" placeholder="要删除的笔记 ID" />
+
+        <button onclick="noteDelete()">删除笔记</button>
+        <pre id="note_delete_result">删除结果将显示在这里</pre>
+      </div>
+    </div>
+
+    <h3>控制台输出</h3>
+    <pre id="log">日志会显示在这里</pre>
+
+    <script>
+      /* ---------------- 工具函数 ---------------- */
+
+      function toggleCollapse(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle("open");
+      }
+
+      function prettyJSON(data, indent = 0) {
+        const pad = "  ".repeat(indent);
+        if (data === null) return `${pad}null`;
+        if (typeof data !== "object") return `${pad}${data}`;
+
+        if (Array.isArray(data)) {
+          let out = `${pad}[数组，共 ${data.length} 项]\n`;
+          data.forEach((item, i) => {
+            out += `${pad}- [${i}] `;
+            if (typeof item === "object") {
+              out += "\n" + prettyJSON(item, indent + 1) + "\n";
+            } else {
+              out += `${item}\n`;
+            }
+          });
+          return out;
+        }
+
+        let out = `${pad}{对象}\n`;
+        for (const key in data) {
+          const val = data[key];
+          if (typeof val === "object" && val !== null) {
+            out += `${pad}${key}:\n${prettyJSON(val, indent + 1)}\n`;
+          } else {
+            out += `${pad}${key}: ${val}\n`;
+          }
+        }
+        return out;
+      }
+
+      function log(...args) {
+        const box = document.getElementById("log");
+        const t = new Date().toLocaleTimeString();
+        box.textContent = `[${t}] ${args.join(" ")}\n` + box.textContent;
+        console.log(...args);
+      }
+
+      function getBase() {
+        return document.getElementById("base").value.trim().replace(/\/$/, "");
+      }
+
+      function getTokenHeader() {
+        const t = document.getElementById("token").value.trim();
+        return t ? { Authorization: "Bearer " + t } : {};
+      }
+
+      /* ---------------- 1. 注册 ---------------- */
+
+      async function registerUser() {
+        const base = getBase();
+        const body = {
+          username: document.getElementById("reg_username").value.trim(),
+          email: document.getElementById("reg_email").value.trim(),
+          password: document.getElementById("reg_password").value.trim(),
+          role: document.getElementById("reg_role").value.trim() || undefined,
+        };
+
+        log("注册 ->", JSON.stringify(body));
+
+        const res = await fetch(`${base}/api/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        log("注册响应:", JSON.stringify(json));
+
+        alert("注册响应:\n" + JSON.stringify(json, null, 2));
+      }
+
+      /* ---------------- 2. 登录 ---------------- */
+
+      async function loginUser() {
+        const base = getBase();
+        const body = {
+          email: document.getElementById("login_email").value.trim(),
+          password: document.getElementById("login_password").value.trim(),
+        };
+
+        log("登录 ->", JSON.stringify(body));
+
+        const res = await fetch(`${base}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        log("登录返回:", JSON.stringify(json));
+
+        if (json?.data?.token) {
+          document.getElementById("token").value = json.data.token;
+          log("Token 已自动填入");
+        }
+
+        alert("登录响应:\n" + JSON.stringify(json, null, 2));
+      }
+
+      async function refreshToken() {
+        const base = getBase();
+
+        log("刷新 Token ->", base + "/api/auth/refresh");
+
+        const res = await fetch(`${base}/api/auth/refresh`, {
+          method: "GET",
+          headers: {
+            ...getTokenHeader(),
+          },
+        });
+
+        const json = await res.json().catch(() => {});
+
+        const box = document.getElementById("refreshResult");
+
+        if (!json) {
+          box.textContent = "响应解析失败";
+          return;
+        }
+
+        log("刷新 Token 响应:", JSON.stringify(json));
+
+        // 展示美化后的 JSON
+        box.textContent = prettyJSON(json);
+
+        // 自动更新 Token
+        if (json.success && json.data && json.data.token) {
+          document.getElementById("token").value = json.data.token;
+          log("Token 已自动更新");
+        }
+      }
+
+      /* ---------------- 3. 当前用户信息 /auth/me ---------------- */
+
+      async function fetchMe() {
+        const base = getBase();
+
+        const res = await fetch(`${base}/api/auth/me`, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("me_area").textContent = JSON.stringify(
+          json,
+          null,
+          2
+        );
+        log("GET /me:", JSON.stringify(json));
+      }
+
+      /* ---------------- 4. 播放 MP4 ---------------- */
+
+      async function playMp4() {
+        const base = getBase();
+        const cid = document.getElementById("courseId").value.trim();
+        const lid = document.getElementById("lessonId").value.trim();
+        const token = document.getElementById("token").value.trim();
+        const video = document.getElementById("player");
+
+        if (!cid) return alert("courseId 必填");
+
+        let url = lid
+          ? `${base}/api/courses/${cid}/lesson/${lid}/stream`
+          : `${base}/api/courses/${cid}/video-preview`;
+
+        if (token) url += "?token=" + token;
+
+        log("播放 MP4:", url);
+        video.src = url;
+        video.play().catch(() => log("自动播放被阻止"));
+      }
+
+      /* ---------------- 5. 生成 & 播放 HLS ---------------- */
+
+      async function generateAndPlayHls() {
+        const base = getBase();
+        const cid = document.getElementById("courseId").value.trim();
+        const lid = document.getElementById("lessonId").value.trim();
+
+        if (!cid || !lid) return alert("HLS 需要填写 courseId 和 lessonId");
+
+        log("POST 生成 HLS...");
+
+        const res = await fetch(
+          `${base}/api/courses/${cid}/lesson/${lid}/hls`,
+          {
+            method: "POST",
+            headers: getTokenHeader(),
+          }
+        );
+
+        const json = await res.json().catch(() => {});
+        log("HLS 返回:", JSON.stringify(json));
+
+        const playlist = json?.data?.playlistUrl;
+        if (!playlist) {
+          return alert("后端未返回 playlistUrl，请检查控制器");
+        }
+
+        const m3u8Url = playlist.startsWith("http")
+          ? playlist
+          : base + playlist;
+
+        log("播放 HLS:", m3u8Url);
+        playHlsWithUrl(m3u8Url);
+      }
+
+      function playHlsWithUrl(url) {
+        const video = document.getElementById("player");
+
+        if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = url;
+          video.play();
+          return;
+        }
+
+        if (Hls.isSupported()) {
+          if (window._hls) window._hls.destroy();
+          const hls = new Hls();
+          window._hls = hls;
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+          return;
+        }
+
+        alert("浏览器不支持 HLS");
+      }
+
+      /* ---------------- 6. 上传封面 ---------------- */
+
+      async function uploadCover() {
+        const base = getBase();
+        const cid = document.getElementById("courseId").value.trim();
+        const file = document.getElementById("coverFile").files[0];
+
+        if (!cid) return alert("courseId 必填");
+        if (!file) return alert("请选择文件");
+
+        const form = new FormData();
+        form.append("image", file);
+
+        const res = await fetch(`${base}/api/courses/${cid}/cover-img`, {
+          method: "POST",
+          headers: getTokenHeader(),
+          body: form,
+        });
+
+        const json = await res.json();
+        log("上传封面:", JSON.stringify(json));
+
+        const url = json?.data?.course?.cover_image;
+        if (url) document.getElementById("coverPreview").src = base + url;
+      }
+
+      /* ---------------- 7. 上传预览视频 ---------------- */
+
+      async function uploadPreview() {
+        const base = getBase();
+        const cid = document.getElementById("courseId").value.trim();
+        const file = document.getElementById("videoFile").files[0];
+
+        if (!cid) return alert("courseId 必填");
+        if (!file) return alert("请选择文件");
+
+        const form = new FormData();
+        form.append("video", file);
+
+        const res = await fetch(`${base}/api/courses/${cid}/video-preview`, {
+          method: "POST",
+          headers: getTokenHeader(),
+          body: form,
+        });
+
+        const json = await res.json();
+        log("上传预览视频:", JSON.stringify(json));
+
+        const url = json?.data?.course?.video_preview;
+        if (url) document.getElementById("videoPreview").src = base + url;
+      }
+      /* ---------------- 8. 上传章节正式视频 ---------------- */
+
+      async function uploadLessonVideo() {
+        const base = getBase();
+        const cid = document.getElementById("courseId").value.trim();
+        const lid = document.getElementById("lessonId").value.trim();
+        const file = document.getElementById("lessonVideoFile").files[0];
+
+        if (!cid) return alert("courseId 必填");
+        if (!lid) return alert("lessonId 必填");
+        if (!file) return alert("请选择章节视频文件");
+
+        const form = new FormData();
+        form.append("video", file);
+
+        const url = `${base}/api/courses/${cid}/lesson/${lid}/video`;
+        log("上传章节视频 ->", url);
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: getTokenHeader(),
+          body: form,
+        });
+
+        const json = await res.json().catch(() => {});
+        log("章节视频上传结果:", JSON.stringify(json));
+
+        if (json?.success && json?.data?.lesson?.video_url) {
+          const finalUrl = json.data.lesson.video_url.startsWith("http")
+            ? json.data.lesson.video_url
+            : base + json.data.lesson.video_url;
+          document.getElementById("lessonVideoPreview").src = finalUrl;
+        }
+
+        alert("上传响应:\n" + JSON.stringify(json, null, 2));
+      }
+
+      async function fetchStaticFile() {
+        const base = getBase();
+        const path = document.getElementById("staticPath").value.trim();
+        const box = document.getElementById("staticResult");
+
+        if (!path) {
+          box.textContent = "请输入 /uploads/... 路径";
+          return;
+        }
+
+        const fullUrl = path.startsWith("http") ? path : base + path;
+
+        log("访问静态资源 ->", fullUrl);
+
+        try {
+          const res = await fetch(fullUrl, {
+            method: "GET",
+          });
+
+          if (!res.ok) {
+            box.textContent = `请求失败: HTTP ${res.status}`;
+            return;
+          }
+
+          const contentType = res.headers.get("content-type") || "";
+          const blob = await res.blob();
+
+          let html = `<b>URL:</b> ${fullUrl}<br>`;
+          html += `<b>Content-Type:</b> ${contentType}<br>`;
+          html += `<b>Size:</b> ${blob.size} bytes<br><br>`;
+
+          if (contentType.startsWith("image/")) {
+            const url = URL.createObjectURL(blob);
+            html += `<img src="${url}" style="max-width:100%; border:1px solid #ccc;">`;
+          } else if (contentType.startsWith("video/")) {
+            const url = URL.createObjectURL(blob);
+            html += `<video src="${url}" controls style="width:100%;"></video>`;
+          } else {
+            html += `<a href="${fullUrl}" target="_blank">点击下载/查看文件</a>`;
+          }
+
+          box.innerHTML = html;
+        } catch (err) {
+          box.textContent = "访问出错: " + err.message;
+        }
+      }
+
+      /* ---------------- 9. 查询课程列表 GET /api/courses ---------------- */
+
+      async function getCourses() {
+        const base = getBase();
+        const page = document.getElementById("coursesPage").value.trim() || 1;
+        const limit =
+          document.getElementById("coursesLimit").value.trim() || 12;
+        const cat = document.getElementById("coursesCategory").value.trim();
+        const search = document.getElementById("coursesSearch").value.trim();
+
+        const params = new URLSearchParams();
+        params.append("page", page);
+        params.append("limit", limit);
+        if (cat) params.append("category", cat);
+        if (search) params.append("search", search);
+
+        const url = `${base}/api/courses?${params.toString()}`;
+        log("请求课程列表 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            ...getTokenHeader(),
+          },
+        });
+
+        const json = await res.json().catch(() => {});
+        log("课程列表响应:", JSON.stringify(json));
+
+        const box = document.getElementById("coursesResult");
+
+        if (!json) {
+          box.textContent = "无法解析响应";
+          return;
+        }
+
+        if (!json.success) {
+          box.textContent = "请求失败:\n" + prettyJSON(json);
+          return;
+        }
+
+        // 使用 prettyJSON 输出完整字段
+        box.textContent = prettyJSON(json.data);
+      }
+
+      /* ---------------- 10. 查询课程详情 GET /api/courses/:courseId ---------------- */
+
+      async function getCourseDetail() {
+        const base = getBase();
+        const cid = document.getElementById("detailCourseId").value.trim();
+        const box = document.getElementById("courseDetailResult");
+
+        if (!cid) return alert("courseId 必填");
+
+        const url = `${base}/api/courses/${cid}`;
+        log("请求课程详情 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+
+        if (!json) {
+          box.textContent = "响应解析失败";
+          return;
+        }
+
+        log("课程详情响应:", JSON.stringify(json));
+
+        if (!json.success) {
+          box.innerHTML = `<b>请求失败：</b>\n${prettyJSON(json)}`;
+          return;
+        }
+
+        // 美化输出全部字段
+        box.textContent = prettyJSON(json.data);
+      }
+
+      /* ---------------- 11. 获取用户列表 GET /api/user ---------------- */
+
+      async function getUsersList() {
+        const base = getBase();
+        const page = document.getElementById("usersPage").value.trim() || 1;
+        const limit = document.getElementById("usersLimit").value.trim() || 10;
+
+        const params = new URLSearchParams();
+        params.append("page", page);
+        params.append("limit", limit);
+
+        const url = `${base}/api/users?${params.toString()}`;
+
+        log("请求用户列表 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        const box = document.getElementById("usersListResult");
+
+        if (!json) {
+          box.textContent = "响应解析失败";
+          return;
+        }
+
+        log("用户列表返回:", JSON.stringify(json));
+
+        // 美化输出
+        box.textContent = prettyJSON(json);
+      }
+
+      /* ---------------- 12. 获取用户档案 GET /api/user/:userId ---------------- */
+      async function getUserProfile() {
+        const base = getBase();
+        const uid = document.getElementById("userProfileId").value.trim();
+        const box = document.getElementById("userProfileResult");
+
+        if (!uid) return alert("必须输入 userId");
+
+        const url = `${base}/api/users/${uid}`;
+
+        log("请求用户 Profile ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+
+        if (!json) {
+          box.textContent = "响应解析失败";
+          return;
+        }
+
+        log("用户 Profile:", JSON.stringify(json));
+
+        box.textContent = prettyJSON(json);
+      }
+
+      /* ---------------------- AI 对话 API ---------------------- */
+
+      /* 1. 创建会话 */
+      async function aiCreateConversation() {
+        const base = getBase();
+        const title = document.getElementById("ai_conv_title").value.trim();
+        const courseId = document.getElementById("ai_conv_course").value.trim();
+        const box = document.getElementById("ai_create_result");
+
+        const body = {};
+        if (title) body.title = title;
+        if (courseId) body.courseId = courseId;
+
+        const res = await fetch(`${base}/api/ai/conversation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        log("创建会话响应:", JSON.stringify(json));
+        box.textContent = prettyJSON(json);
+      }
+
+      /* 2. 会话列表 */
+      async function aiListConversations() {
+        const base = getBase();
+        const page = document.getElementById("ai_list_page").value.trim() || 1;
+        const limit =
+          document.getElementById("ai_list_limit").value.trim() || 20;
+        const box = document.getElementById("ai_list_result");
+
+        const url = `${base}/api/ai/conversation?page=${page}&limit=${limit}`;
+        log("请求会话列表 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        box.textContent = prettyJSON(json);
+      }
+
+      /* 3. 获取单个会话 */
+      async function aiGetConversation() {
+        const base = getBase();
+        const id = document.getElementById("ai_get_id").value.trim();
+        const box = document.getElementById("ai_get_result");
+
+        if (!id) return alert("请输入 conversationId");
+
+        const url = `${base}/api/ai/conversation/${id}`;
+        log("请求会话详情 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        box.textContent = prettyJSON(json);
+      }
+
+      /* 4. 发送消息 */
+      async function aiSendMessage() {
+        const base = getBase();
+        const id = document.getElementById("ai_msg_conv_id").value.trim();
+        const text = document.getElementById("ai_msg_text").value.trim();
+        const sender = document.getElementById("ai_msg_sender").value.trim();
+        const box = document.getElementById("ai_msg_result");
+
+        if (!id) return alert("请输入 conversationId");
+        if (!text) return alert("请输入消息内容");
+
+        const body = { text };
+        if (sender) body.sender = sender;
+
+        const url = `${base}/api/ai/conversation/${id}`;
+        log("发送消息 ->", url);
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        box.textContent = prettyJSON(json);
+      }
+      /* ---------------- NOTE API ---------------- */
+
+      async function noteCreate() {
+        const base = getBase();
+        const body = {
+          courseId:
+            document.getElementById("note_courseId").value.trim() || undefined,
+          lessonId:
+            document.getElementById("note_lessonId").value.trim() || undefined,
+          content: document.getElementById("note_content").value.trim() || "",
+        };
+
+        log("创建笔记 ->", JSON.stringify(body));
+
+        const res = await fetch(`${base}/api/note`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("note_create_result").textContent =
+          prettyJSON(json);
+        log("创建笔记响应:", JSON.stringify(json));
+      }
+
+      async function noteList() {
+        const base = getBase();
+
+        const params = new URLSearchParams();
+        const c = document.getElementById("note_list_courseId").value.trim();
+        const l = document.getElementById("note_list_lessonId").value.trim();
+        const p = document.getElementById("note_list_page").value.trim();
+        const limit = document.getElementById("note_list_limit").value.trim();
+
+        if (c) params.append("courseId", c);
+        if (l) params.append("lessonId", l);
+        params.append("page", p || 1);
+        params.append("limit", limit || 20);
+
+        const url = `${base}/api/note?${params.toString()}`;
+        log("获取笔记列表 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("note_list_result").textContent =
+          prettyJSON(json);
+        log("笔记列表响应:", JSON.stringify(json));
+      }
+
+      async function noteUpdate() {
+        const base = getBase();
+        const nid = document.getElementById("note_update_id").value.trim();
+
+        if (!nid) return alert("noteId 不能为空");
+
+        const body = {
+          content: document.getElementById("note_update_content").value.trim(),
+        };
+
+        log("更新笔记 ->", nid, JSON.stringify(body));
+
+        const res = await fetch(`${base}/api/note/${nid}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("note_update_result").textContent =
+          prettyJSON(json);
+        log("更新笔记响应:", JSON.stringify(json));
+      }
+
+      async function noteDelete() {
+        const base = getBase();
+        const nid = document.getElementById("note_delete_id").value.trim();
+
+        if (!nid) return alert("noteId 不能为空");
+
+        log("删除笔记 ->", nid);
+
+        const res = await fetch(`${base}/api/note/${nid}`, {
+          method: "DELETE",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("note_delete_result").textContent =
+          prettyJSON(json);
+        log("删除笔记响应:", JSON.stringify(json));
+      }
+      /* ---------------- LEARNING API ---------------- */
+
+      async function learningGetProgress() {
+        const base = getBase();
+        const courseId = document
+          .getElementById("learn_progress_courseId")
+          .value.trim();
+        if (!courseId) return alert("courseId 不能为空");
+
+        const url = `${base}/api/learning/progress/${courseId}`;
+        log("获取课程进度 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("learning_progress_result").textContent =
+          prettyJSON(json);
+      }
+
+      async function learningMark() {
+        const base = getBase();
+        const courseId = document
+          .getElementById("learn_mark_courseId")
+          .value.trim();
+        const lessonId = document
+          .getElementById("learn_mark_lessonId")
+          .value.trim();
+
+        if (!courseId || !lessonId)
+          return alert("courseId 和 lessonId 不能为空");
+
+        const url = `${base}/api/learning/progress/${lessonId}`;
+        log("标记完成 ->", url);
+
+        const body = {
+          completed: true,
+          courseId,
+        };
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getTokenHeader(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("learning_mark_result").textContent =
+          prettyJSON(json);
+      }
+
+      async function learningRecent() {
+        const base = getBase();
+        const page =
+          document.getElementById("learn_recent_page").value.trim() || 1;
+        const limit =
+          document.getElementById("learn_recent_limit").value.trim() || 12;
+
+        const url = `${base}/api/learning/recent?page=${page}&limit=${limit}`;
+        log("获取最近学习记录 ->", url);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTokenHeader(),
+        });
+
+        const json = await res.json().catch(() => {});
+        document.getElementById("learning_recent_result").textContent =
+          prettyJSON(json);
+      }
+    </script>
+  </body>
+</html>

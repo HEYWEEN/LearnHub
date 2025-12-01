@@ -1,10 +1,13 @@
 import bcrypt from "bcrypt";
+import STATUS from "../constants/httpStatus.js";
 
 const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
 
 export async function hashPassword(password) {
   if (typeof password !== "string" || password.length === 0) {
-    throw new Error("password is required and must be a non-empty string");
+    const err = new Error("password is required and must be a non-empty string");
+    err.status = STATUS.BAD_REQUEST;
+    throw err;
   }
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
   return hash;
