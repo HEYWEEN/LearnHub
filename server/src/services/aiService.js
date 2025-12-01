@@ -135,7 +135,7 @@ export async function deleteConversation({ conversationId, user }) {
 }
 
 export async function chatWithAi(messages, think = false) {
-  if (!process.env.DEEPSEEK_API_KEY) {
+  if (!process.env.API_KEY) {
     console.error(
       LOG_COLOR.FG_RED + "[err] 未设置API_KEY,无法开启ai功能" + LOG_COLOR.RESET
     );

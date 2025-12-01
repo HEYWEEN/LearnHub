@@ -20,6 +20,7 @@ export const checkEnvConfig = () => {
         LOG_COLOR.RESET +
         "没有设置ai相关环境变量(API_KEY、AI_URL、AI_MODEL),无法启用相关功能"
     );
+    console.warn(process.env.API_KEY,process.env.AI_URL,process.env.AI_MODEL);
   }
   if (missingVars.length > 0) {
     console.error(

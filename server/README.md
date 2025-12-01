@@ -33,10 +33,12 @@ sudo apt update && sudo apt install -y ffmpeg
 ```
 DB_HOST=localhost
 DB_USER=admin_user
-DB_PASS=123456
+DB_PASSWORD=123456
 DB_NAME=learnhub
-SECRET_KEY=your_key
-DEEPSEEK_API_KEY=your_api
+SECRET_KEY=
+AI_URL=https://api.deepseek.com/v1
+API_KEY=
+AI_MODEL=deepseek-chat
 ```
 
 3. 导入测试数据(可选)
