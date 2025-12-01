@@ -49,6 +49,12 @@ const getMessage = asyncHandler(async (req, res) => {
   return sendSuccess(res, "获取消息成功", { message });
 });
 
+const deleteConversation = asyncHandler(async (req, res) => {
+  const { conversationId } = req.params;
+  await aiService.deleteConversation({ conversationId, user: req.user });
+  return sendSuccess(res, "删除会话成功", null);
+});
+
 export {
   getMessage,
   getRecommendations,
@@ -56,4 +62,5 @@ export {
   listConversations,
   getConversation,
   sendMessage,
+  deleteConversation,
 };

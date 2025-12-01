@@ -5,6 +5,7 @@ import {
   getMessage,
   listConversations,
   sendMessage,
+  deleteConversation,
 } from "../controllers/aiController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
@@ -93,5 +94,11 @@ router.get("/conversation/:conversationId", verifyToken, getMessage);
 //   "message": "string, 必填, 用户发送的消息内容"
 // }
 router.post("/conversation/:conversationId", verifyToken, sendMessage);
+
+// 删除会话
+// DELETE /ai/conversation/:conversationId
+// 请求头:
+// Authorization: Bearer {token}
+router.delete("/conversation/:conversationId", verifyToken, deleteConversation);
 
 export default router;

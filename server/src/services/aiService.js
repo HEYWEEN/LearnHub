@@ -123,7 +123,7 @@ export async function deleteConversation({ conversationId, user }) {
       e.status = STATUS.NOT_FOUND;
       throw e;
     }
-    if (conv.user_id !== user.id || !user.role !== "admin") {
+    if (conv.user_id !== user.id && user.role !== "admin") {
       const e = new Error("没有权限删除该会话");
       e.status = STATUS.FORBIDDEN;
       throw e;

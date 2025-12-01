@@ -14,6 +14,7 @@
         <router-link to="/" class="nav-link">主页</router-link>
         <router-link to="/courses" class="nav-link">课程中心</router-link>
         <a @click="handleLearningSpaceClick" class="nav-link nav-link-clickable">学习空间</a>
+        <a @click="handleAIAssistantClick" class="nav-link nav-link-clickable">AI助手</a>
         <router-link to="/profile" class="nav-link">个人中心</router-link>
       </nav>
 
@@ -22,6 +23,7 @@
         <router-link to="/teacher" class="nav-link">工作台</router-link>
         <router-link to="/teacher/courses/manage" class="nav-link">课程管理</router-link>
         <router-link to="/teacher/students" class="nav-link">学生管理</router-link>
+        <a @click="handleAIAssistantClick" class="nav-link nav-link-clickable">AI助手</a>
         <router-link to="/profile" class="nav-link">个人中心</router-link>
       </nav>
 
@@ -56,6 +58,9 @@
         </div>
       </div>
     </div>
+
+    <!-- AI助手弹窗 -->
+    <AIAssistant v-model="showAIAssistant" />
   </header>
 </template>
 
@@ -66,12 +71,14 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/slices/user'
 import { getRecentLearning } from '../../services/learningService'
 import defaultAvatar from '../../assets/images/default-avatar.png'
+import AIAssistant from './AIAssistant.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const showDropdown = ref(false)
 const profileRef = ref(null)
 const isScrolled = ref(false)
+const showAIAssistant = ref(false)
 
 // 用户头像
 const userAvatar = computed(() => {
@@ -124,6 +131,17 @@ const handleLearningSpaceClick = async () => {
     console.error('获取最近学习记录失败:', err)
     ElMessage.error('获取学习记录失败')
   }
+}
+
+// 处理AI助手点击
+const handleAIAssistantClick = () => {
+  // 检查是否登录
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后使用AI助手')
+    router.push('/login')
+    return
+  }
+  showAIAssistant.value = true
 }
 
 // 处理退出登录
