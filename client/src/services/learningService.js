@@ -2,7 +2,7 @@ import axios from './axios'
 import * as mockService from './learningService.mock'
 
 // 切换开关：true 使用 Mock，false 使用真实 API
-const USE_MOCK = true
+const USE_MOCK = false
 
 // 真实 API 调用
 const realGetCourseChapters = async (courseId) => {
