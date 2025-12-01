@@ -366,15 +366,21 @@
 
         <pre id="ai_list_result">{ 会话列表将显示在这里 }</pre>
 
-        <!-- 获取单条会话 -->
-        <h3>3. 获取指定会话 GET /api/ai/conversation/:id</h3>
+        <!-- 获取会话消息 -->
+        <h3>3. 获取消息列表 GET /api/ai/conversation/:id</h3>
 
         <label>conversationId</label>
-        <input id="ai_get_id" placeholder="填写会话 ID" />
+        <input id="ai_msg_list_id" placeholder="填写会话 ID" />
 
-        <button onclick="aiGetConversation()">获取会话详情</button>
+        <label>page</label>
+        <input id="ai_msg_list_page" value="1" />
 
-        <pre id="ai_get_result">{ 会话详情将显示在这里 }</pre>
+        <label>limit</label>
+        <input id="ai_msg_list_limit" value="20" />
+
+        <button onclick="aiGetMessages()">获取消息列表</button>
+
+        <pre id="ai_msg_list_result">{ 消息列表将显示在这里 }</pre>
 
         <!-- 发送消息 -->
         <h3>4. 发送消息 POST /api/ai/conversation/:id</h3>
@@ -382,15 +388,12 @@
         <label>conversationId</label>
         <input id="ai_msg_conv_id" placeholder="填写会话 ID" />
 
-        <label>消息内容 text</label>
+        <label>用户消息 text</label>
         <input id="ai_msg_text" placeholder="例如：你好，我想学习 JS" />
 
-        <label>sender（可选，默认 user）</label>
-        <input id="ai_msg_sender" placeholder="user / system / assistant" />
+        <button onclick="aiSendMessage()">发送消息（含AI回复）</button>
 
-        <button onclick="aiSendMessage()">发送消息</button>
-
-        <pre id="ai_msg_result">{ 消息发送结果将显示在这里 }</pre>
+        <pre id="ai_msg_result">{ 消息与 AI 回复将显示在这里 }</pre>
 
         <hr />
       </div>
@@ -1081,14 +1084,11 @@
         box.textContent = prettyJSON(json);
       }
 
-      /* ---------------------- AI 对话 API ---------------------- */
-
-      /* 1. 创建会话 */
+      /* -------------------- AI: 创建会话 -------------------- */
       async function aiCreateConversation() {
         const base = getBase();
         const title = document.getElementById("ai_conv_title").value.trim();
         const courseId = document.getElementById("ai_conv_course").value.trim();
-        const box = document.getElementById("ai_create_result");
 
         const body = {};
         if (title) body.title = title;
@@ -1104,66 +1104,62 @@
         });
 
         const json = await res.json().catch(() => {});
-        log("创建会话响应:", JSON.stringify(json));
-        box.textContent = prettyJSON(json);
+        document.getElementById("ai_create_result").textContent =
+          prettyJSON(json);
       }
 
-      /* 2. 会话列表 */
+      /* -------------------- AI: 会话列表 -------------------- */
       async function aiListConversations() {
         const base = getBase();
-        const page = document.getElementById("ai_list_page").value.trim() || 1;
-        const limit =
-          document.getElementById("ai_list_limit").value.trim() || 20;
-        const box = document.getElementById("ai_list_result");
+
+        const page = document.getElementById("ai_list_page").value || 1;
+        const limit = document.getElementById("ai_list_limit").value || 20;
 
         const url = `${base}/api/ai/conversation?page=${page}&limit=${limit}`;
-        log("请求会话列表 ->", url);
+        log("Get Conversations ->", url);
 
         const res = await fetch(url, {
-          method: "GET",
-          headers: getTokenHeader(),
+          headers: { ...getTokenHeader() },
         });
 
         const json = await res.json().catch(() => {});
-        box.textContent = prettyJSON(json);
+        document.getElementById("ai_list_result").textContent =
+          prettyJSON(json);
       }
 
-      /* 3. 获取单个会话 */
-      async function aiGetConversation() {
+      /* -------------------- AI: 获取消息列表 -------------------- */
+      async function aiGetMessages() {
         const base = getBase();
-        const id = document.getElementById("ai_get_id").value.trim();
-        const box = document.getElementById("ai_get_result");
 
-        if (!id) return alert("请输入 conversationId");
+        const id = document.getElementById("ai_msg_list_id").value.trim();
+        const page = document.getElementById("ai_msg_list_page").value || 1;
+        const limit = document.getElementById("ai_msg_list_limit").value || 20;
 
-        const url = `${base}/api/ai/conversation/${id}`;
-        log("请求会话详情 ->", url);
+        if (!id) return alert("conversationId 不能为空");
+
+        const url = `${base}/api/ai/conversation/${id}?page=${page}&limit=${limit}`;
+        log("Get Messages ->", url);
 
         const res = await fetch(url, {
-          method: "GET",
-          headers: getTokenHeader(),
+          headers: { ...getTokenHeader() },
         });
 
         const json = await res.json().catch(() => {});
-        box.textContent = prettyJSON(json);
+        document.getElementById("ai_msg_list_result").textContent =
+          prettyJSON(json);
       }
 
-      /* 4. 发送消息 */
+      /* -------------------- AI: 发送消息并获得 AI 回复 -------------------- */
       async function aiSendMessage() {
         const base = getBase();
+
         const id = document.getElementById("ai_msg_conv_id").value.trim();
         const text = document.getElementById("ai_msg_text").value.trim();
-        const sender = document.getElementById("ai_msg_sender").value.trim();
-        const box = document.getElementById("ai_msg_result");
 
-        if (!id) return alert("请输入 conversationId");
-        if (!text) return alert("请输入消息内容");
-
-        const body = { text };
-        if (sender) body.sender = sender;
+        if (!id || !text) return alert("conversationId 和 text 都不能为空");
 
         const url = `${base}/api/ai/conversation/${id}`;
-        log("发送消息 ->", url);
+        log("Send Message ->", url);
 
         const res = await fetch(url, {
           method: "POST",
@@ -1171,12 +1167,13 @@
             "Content-Type": "application/json",
             ...getTokenHeader(),
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ text }),
         });
 
         const json = await res.json().catch(() => {});
-        box.textContent = prettyJSON(json);
+        document.getElementById("ai_msg_result").textContent = prettyJSON(json);
       }
+
       /* ---------------- NOTE API ---------------- */
 
       async function noteCreate() {

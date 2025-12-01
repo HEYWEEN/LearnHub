@@ -47,7 +47,7 @@ export async function register(payload) {
   });
 }
 
-export async function login({ email, password }) {
+export async function login({ email, password ,role}) {
   const user = await withConnection((conn) =>
     authRepo.findUserByEmail(conn, email)
   );
@@ -59,6 +59,11 @@ export async function login({ email, password }) {
   const ok = await comparePassword(password, user.password);
   if (!ok) {
     const e = new Error("用户不存在或密码错误");
+    e.status = STATUS.UNAUTHORIZED;
+    throw e;
+  }
+  if(role && user.role !== role) {
+    const e = new Error("用户角色不匹配");
     e.status = STATUS.UNAUTHORIZED;
     throw e;
   }

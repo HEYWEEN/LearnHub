@@ -10,7 +10,8 @@ const register = asyncHandler(async (req, res) => {
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const result = await authService.login({ email, password });
+  const role = req.body?.role||'admin';
+  const result = await authService.login({ email, password ,role});
   return sendSuccess(res, "登录成功", result);
 });
 

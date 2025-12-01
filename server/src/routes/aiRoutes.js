@@ -1,8 +1,8 @@
 import express from "express";
 import {
-  askAI,
   createConversation,
   getConversation,
+  getMessage,
   listConversations,
   sendMessage,
 } from "../controllers/aiController.js";
@@ -32,7 +32,6 @@ const router = express.Router();
  *   "code": 200
  * }
  */
-router.post("/ask", verifyToken, askAI);
 
 // 获取学习推荐
 // GET /ai/recommendations
@@ -54,30 +53,45 @@ router.post("/ask", verifyToken, askAI);
 //   },
 //   "code": 200
 // }
-router.get("/recommendations", (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      recommendations: [
-        {
-          courseId: "course_456",
-          title: "Vue.js实战教程",
-          coverImage: "/covers/vue-course.jpg",
-          reason: "基于你的React学习经历推荐",
-          matchScore: 0.85,
-        },
-      ],
-    },
-    code: 200,
-  });
-});
+
+// router.get("/recommendations", (req, res) => {
+//   res.json({
+//     success: true,
+//     data: {
+//       recommendations: [
+//         {
+//           courseId: "course_456",
+//           title: "Vue.js实战教程",
+//           coverImage: "/covers/vue-course.jpg",
+//           reason: "基于你的React学习经历推荐",
+//           matchScore: 0.85,
+//         },
+//       ],
+//     },
+//     code: 200,
+//   });
+// });
 
 router.post("/conversation", verifyToken, createConversation);
 
 router.get("/conversation", verifyToken, listConversations);
 
-router.get("/conversation/:conversationId", verifyToken, getConversation);
+// router.get("/conversation/:conversationId", verifyToken, getConversation);
 
+// 通过conversationId获取消息记录
+// GET /ai/conversation/:conversationId
+// 请求头:
+// Authorization: Bearer {token}
+router.get("/conversation/:conversationId", verifyToken, getMessage);
+
+// 发送消息到指定会话并获取AI回复
+// POST /ai/conversation/:conversationId
+// 请求头:
+// Authorization: Bearer {token}
+// 请求参数:
+// {
+//   "message": "string, 必填, 用户发送的消息内容"
+// }
 router.post("/conversation/:conversationId", verifyToken, sendMessage);
 
 export default router;
