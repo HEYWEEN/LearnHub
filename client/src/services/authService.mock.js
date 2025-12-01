@@ -22,7 +22,7 @@ const mockUsers = [
     role: 'teacher',
     avatar: null, // 使用默认头像
     createdAt: '2024-01-10T08:00:00Z'
-  },
+  },  
   {
     id: 'user_003',
     username: '王芳',

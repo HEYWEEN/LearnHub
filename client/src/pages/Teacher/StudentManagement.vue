@@ -159,7 +159,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/slices/user'
 import { getTeacherCourses } from '@/services/courseService.mock'
-import { getEnrolledStudents } from '@/services/teacherService.mock'
+import { getEnrolledStudents } from '@/services/teacherService'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
 const userStore = useUserStore()

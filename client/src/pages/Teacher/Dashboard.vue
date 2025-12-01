@@ -65,7 +65,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/slices/user'
-import { getTeacherStatistics } from '@/services/teacherService.mock'
+import { getTeacherStatistics } from '@/services/teacherService'
 
 const router = useRouter()
 const userStore = useUserStore()
