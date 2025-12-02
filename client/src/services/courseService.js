@@ -1,45 +1,63 @@
 import axios from './axios'
-import * as mockService from './courseService.mock'
 
-// 切换开关：true 使用 Mock，false 使用真实 API
-const USE_MOCK = false
-
-// 真实 API 调用
-const realGetCourses = async (params) => {
+// 获取课程列表
+export const getCourses = async (params) => {
+  // axios拦截器返回 res.data，即 { success, message, data, code }
+  // 我们需要返回 data 字段中的内容
   const response = await axios.get('/courses', { params })
-  return response.data.data
+  return response.data // 返回 { courses: [...], pagination: {...} }
 }
 
-const realGetCourseById = async (courseId) => {
+// 根据ID获取课程详情
+export const getCourseById = async (courseId) => {
   const response = await axios.get(`/courses/${courseId}`)
-  return response.data.data.course
+  return response.data // 返回课程对象
 }
 
-const realEnrollCourse = async (courseId) => {
+// 选课
+export const enrollCourse = async (courseId) => {
   const response = await axios.post(`/courses/${courseId}/enroll`)
-  return response.data
+  return response // 返回完整响应 { success, message, data }
 }
 
-const realCancelEnrollment = async (courseId) => {
+// 退课
+export const cancelEnrollment = async (courseId) => {
   const response = await axios.post(`/courses/${courseId}/cancel`)
-  return response.data
+  return response // 返回完整响应 { success, message, data }
 }
 
-const realCheckEnrollmentStatus = async (courseId) => {
+// 检查选课状态
+export const checkEnrollmentStatus = async (courseId) => {
   const response = await axios.get(`/courses/${courseId}/enrollment-status`)
-  return response.data.data
+  return response.data // 返回状态数据
 }
 
-const realSubmitReview = async (courseId, reviewData) => {
+// 提交课程评价
+export const submitReview = async (courseId, reviewData) => {
   const response = await axios.post(`/courses/${courseId}/reviews`, reviewData)
-  return response.data
+  return response // 返回完整响应
 }
 
-// 根据开关选择使用 Mock 或真实 API
-export const getCourses = USE_MOCK ? mockService.getCourses : realGetCourses
-export const getCourseById = USE_MOCK ? mockService.getCourseById : realGetCourseById
-export const enrollCourse = USE_MOCK ? mockService.enrollCourse : realEnrollCourse
-export const cancelEnrollment = USE_MOCK ? mockService.cancelEnrollment : realCancelEnrollment
-export const checkEnrollmentStatus = USE_MOCK ? mockService.checkEnrollmentStatus : realCheckEnrollmentStatus
-export const submitReview = USE_MOCK ? mockService.submitReview : realSubmitReview
+// 获取教师课程列表
+export const getTeacherCourses = async (teacherId) => {
+  const response = await axios.get(`/teacher/${teacherId}/courses`)
+  return response.data // 返回课程列表数据
+}
 
+// 创建课程
+export const createCourse = async (courseData) => {
+  const response = await axios.post('/teacher/courses', courseData)
+  return response.data // 返回创建的课程数据
+}
+
+// 更新课程
+export const updateCourse = async (courseId, courseData) => {
+  const response = await axios.put(`/teacher/courses/${courseId}`, courseData)
+  return response.data // 返回更新后的课程数据
+}
+
+// 删除课程
+export const deleteCourse = async (courseId) => {
+  const response = await axios.delete(`/teacher/courses/${courseId}`)
+  return response // 返回完整响应
+}

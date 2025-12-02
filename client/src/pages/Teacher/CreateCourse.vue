@@ -82,7 +82,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/slices/user'
-import { createCourse, updateCourse, getCourseById } from '@/services/courseService.mock'
+import { createCourse, updateCourse, getCourseById } from '@/services/courseService'
 
 const router = useRouter()
 const route = useRoute()

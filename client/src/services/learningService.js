@@ -1,51 +1,43 @@
 import axios from './axios'
-import * as mockService from './learningService.mock'
 
-// 切换开关：true 使用 Mock，false 使用真实 API
-const USE_MOCK = false
-
-// 真实 API 调用
-const realGetCourseChapters = async (courseId) => {
+// 获取课程章节列表
+export const getCourseChapters = async (courseId) => {
   const response = await axios.get(`/courses/${courseId}/chapters`)
-  return response.data
+  return response.data // 返回章节数据
 }
 
-const realGetVideoProgress = async (courseId, chapterId) => {
+// 获取视频进度
+export const getVideoProgress = async (courseId, chapterId) => {
   const response = await axios.get(`/learning/progress/${courseId}/${chapterId}`)
-  return response.data
+  return response.data // 返回进度数据
 }
 
-const realSaveVideoProgress = async (courseId, chapterId, progressData) => {
+// 保存视频进度
+export const saveVideoProgress = async (courseId, chapterId, progressData) => {
   const response = await axios.post(`/learning/progress/${courseId}/${chapterId}`, progressData)
-  return response.data
+  return response // 返回完整响应
 }
 
-const realGetChapterNotes = async (courseId, chapterId) => {
+// 获取章节笔记
+export const getChapterNotes = async (courseId, chapterId) => {
   const response = await axios.get(`/learning/notes/${courseId}/${chapterId}`)
-  return response.data
+  return response.data // 返回笔记数据
 }
 
-const realSaveChapterNotes = async (courseId, chapterId, content) => {
+// 保存章节笔记
+export const saveChapterNotes = async (courseId, chapterId, content) => {
   const response = await axios.post(`/learning/notes/${courseId}/${chapterId}`, { content })
-  return response.data
+  return response // 返回完整响应
 }
 
-const realGetCourseProgress = async (courseId) => {
+// 获取课程整体进度
+export const getCourseProgress = async (courseId) => {
   const response = await axios.get(`/learning/progress/${courseId}`)
-  return response.data
+  return response.data // 返回进度数据
 }
 
-const realGetRecentLearning = async () => {
+// 获取最近学习记录
+export const getRecentLearning = async () => {
   const response = await axios.get('/learning/recent')
-  return response.data
+  return response.data // 返回学习记录数据
 }
-
-// 根据开关选择使用 Mock 或真实 API
-export const getCourseChapters = USE_MOCK ? mockService.getCourseChapters : realGetCourseChapters
-export const getVideoProgress = USE_MOCK ? mockService.getVideoProgress : realGetVideoProgress
-export const saveVideoProgress = USE_MOCK ? mockService.saveVideoProgress : realSaveVideoProgress
-export const getChapterNotes = USE_MOCK ? mockService.getChapterNotes : realGetChapterNotes
-export const saveChapterNotes = USE_MOCK ? mockService.saveChapterNotes : realSaveChapterNotes
-export const getCourseProgress = USE_MOCK ? mockService.getCourseProgress : realGetCourseProgress
-export const getRecentLearning = USE_MOCK ? mockService.getRecentLearning : realGetRecentLearning
-

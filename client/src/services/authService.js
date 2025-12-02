@@ -1,44 +1,32 @@
-import axios from 'axios'
-import * as mockService from './authService.mock'
+import axios from './axios'
 
-// 切换开关：true 使用 Mock，false 使用真实 API
-const USE_MOCK = false
+// 登录
+export const login = async (email, password, role) => {
+  // authService 需要直接访问完整响应，因为需要获取 token
+  const response = await axios.post('/auth/login', { email, password, role })
+  return response.data
+}
 
-const API_BASE_URL = 'http://localhost:3000/api'
+// 注册
+export const register = async (username, email, password, role) => {
+  const response = await axios.post('/auth/register', { username, email, password, role })
+  return response.data
+}
 
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000, // 10s超时
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+// 获取用户信息
+export const getUserProfile = async () => {
+  const response = await axios.get('/auth/me')
+  return response.profile
+}
 
-// 真实 API 调用
-const realLogin = (email, password, role) =>
-  axiosInstance.post('/auth/login', { email, password, role }).then(res => res.data.data)
+// 更新用户信息
+export const updateUserProfile = async (profileData) => {
+  const response = await axios.put('/users/me', profileData)
+  return response
+}
 
-const realRegister = (username, email, password, role) =>
-  axiosInstance.post('/auth/register', { username, email, password, role }).then(res => res.data.data)
-
-const realGetUserProfile = () =>
-  axiosInstance.get('/auth/profile', {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-  }).then(res => res.data.data)
-
-const realUpdateUserProfile = (profileData) =>
-  axiosInstance.put('/auth/profile', profileData, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-  }).then(res => res.data.data)
-
-const realChangePassword = (passwordData) =>
-  axiosInstance.put('/auth/password', passwordData, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-  }).then(res => res.data.data)
-
-// 根据开关选择使用 Mock 或真实 API
-export const login = USE_MOCK ? mockService.login : realLogin
-export const register = USE_MOCK ? mockService.register : realRegister
-export const getUserProfile = USE_MOCK ? mockService.getUserProfile : realGetUserProfile
-export const updateUserProfile = USE_MOCK ? mockService.updateUserProfile : realUpdateUserProfile
-export const changePassword = USE_MOCK ? mockService.changePassword : realChangePassword
+// 修改密码
+export const changePassword = async (passwordData) => {
+  const response = await axios.post('/auth/password', passwordData)
+  return response
+}

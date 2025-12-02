@@ -25,6 +25,7 @@ export async function getCourses({
       repo.countCourses(conn, { filters }),
     ])
   );
+  
   return {
     courses,
     pagination: {
