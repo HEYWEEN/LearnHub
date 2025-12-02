@@ -67,7 +67,8 @@ router.delete(
 
 router.get("/:courseId", getCourseById);
 
-//=检测报名状态（student）
+// 检测报名状态（student）
+// GET /courses/{courseId}/enroll-status
 // 请求头:
 // Authorization: Bearer {token}
 router.get("/:courseId/enroll-status", verifyToken, checkEnrollStatus);

@@ -1,9 +1,44 @@
 
-** 1.1 新增路由 **
+** 1.1 路由 **
 
 - GET /auth/refresh
 
-refreshToken
+刷新jwt token有效期，返回一个新的token
+
+请求头:
+
+Authorization: Bearer {token}
+
+返回：
+```
+ {success:True
+  message:"..."
+  data:{ 
+    token:...  
+  }
+  code:200
+ }
+ ```
+
+
+-  GET /courses/{courseId}/enroll-status
+
+检测报名状态（student）
+
+请求头:
+
+Authorization: Bearer {token}
+
+返回：
+```
+ {success:True
+  message:"查询成功"
+  data:{ 
+    isEnrolled:True  
+  }
+  code:200
+ }
+```
 
 ** 1.0 ** ：
 
