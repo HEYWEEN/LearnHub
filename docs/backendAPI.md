@@ -215,12 +215,12 @@
   - 鉴权：必须
   - 成功：200 返回 progress 列表或汇总
 
-- POST /api/learning/:courseId/lesson/:lessonId/complete
+- POST /api/learning/progress/:courseId/:lessonId/complete
   - 说明：标记章节为已完成
   - 鉴权：必须
   - 成功：200 返回标记结果 { userId, courseId, lessonId, completed: true }
 
-- GET /api/learning/:courseId
+- GET /api/learning/progress/:courseId
   - 说明：获取课程学习统计（总章节/已完成/完成率）
   - 鉴权：必须
   - 成功：200 返回 { total, completed, rate, lessons, progress }

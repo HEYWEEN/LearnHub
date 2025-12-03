@@ -1,7 +1,11 @@
 
 ** 1.2 路由 **
 
+新增路由
+
 - POST learning/progress/:lessonId/time
+
+BODY: {"progress":(秒)}
 
 保存视频进度
 
@@ -74,7 +78,38 @@ query : courseId
 获取指定学生课程的学习进度
 
 鉴权：有 并要求role 为老师或管理员
-
+```
+{
+    "success": true,
+    "message": "获取学生课程学习数据成功",
+    "data": {
+        "total": 13,
+        "completed": 1,
+        "rate": 8,
+        "progress": [
+            {
+                "total_time": 229,
+                "watch_time": 380,
+                "title": "Lesson 6",
+                "lesson_created_at": "2025-12-03T03:07:03.000Z",
+                "lesson_id": "0e64089b-e430-4a6e-beb6-ad123f3f1d18",
+                "completed": 1,
+                "updated_at": "2025-12-03T03:07:35.000Z"
+            },
+            {
+                "total_time": 557,
+                "watch_time": 25,
+                "title": "Lesson 1",
+                "lesson_created_at": "2025-12-03T03:07:03.000Z",
+                "lesson_id": "dd1714bb-559d-4dd3-aefe-bb3b38d154de",
+                "completed": 0,
+                "updated_at": "2025-12-03T03:07:35.000Z"
+            }
+        ]
+    },
+    "code": 200
+}
+```
 - get /teacher/courses
 
 获取老师开的所有课程列表
@@ -86,6 +121,7 @@ query : courseId
 获取老师一些统计数据，包括开设课程数量、章节数量、报名学生数量、总评论数量
 
 鉴权：有 并要求role 为老师
+
 
 ** 1.1 路由 **
 

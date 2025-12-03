@@ -1,3 +1,23 @@
+# 更新
+
+1. **表结构发生变化**
+
+**运行``npm run db:update``更新表结构**
+
+2. **用于填充测试数据的脚本更新**
+
+**同时再运行一遍``npm run db:test``重新填充数据**
+
+3. **关于ffmpeg**
+
+如果没有在环境里安装ffmpeg
+
+那么数据库在上传课程视频时不会填充视频时长字段（watch_time）并且无法启用hls
+
+4. **.env结构变化**
+
+请检查当前.env文件结构是否与.env.example一致
+
 # 依赖安装
 
 Node.js, npm, MySQL, ffmpeg（用于 HLS 生成）（可选）
@@ -59,12 +79,6 @@ npm test
 这个指令会打开一个用于测试视频流、hls和视频图片上传的测试界面
 
 需同时运行``npm start``或``node src/index.js``才能使用
-
-# 更新
-
-由于表结构发生变化
-
-运行``npm run db:update``更新
 
 
 # other
