@@ -36,18 +36,17 @@ export async function markCompleted({ user, courseId, lessonId }) {
 
 export async function getCourseLearning({ user, courseId }) {
   // 返回课程学习进度汇总：总章节数、已完成数、完成率
-  const [lessons, progressRows] = await withTransaction(async (conn) =>
+  const [total, progressRows] = await withTransaction(async (conn) =>
     Promise.all([
-      lessonRepo.findLessonsByCourseId(conn, courseId),
+      lessonRepo.countLessonsByCourseId(conn, courseId),
       learningRepo.findProgressByUserCourse(conn, user.id, courseId),
     ])
   );
-  const total = lessons.length || 0;
   const completed = progressRows.filter(
     (r) => r.completed === 1 || r.completed === true
   ).length;
   const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
-  return { total, completed, rate, lessons, progress: progressRows };
+  return { total, completed, rate, progress: progressRows };
 }
 
 export async function getRecentLearning({ user, page, limit }) {

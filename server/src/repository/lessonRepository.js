@@ -52,3 +52,11 @@ export async function findLessonsByCourseId(pool, courseId) {
   );
   return rows;
 }
+
+export async function countLessonsByCourseId(pool, courseId) {
+  const [rows] = await pool.query(
+    "SELECT COUNT(*) AS total FROM lessons WHERE course_id = ?",
+    [courseId]
+  );
+  return rows[0].total||0;
+}

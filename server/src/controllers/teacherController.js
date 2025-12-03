@@ -12,8 +12,9 @@ const getStudentProgress = asyncHandler(async (req, res) => {
 
 const listEnrollments = asyncHandler(async (req, res) => {
   const user = req.user;
-  const enrollments = await enrollService.listEnrollments({ user });
-  return sendSuccess(res, "查询成功", { enrollments });
+  const courseId = req.query?.courseId||"";
+  const data= await enrollService.listEnrollments({ user,courseId });
+  return sendSuccess(res, "查询成功", data );
 });
 
 const getCourseByTeacherId = asyncHandler(async (req, res) => {

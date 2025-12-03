@@ -10,7 +10,11 @@ export async function findAllProgress(pool, userId) {
 
 export async function findProgressByUserCourse(pool, userId, courseId) {
   const [rows] = await pool.query(
-    "SELECT * FROM progress WHERE user_id = ? AND course_id = ? ORDER BY updated_at DESC",
+    `SELECT l.duration as total_time,p.watch_time,l.title,l.created_at as lesson_created_at,p.lesson_id,p.completed,p.updated_at
+    FROM progress p
+    JOIN lessons l ON p.lesson_id = l.id 
+    WHERE p.user_id = ? AND p.course_id = ? 
+    ORDER BY updated_at DESC`,
     [userId, courseId]
   );
   return rows;

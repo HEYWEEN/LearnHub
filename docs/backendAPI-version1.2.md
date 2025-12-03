@@ -15,9 +15,13 @@
 
 - get teacher/enrollments
 
-列出报名自己课程（所有）的学生
+列出报名自己课程（如果不填courseId就是所有课程）的学生
+
+query : courseId
 
 请求头：Authorization: Bearer {jwt_token} 
+
+鉴权：有 并要求role 为老师
 
 ```
 {
@@ -64,7 +68,6 @@
 }
 ```
 
-鉴权：有 并要求role 为老师
 
 - get /enrollments/:courseId/:studentId
 

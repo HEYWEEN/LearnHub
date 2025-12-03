@@ -1,9 +1,56 @@
 import getPool from "../config/db.js";
 
-export async function findEnrollment(pool, userId, courseId) {
+export async function findEnrollment(pool, filters = {}) {
+  const where = [];
+  const params = [];
+  if (filters.userId) {
+    where.push("e.user_id = ?");
+    params.push(filters.userId);
+  }
+  if (filters.courseId) {
+    where.push("e.course_id = ?");
+    params.push(filters.courseId);
+  }
+  if(filters.instructorId) {
+    where.push("c.instructor_id = ?");
+    params.push(filters.instructorId);
+  }
+  const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
+  
   const [rows] = await pool.query(
-    "SELECT * FROM enrollments WHERE user_id = ? AND course_id = ?",
-    [userId, courseId]
+    `SELECT e.id AS enrollment_id, e.enrolled_at, c.id AS course_id, c.title AS course_title,u.id AS student_id, u.username, u.email, u.avatar, u.created_at AS student_created_at
+     FROM enrollments e
+     JOIN courses c ON e.course_id = c.id
+     JOIN users u ON e.user_id = u.id
+     ${whereSQL}`,
+    params
+  );
+  return rows;
+}
+
+export async function countEnrollment(pool, filters = {}) {
+  const where = [];
+  const params = [];
+  if (filters.userId) {
+    where.push("e.user_id = ?");
+    params.push(filters.userId);
+  }
+  if (filters.courseId) {
+    where.push("e.course_id = ?");
+    params.push(filters.courseId);
+  }
+  if(filters.instructorId) {
+    where.push("c.instructor_id = ?");
+    params.push(filters.instructorId);
+  }
+  const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
+  
+  const [rows] = await pool.query(
+    `SELECT COUNT(e.id) AS total
+     FROM enrollments e
+     JOIN courses c ON e.course_id = c.id
+     ${whereSQL}`,
+    params
   );
   return rows[0];
 }
@@ -18,18 +65,6 @@ export async function deleteEnrollment(pool, userId, courseId) {
     "DELETE FROM enrollments WHERE user_id = ? AND course_id = ?",
     [userId, courseId]
   );
-}
-
-export async function findEnrollmentByTeacherId(pool, userId) {
-  const [rows] = await pool.query(
-    `SELECT e.id AS enrollment_id, e.enrolled_at, c.id AS course_id, c.title AS course_title,u.id AS student_id, u.username, u.email, u.avatar, u.created_at AS student_created_at
-     FROM enrollments e
-     JOIN courses c ON e.course_id = c.id
-     JOIN users u ON e.user_id = u.id
-     WHERE c.instructor_id = ?`,
-    [userId]
-  );
-  return rows;
 }
 
 export async function countEnrollmentTeacher(pool, user_id) {
