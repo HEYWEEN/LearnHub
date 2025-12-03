@@ -4,6 +4,7 @@ import coursesRouter from './coursesRoutes.js';
 import learningRouter from './learningRoutes.js';
 import usersRouter from './usersRoutes.js';
 import noteRouter from './noteRoutes.js';
+import teacherRouter from './teacherRoutes.js';
 
 export default {
     aiRouter: aiRouter,
@@ -11,7 +12,8 @@ export default {
     coursesRouter:coursesRouter,
     learningRouter:learningRouter,
     usersRouter:usersRouter,
-    noteRouter:noteRouter
+    noteRouter:noteRouter,
+    teacherRouter:teacherRouter
 };
 
 

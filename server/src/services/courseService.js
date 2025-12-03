@@ -1,4 +1,3 @@
-import getPool from "../config/db.js";
 import STATUS from "../constants/httpStatus.js";
 import { v4 as uuidv4 } from "uuid";
 

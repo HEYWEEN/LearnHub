@@ -38,12 +38,14 @@ const updateVideo = asyncHandler(async (req, res) => {
   const file = await fileService.uploadFileAsync("video")(req, res);
   // 获取上传后的文件路径
   const coverVideoUrl = fileService.getUploadedFilePath(file);
+
+  const duration = await fileService.getVideoDuration(file.path);
   // 更新课程封面
   const updated = await lessonService.modifyLesson({
     user,
     courseId,
     lessonId,
-    payload: { video_url: coverVideoUrl },
+    payload: { video_url: coverVideoUrl,duration },
   });
   return sendSuccess(res, "更新成功", { course: updated });
 });

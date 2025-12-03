@@ -63,3 +63,10 @@ export async function getCourseEnrollments({ courseId }) {
   );
   return enrollments;
 }
+
+export async function listEnrollments({user}) {
+  const enrollments = await withConnection((conn) =>
+    repo.findEnrollmentByTeacherId(conn, user.id)
+  );
+  return enrollments;
+}

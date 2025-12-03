@@ -121,6 +121,11 @@ export async function streamFileByRange(filePath, req, res) {
  * 注意：需要系统上安装 ffmpeg
  */
 export async function ensureHls(inputPath, id) {
+  if(global.HAS_FFMPEG===false){
+    const err = new Error("当前环境未安装 ffmpeg，无法生成hls");
+    err.status = STATUS.INTERNAL_SERVER;
+    throw err;
+  }
   if (!inputPath) throw new Error("missing inputPath");
   const outDir = path.join(UPLOADS_DIR, "hls", String(id));
   const playlist = path.join(outDir, "index.m3u8");

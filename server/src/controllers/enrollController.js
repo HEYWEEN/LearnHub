@@ -28,4 +28,6 @@ const checkEnrollStatus = asyncHandler(async (req, res) => {
   return sendSuccess(res, "查询成功", { isEnrolled });
 });
 
+
+
 export { enrollCourse, cancelEnrollCourse, checkEnrollStatus };

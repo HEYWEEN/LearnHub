@@ -10,7 +10,8 @@ import { connectDB } from './config/db.js';
 await connectDB();
 
 import checkConfig from './utils/configChecker.js';
-checkConfig();
+
+await checkConfig();
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,14 +42,16 @@ import notFound from './middleware/notFoundMiddleware.js';
 
 app.use(loggerMiddleware);
 
-app.use('/api/auth'     , routes.authRouter);
+app.use('/api/auth'     , routes.authRouter    );
 app.use('/api/learning' , routes.learningRouter);
-app.use('/api/courses'  , routes.coursesRouter);
-app.use('/api/users'    , routes.usersRouter);
-app.use('/api/ai'       , routes.aiRouter);
-app.use('/api/note'     , routes.noteRouter);
+app.use('/api/courses'  , routes.coursesRouter );
+app.use('/api/users'    , routes.usersRouter   );
+app.use('/api/ai'       , routes.aiRouter      );
+app.use('/api/note'     , routes.noteRouter    );
+app.use('/api/teacher'  , routes.teacherRouter );
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/public', express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
     res.send('LearnHub API is running...');

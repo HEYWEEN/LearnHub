@@ -16,14 +16,14 @@ export async function getProgress({ user, courseId }) {
 
 export async function markCompleted({ user, courseId, lessonId }) {
   return withTransaction(async (conn) => {
-    const lesson = await lessonRepo.findLessonById(lessonId);
+    const lesson = await lessonRepo.findLessonById(conn, lessonId);
     if (!lesson) {
       const e = new Error("章节不存在");
       e.status = STATUS.NOT_FOUND;
       throw e;
     }
     const id = uuidv4();
-    await learningRepo.upsertProgress({
+    await learningRepo.upsertProgress(conn, {
       id,
       user_id: user.id,
       course_id: courseId,
@@ -38,8 +38,8 @@ export async function getCourseLearning({ user, courseId }) {
   // 返回课程学习进度汇总：总章节数、已完成数、完成率
   const [lessons, progressRows] = await withTransaction(async (conn) =>
     Promise.all([
-      lessonRepo.findLessonsByCourseId(courseId),
-      learningRepo.findProgressByUserCourse(user.id, courseId),
+      lessonRepo.findLessonsByCourseId(conn, courseId),
+      learningRepo.findProgressByUserCourse(conn, user.id, courseId),
     ])
   );
   const total = lessons.length || 0;
@@ -70,4 +70,29 @@ export async function getRecentLearning({ user, page, limit }) {
       pages: Math.ceil(total / limit),
     },
   };
+}
+
+export async function saveVideoProgress({
+  user,
+  courseId,
+  lessonId,
+  progress,
+}) {
+  return withTransaction(async (conn) => {
+    const lesson = await lessonRepo.findLessonById(conn, lessonId);
+    if (!lesson) {
+      const e = new Error("章节不存在");
+      e.status = STATUS.NOT_FOUND;
+      throw e;
+    }
+    const id = uuidv4();
+    await learningRepo.upsertProgress(conn, {id,course_id: courseId,lesson_id: lessonId,user_id: user.id,watch_time: progress});
+  });
+}
+
+export async function getVideoProgress({ user, lessonId }) {
+  const row = await withConnection((conn) =>
+    learningRepo.findProgressByUserLesson(conn, user.id,  lessonId)
+  );
+  return row ? row.watch_time : 0;
 }

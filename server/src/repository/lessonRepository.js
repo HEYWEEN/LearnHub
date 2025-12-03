@@ -20,6 +20,16 @@ export async function findLessonById(pool, lessonId) {
   ]);
   return rows[0];
 }
+export async function countLessonsByInstructorId(pool, instructorId) {
+  const sql = `
+    SELECT COUNT(*) AS lessonCount
+    FROM lessons l
+    JOIN courses c ON l.course_id = c.id
+    WHERE c.instructor_id = ?
+  `;
+  const [rows] = await pool.query(sql, [instructorId]);
+  return rows[0].lessonCount;
+} 
 
 export async function deleteLesson(pool, lessonId) {
   await pool.query("DELETE FROM lessons WHERE id = ?", [lessonId]);

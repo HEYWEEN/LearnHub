@@ -8,9 +8,14 @@ export async function findCourses(pool,{ offset = 0, limit = 12, filters = {} })
     params.push(filters.category);
   }
   if (filters.search) {
-    where.push("(c.title LIKE ? OR c.description LIKE ?)");
+    where.push("(c.title LIKE ? OR c.description LIKE ? OR u.username LIKE ?)");
     params.push(`%${filters.search}%`);
     params.push(`%${filters.search}%`);
+    params.push(`%${filters.search}%`);
+  }
+  if(filters.instructorId) {
+    where.push("c.instructor_id = ?");
+    params.push(filters.instructorId);
   }
   const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
   

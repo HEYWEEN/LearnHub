@@ -7,7 +7,8 @@
   "scripts": {
     "test": "nodemon scripts/unit/app.js",
     "start": "nodemon ./src/index.js",
-    "db:test": "node scripts/bigSeed.js"
+    "db:test": "node scripts/bigSeed.js",
+    "db:update": "node scripts/update.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +18,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "fluent-ffmpeg": "^2.1.3",
     "jsonwebtoken": "^9.0.2",
     "mime": "^4.1.0",
     "multer": "^2.0.2",

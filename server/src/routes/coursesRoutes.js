@@ -82,11 +82,6 @@ router.post("/:courseId/enroll", verifyToken, enrollCourse);
 router.post("/:courseId/cancel", verifyToken, cancelEnrollCourse);
 
 
-
-
-
-
-
 // 修改课程封面（teacher）
 // POST /courses/{courseId}/cover-img
 // 请求头:

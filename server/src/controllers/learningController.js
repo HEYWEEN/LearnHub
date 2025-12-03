@@ -27,11 +27,41 @@ const getCourseLearning = asyncHandler(async (req, res) => {
   return sendSuccess(res, "获取课程学习数据成功", data);
 });
 
-const getRecentLearning = asyncHandler(async (req,res)=>{
+const getRecentLearning = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { page = 1, limit = 12} = req.query;
-  const data = await learningService.getRecentLearning({user,page,limit});
-  return sendSuccess(res,"获取学习数据成功",data);
-})
+  const { page = 1, limit = 12 } = req.query;
+  const data = await learningService.getRecentLearning({ user, page, limit });
+  return sendSuccess(res, "获取学习数据成功", data);
+});
 
-export { getProgress, markCompleted, getCourseLearning,getRecentLearning };
+const saveVideoProgress = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { courseId, lessonId } = req.params;
+  const { progress } = req.body;
+  const result = await learningService.saveVideoProgress({
+    user,
+    courseId,
+    lessonId,
+    progress,
+  });
+  return sendSuccess(res, "保存视频进度成功", result);
+});
+
+const getVideoProgress = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { courseId, lessonId } = req.params;
+  const progress = await learningService.getVideoProgress({
+    user,
+    lessonId,
+  });
+  return sendSuccess(res, "获取视频进度成功", { progress });
+});
+
+export {
+  getVideoProgress,
+  saveVideoProgress,
+  getProgress,
+  markCompleted,
+  getCourseLearning,
+  getRecentLearning,
+};

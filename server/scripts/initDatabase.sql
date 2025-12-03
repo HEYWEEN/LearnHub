@@ -36,7 +36,7 @@ CREATE TABLE lessons (
     title VARCHAR(100) NOT NULL,
     description TEXT,
     video_url VARCHAR(255),
-    duration INT, -- 秒数
+    duration INT , -- 秒数
     is_free BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -60,6 +60,7 @@ CREATE TABLE progress (
     user_id VARCHAR(36) NOT NULL,
     course_id VARCHAR(36) NOT NULL,
     lesson_id VARCHAR(36),
+    watch_time INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '已观看秒数',
     completed BOOLEAN DEFAULT FALSE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -101,7 +102,7 @@ CREATE TABLE ai_messages(
     context TEXT NOT NULL,
     send_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(conversation_id) REFERENCES ai_conversation(id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE notes(
     id VARCHAR(36) PRIMARY KEY,
@@ -114,4 +115,4 @@ CREATE TABLE notes(
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL
-)
+);

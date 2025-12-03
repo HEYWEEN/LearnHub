@@ -60,6 +60,14 @@ npm test
 
 需同时运行``npm start``或``node src/index.js``才能使用
 
+# 更新
+
+由于表结构发生变化
+
+运行``npm run db:update``更新
+
+
+# other
 
 视频流（Range）与 HLS 使用
 ------------------------

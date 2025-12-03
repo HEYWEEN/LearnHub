@@ -45,3 +45,22 @@ export async function updateReviewById(pool, id, { comment, rating }) {
   const sql = `UPDATE reviews SET comment = ?, rating = ? WHERE id = ?`;
   await pool.query(sql, [comment, rating, id]);
 }
+
+export async function countReviewsByCourseId(pool, courseId) {
+  const [rows] = await pool.query(
+    "SELECT COUNT(*) as count FROM reviews WHERE course_id = ?",
+    [courseId]
+  );
+  return rows[0].count;
+}
+
+export async function countReviewsByInstructorId(pool, instructorId) {
+  const sql = `
+    SELECT COUNT(*) as count
+    FROM reviews r
+    JOIN courses c ON r.course_id = c.id
+    WHERE c.instructor_id = ?
+  `;
+  const [rows] = await pool.query(sql, [instructorId]);
+  return rows[0].count;
+}

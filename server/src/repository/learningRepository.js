@@ -26,7 +26,7 @@ export async function findProgressByUserLesson(pool, userId, lessonId) {
 
 export async function upsertProgress(
   pool,
-  { id, user_id, course_id, lesson_id, completed }
+  { id, user_id, course_id, lesson_id, completed = undefined , watch_time = undefined }
 ) {
   // Try update first
   const [existing] = await pool.query(
@@ -34,14 +34,25 @@ export async function upsertProgress(
     [user_id, lesson_id]
   );
   if (existing && existing.length) {
+    let sql = "";
+    let params = [];
+    if (completed !== undefined) {
+      sql += "completed = ?, ";
+      params.push(completed ? 1 : 0);
+    }
+    if (watch_time !== undefined) {
+      sql += "watch_time = ?, ";
+      params.push(watch_time);
+    }
+    params.push(user_id, lesson_id);
     await pool.query(
-      "UPDATE progress SET completed = ?, updated_at = NOW() WHERE user_id = ? AND lesson_id = ?",
-      [completed ? 1 : 0, user_id, lesson_id]
+      `UPDATE progress SET ${sql} updated_at = NOW() WHERE user_id = ? AND lesson_id = ?`,
+       params
     );
   } else {
     await pool.query(
-      "INSERT INTO progress (id, user_id, course_id, lesson_id, completed, updated_at) VALUES (?, ?, ?, ?, ?, NOW())",
-      [id, user_id, course_id, lesson_id, completed ? 1 : 0]
+      "INSERT INTO progress (id, user_id, course_id, lesson_id, completed , watch_time , updated_at) VALUES (?, ?, ?, ?, ?, ? ,NOW())",
+      [id, user_id, course_id, lesson_id, completed ? 1 : 0, watch_time? watch_time : 0]
     );
   }
 }

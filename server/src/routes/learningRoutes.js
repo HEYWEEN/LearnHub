@@ -4,6 +4,8 @@ import {
   getProgress,
   getRecentLearning,
   markCompleted,
+  saveVideoProgress,
+  getVideoProgress,
 } from "../controllers/learningController.js";
 const router = express.Router();
 
@@ -21,7 +23,11 @@ router.get("/progress/:courseId", verifyToken, getProgress);
 // {
 //   "completed": "boolean, 是否完成该课时"
 // }
-router.post("/progress/:lessonId", verifyToken, markCompleted);
+router.post("/progress/:courseId/:lessonId/complete", verifyToken, markCompleted);
+
+router.post("/progress/:courseId/:lessonId/time", verifyToken, saveVideoProgress);
+
+router.get("/progress/:courseId/:lessonId/time", verifyToken, getVideoProgress);
 
 // 获取最近学习进度
 // GET /recent
