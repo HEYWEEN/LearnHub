@@ -2,6 +2,8 @@ import STATUS from "../constants/httpStatus.js";
 import { sendError } from "../utils/response.js";
 import jwt from "jsonwebtoken";
 import { getSecretKey } from "../config/jwt.js";
+import { prettyJSON } from "../utils/logUtils.js";
+import LOG_COLOR from "../constants/logColor.js";
 
 const verifyToken = (req, res, next) => {
   const SECRET_KEY = getSecretKey();
@@ -27,7 +29,11 @@ const authorize = (roles = []) => {
   return async (req, res, next) => {
     const user = req.user;
     if (!roles.includes(user.role)) {
-      const err = new Error("权限不足");
+      let message = "权限不足\n";
+      if (global.detailedLogging) {
+        message += "当前用户"+prettyJSON(user);
+      }
+      const err = new Error(message);
       err.status = STATUS.FORBIDDEN;
       return next(err);
     }

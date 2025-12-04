@@ -14,7 +14,7 @@ export const checkEnvConfig = () => {
         "正在使用默认的SECRET_KEY,建议在.env中设置一个强随机性的SECRET_KEY。"
     );
   }
-  if (!process.env.API_KEY || !process.env.AI_URL || !process.env.AI_MODEL) {
+  if (!process.env.API_KEY || !process.env.AI_URL ) {
     console.warn(
       LOG_COLOR.FG_RED +
         "[Warning]" +
