@@ -114,29 +114,32 @@
             <div class="password-form" v-if="showPasswordForm" key="form">
               <div class="form-item">
                 <label>当前密码</label>
-                <input
+                <el-input
                   v-model="passwordForm.currentPassword"
                   type="password"
-                  class="form-input"
                   placeholder="请输入当前密码"
+                  show-password
+                  class="password-input"
                 />
               </div>
               <div class="form-item">
                 <label>新密码</label>
-                <input
+                <el-input
                   v-model="passwordForm.newPassword"
                   type="password"
-                  class="form-input"
                   placeholder="请输入新密码（至少6位）"
+                  show-password
+                  class="password-input"
                 />
               </div>
               <div class="form-item">
                 <label>确认新密码</label>
-                <input
+                <el-input
                   v-model="passwordForm.confirmPassword"
                   type="password"
-                  class="form-input"
                   placeholder="请再次输入新密码"
+                  show-password
+                  class="password-input"
                 />
               </div>
 
@@ -654,6 +657,11 @@ onMounted(() => {
   font-size: 14px;
   font-weight: 600;
   color: #666;
+}
+
+/* 密码输入框 */
+.password-input {
+  width: 100%;
 }
 
 .form-input {
