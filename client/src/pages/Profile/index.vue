@@ -192,6 +192,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '../../store/slices/user'
 import defaultAvatar from '../../assets/images/default-avatar.png'
 import * as authService from '../../services/authService'
+import instance, { FILE_UPLOAD_URL } from '../../services/axios'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -227,7 +228,7 @@ const passwordForm = ref({
 
 // 计算属性
 const userAvatar = computed(() => {
-  return userInfo.value.avatar || defaultAvatar
+  return userInfo.value.avatar?FILE_UPLOAD_URL + userInfo.value.avatar: defaultAvatar
 })
 
 const roleText = computed(() => {

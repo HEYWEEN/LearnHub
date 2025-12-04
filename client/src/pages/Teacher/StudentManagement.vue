@@ -35,7 +35,7 @@
               <template #default="{ row }">
                 <div class="student-info">
                   <img
-                    :src="row.student.avatar || defaultAvatar"
+                    :src="row.student.avatar?FILE_UPLOAD_URL + row.student.avatar: defaultAvatar"
                     :alt="row.student.username"
                     class="student-avatar"
                   />
@@ -47,7 +47,11 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="报名课程" prop="course.title" min-width="180" />
+            <el-table-column
+              label="报名课程"
+              prop="course.title"
+              min-width="180"
+            />
 
             <el-table-column label="报名时间" min-width="150">
               <template #default="{ row }">
@@ -117,7 +121,9 @@
             </div>
             <div class="detail-item">
               <span class="label">报名时间：</span>
-              <span class="value">{{ formatDate(selectedStudent.enrolledAt) }}</span>
+              <span class="value">{{
+                formatDate(selectedStudent.enrolledAt)
+              }}</span>
             </div>
             <div class="detail-item">
               <span class="label">总体进度：</span>
@@ -131,7 +137,8 @@
               <div class="stat-item">
                 <div class="stat-label">已完成章节</div>
                 <div class="stat-value">
-                  {{ selectedStudent.completedChapters }} / {{ selectedStudent.totalChapters }}
+                  {{ selectedStudent.completedChapters }} /
+                  {{ selectedStudent.totalChapters }}
                 </div>
               </div>
               <div class="stat-item">
@@ -140,7 +147,9 @@
               </div>
               <div class="stat-item">
                 <div class="stat-label">最后学习</div>
-                <div class="stat-value">{{ formatDate(selectedStudent.lastStudyTime) }}</div>
+                <div class="stat-value">
+                  {{ formatDate(selectedStudent.lastStudyTime) }}
+                </div>
               </div>
             </div>
           </div>
@@ -155,85 +164,103 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/store/slices/user'
-import { getTeacherCourses } from '@/services/courseService'
-import { getEnrolledStudents } from '@/services/teacherService'
-import defaultAvatar from '@/assets/images/default-avatar.png'
+import { ref, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { useUserStore } from "@/store/slices/user";
+import { getTeacherCourses } from "@/services/courseService";
+import { getEnrolledStudents } from "@/services/teacherService";
+import defaultAvatar from "@/assets/images/default-avatar.png";
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 
-const loading = ref(false)
-const teacherCourses = ref([])
-const selectedCourseId = ref('')
-const students = ref([])
-const detailDialogVisible = ref(false)
-const selectedStudent = ref(null)
+const loading = ref(false);
+const teacherCourses = ref([]);
+const selectedCourseId = ref("");
+const students = ref([]);
+const detailDialogVisible = ref(false);
+const selectedStudent = ref(null);
 
 // 加载教师的课程
 const loadTeacherCourses = async () => {
   try {
-    const result = await getTeacherCourses(userStore.user.id)
+    const result = await getTeacherCourses(userStore.user.id);
     if (result.success) {
-      teacherCourses.value = result.courses
+      teacherCourses.value = result.courses;
     }
   } catch (error) {
-    console.error('加载课程列表失败:', error)
+    console.error("加载课程列表失败:", error);
   }
-}
+};
 
 // 加载学生列表
 const loadStudents = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const result = await getEnrolledStudents(
       userStore.user.id,
       selectedCourseId.value || null
-    )
+    );
+    console.log(result)
     if (result.success) {
-      students.value = result.data
+      // 转换数据格式以适应前端展示
+      students.value = result.data.enrollments.map((enrollment) => ({
+        student: {
+          username: enrollment.username,
+          email: enrollment.email,
+          avatar: enrollment.avatar || defaultAvatar,
+        },
+        course: {
+          title: enrollment.course_title,
+        },
+        enrolledAt: enrollment.enrolled_at,
+        progress: 0, // 这里可能需要根据实际进度数据来调整
+        completedChapters: 0, // 这里也可能需要调整
+        totalChapters: 0, // 同上
+        notesCount: 0, // 同上
+        lastStudyTime: enrollment.student_created_at, // 可以用学生创建时间作为学习的开始时间
+      }));
+      console.log(students.value)
     }
   } catch (error) {
-    console.error('加载学生列表失败:', error)
-    ElMessage.error('加载学生列表失败')
+    console.error("加载学生列表失败:", error);
+    ElMessage.error("加载学生列表失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  loadTeacherCourses()
-  loadStudents()
-})
+  loadTeacherCourses();
+  loadStudents();
+});
 
 const handleCourseChange = () => {
-  loadStudents()
-}
+  loadStudents();
+};
 
 const formatDate = (dateString) => {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  return date.toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const getProgressColor = (progress) => {
-  if (progress >= 80) return '#67c23a'
-  if (progress >= 50) return '#409eff'
-  if (progress >= 30) return '#e6a23c'
-  return '#f56c6c'
-}
+  if (progress >= 80) return "#67c23a";
+  if (progress >= 50) return "#409eff";
+  if (progress >= 30) return "#e6a23c";
+  return "#f56c6c";
+};
 
 const handleViewDetails = (student) => {
-  selectedStudent.value = student
-  detailDialogVisible.value = true
-}
+  selectedStudent.value = student;
+  detailDialogVisible.value = true;
+};
 </script>
 
 <style scoped>
@@ -420,4 +447,3 @@ const handleViewDetails = (student) => {
   }
 }
 </style>
-

@@ -13,7 +13,7 @@
         <div class="header-content">
           <div class="cover-section">
             <img 
-              :src="courseDetail.coverImage" 
+              :src="courseDetail.coverImage? FILE_UPLOAD_URL + courseDetail.coverImage : defaultCourse" 
               :alt="courseDetail.title"
               class="course-cover"
             />
@@ -89,7 +89,7 @@
             </template>
             <div class="teacher-info">
               <img 
-                :src="courseDetail.instructor.avatar" 
+                :src="courseDetail.instructor.avatar? FILE_UPLOAD_URL + courseDetail.instructor.avatar : defaultAvatar" 
                 :alt="courseDetail.instructor.name"
                 class="teacher-avatar"
               />
@@ -212,7 +212,7 @@
                 class="review-item"
               >
                 <img 
-                  :src="review.user_avatar" 
+                  :src="review.user_avatar? FILE_UPLOAD_URL + review.user_avatar : defaultAvatar" 
                   :alt="review.user_name"
                   class="review-avatar"
                 />
@@ -272,7 +272,9 @@ import {
   submitReview 
 } from '../../services/courseService'
 import { useUserStore } from '../../store/slices/user'
-
+import { FILE_UPLOAD_URL } from '../../services/axios'
+import defaultAvatar from '../../assets/images/default-avatar.png'
+import defaultCourse from '../../assets/images/default-course.png'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()

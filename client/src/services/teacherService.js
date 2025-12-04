@@ -10,7 +10,7 @@ export const getTeacherStatistics = async (teacherId) => {
 export const getEnrolledStudents = async (teacherId, courseId = null) => {
   const params = courseId ? { courseId } : {}
   const response = await axios.get(`/teacher/enrollments`, { params })
-  return response.data // 返回学生列表数据
+  return response // 返回学生列表数据
 }
 
 // 获取学生详细进度

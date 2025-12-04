@@ -5,6 +5,8 @@ const instance = axios.create({
   timeout: 5000
 })
 
+export const FILE_UPLOAD_URL = import.meta.env.VITE_FILE_UPLOAD_URL || 'http://localhost:3000'
+
 instance.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token) config.headers.Authorization = `Bearer ${token}`

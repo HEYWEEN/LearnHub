@@ -13,13 +13,23 @@
         <div v-if="courses.length === 0" class="empty-state">
           <div class="empty-icon">📚</div>
           <p class="empty-text">您还没有创建课程</p>
-          <el-button type="primary" @click="handleCreateCourse">创建第一个课程</el-button>
+          <el-button type="primary" @click="handleCreateCourse"
+            >创建第一个课程</el-button
+          >
         </div>
 
         <div v-else class="courses-grid">
           <div v-for="course in courses" :key="course.id" class="course-card">
             <div class="course-cover">
-              <img :src="course.coverImage" :alt="course.title" @error="handleImageError" />
+              <img
+                :src="
+                  course.coverImage
+                    ? FILE_UPLOAD_URL + course.coverImage
+                    : defaultCourse
+                "
+                :alt="course.title"
+                @error="handleImageError"
+              />
             </div>
             <div class="course-info">
               <h3 class="course-title">{{ course.title }}</h3>
@@ -38,10 +48,18 @@
                 <el-button size="small" @click="handleViewDetail(course.id)">
                   查看详情
                 </el-button>
-                <el-button size="small" type="primary" @click="handleEditCourse(course.id)">
+                <el-button
+                  size="small"
+                  type="primary"
+                  @click="handleEditCourse(course.id)"
+                >
                   编辑
                 </el-button>
-                <el-button size="small" type="danger" @click="handleDeleteCourse(course)">
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="handleDeleteCourse(course)"
+                >
                   删除
                 </el-button>
               </div>
@@ -54,83 +72,83 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/store/slices/user'
-import { getTeacherCourses, deleteCourse } from '@/services/courseService'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { useUserStore } from "@/store/slices/user";
+import { getTeacherCourses, deleteCourse } from "@/services/courseService";
+import defaultCourse from "../../assets/images/default-course.png";
+const router = useRouter();
+const userStore = useUserStore();
 
-const router = useRouter()
-const userStore = useUserStore()
-
-const loading = ref(false)
-const courses = ref([])
+const loading = ref(false);
+const courses = ref([]);
 
 // 加载课程列表
 const loadCourses = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const result = await getTeacherCourses()
+    const result = await getTeacherCourses();
     if (result.success) {
       // 后端返回的数据结构可能是 data.courses 或 data 本身包含课程列表
-      courses.value = result.data?.courses || result.data || []
+      courses.value = result.data?.courses || result.data || [];
     }
   } catch (error) {
-    console.error('加载课程列表失败:', error)
-    ElMessage.error(error.response?.data?.message || '加载课程列表失败')
+    console.error("加载课程列表失败:", error);
+    ElMessage.error(error.response?.data?.message || "加载课程列表失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  loadCourses()
-})
+  loadCourses();
+});
 
 const handleImageError = (e) => {
-  e.target.src = '/src/assets/images/default-course.png'
-}
+  e.target.src = "/src/assets/images/default-course.png";
+};
 
 const handleCreateCourse = () => {
-  router.push('/teacher/courses/create')
-}
+  router.push("/teacher/courses/create");
+};
 
 const handleViewDetail = (courseId) => {
-  router.push(`/courses/${courseId}`)
-}
+  router.push(`/courses/${courseId}`);
+};
 
 const handleEditCourse = (courseId) => {
   router.push({
-    path: '/teacher/courses/create',
-    query: { courseId }
-  })
-}
+    path: "/teacher/courses/create",
+    query: { courseId },
+  });
+};
 
 const handleDeleteCourse = async (course) => {
   try {
     await ElMessageBox.confirm(
       `确定要删除课程"${course.title}"吗？此操作不可恢复。`,
-      '确认删除',
+      "确认删除",
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }
-    )
-    
-    loading.value = true
-    await deleteCourse(course.id)
-    ElMessage.success('课程删除成功！')
-    await loadCourses()
+    );
+
+    loading.value = true;
+    await deleteCourse(course.id);
+    ElMessage.success("课程删除成功！");
+    await loadCourses();
   } catch (error) {
-    if (error !== 'cancel') {
-      console.error('删除课程失败:', error)
-      ElMessage.error('删除课程失败')
+    if (error !== "cancel") {
+      console.error("删除课程失败:", error);
+      ElMessage.error("删除课程失败");
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -291,22 +309,21 @@ const handleDeleteCourse = async (course) => {
     gap: 16px;
     align-items: flex-start;
   }
-  
+
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .courses-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .course-actions {
     flex-direction: column;
   }
-  
+
   .course-actions .el-button {
     width: 100%;
   }
 }
 </style>
-

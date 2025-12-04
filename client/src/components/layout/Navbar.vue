@@ -72,6 +72,7 @@ import { useUserStore } from '../../store/slices/user'
 import { getRecentLearning } from '../../services/learningService'
 import defaultAvatar from '../../assets/images/default-avatar.png'
 import AIAssistant from './AIAssistant.vue'
+import instance, { FILE_UPLOAD_URL } from '../../services/axios'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -82,7 +83,7 @@ const showAIAssistant = ref(false)
 
 // 用户头像
 const userAvatar = computed(() => {
-  return userStore.user?.avatar || defaultAvatar
+  return userStore.user?.avatar? FILE_UPLOAD_URL + userStore.user.avatar : defaultAvatar
 })
 
 // 用户名
@@ -113,13 +114,13 @@ const handleLearningSpaceClick = async () => {
     // 获取最近学习记录
     const result = await getRecentLearning()
     
-    if (result.data && result.data.courseId) {
+    if (result && result.progress.length>0) {
       // 有最近学习记录，跳转到最近学习的课程和章节
       router.push({
         name: 'Learning',
         params: {
-          courseId: result.data.courseId,
-          chapterId: result.data.chapterId
+          courseId: result[0].courseId,
+          chapterId: result[0].chapterId
         }
       })
     } else {

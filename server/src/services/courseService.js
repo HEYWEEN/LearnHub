@@ -73,8 +73,7 @@ export async function removeCourse({ user, courseId }) {
       err.status = STATUS.NOT_FOUND;
       throw err;
     }
-    if (course.instructor_id !== user.id && user.role !== "admin") {
-      const err = new Error("只能删除自己创建的课程");
+    if (course.instructor.id !== user.id && user.role !== "admin") {
       err.status = STATUS.FORBIDDEN;
       throw err;
     }
@@ -93,7 +92,7 @@ export async function modifyCourse({ user, courseId, payload }) {
       err.status = STATUS.NOT_FOUND;
       throw err;
     }
-    if (course.instructor_id !== user.id && user.role !== "admin") {
+    if (course.instructor.id !== user.id && user.role !== "admin") {
       const err = new Error("只能修改自己创建的课程");
       err.status = STATUS.FORBIDDEN;
       throw err;

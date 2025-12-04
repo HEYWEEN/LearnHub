@@ -47,7 +47,7 @@
           <div class="course-card">
             <!-- 封面图 -->
             <div class="course-cover">
-              <img :src="course.coverImage" :alt="course.title" />
+              <img :src="course.coverImage? FILE_UPLOAD_URL + course.coverImage : defaultCourse" :alt="course.title" />
               <div class="course-overlay">
                 <el-button
                   type="primary"
@@ -83,7 +83,7 @@
               <!-- 授课教师 -->
               <div class="course-instructor">
                 <img
-                  :src="course.instructor.avatar"
+                  :src="course.instructor.avatar? FILE_UPLOAD_URL + course.instructor.avatar : defaultAvatar"
                   :alt="course.instructor.name"
                   class="instructor-avatar"
                 />
@@ -149,7 +149,9 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getCourses, enrollCourse, cancelEnrollment, checkEnrollmentStatus } from '../../services/courseService'
 import { useUserStore } from '../../store/slices/user'
-
+import { FILE_UPLOAD_URL } from '../../services/axios'
+import defaultAvatar from '../../assets/images/default-avatar.png'
+import defaultCourse from '../../assets/images/default-course.png'
 const router = useRouter()
 const userStore = useUserStore()
 
