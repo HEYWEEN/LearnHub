@@ -2,20 +2,20 @@ import axios from './axios'
 
 // 获取教师统计数据
 export const getTeacherStatistics = async (teacherId) => {
-  const response = await axios.get(`/teacher/${teacherId}/statistics`)
+  const response = await axios.get(`/teacher/statistics`)
   return response.data // 返回统计数据
 }
 
 // 获取已选课学生列表
 export const getEnrolledStudents = async (teacherId, courseId = null) => {
   const params = courseId ? { courseId } : {}
-  const response = await axios.get(`/teacher/${teacherId}/students`, { params })
+  const response = await axios.get(`/teacher/enrollments`, { params })
   return response.data // 返回学生列表数据
 }
 
 // 获取学生详细进度
 export const getStudentDetailedProgress = async (studentId, courseId) => {
-  const response = await axios.get(`/teacher/students/${studentId}/progress`, {
+  const response = await axios.get(`/teacher/enrollments/${courseId}/${studentId}`, {
     params: { courseId }
   })
   return response.data // 返回进度数据

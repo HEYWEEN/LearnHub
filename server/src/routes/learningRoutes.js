@@ -25,8 +25,18 @@ router.get("/progress/:courseId", verifyToken, getProgress);
 // }
 router.post("/progress/:courseId/:lessonId/complete", verifyToken, markCompleted);
 
+
+// 保存视频进度
+// POST /learning/progress/{courseId}/{lessonId}/time
+// 请求头:
+// Authorization: Bearer {token}
 router.post("/progress/:courseId/:lessonId/time", verifyToken, saveVideoProgress);
 
+
+// 获取视频进度
+// GET /learning/progress/{courseId}/{lessonId}/time
+// 请求头:
+// Authorization: Bearer {token}
 router.get("/progress/:courseId/:lessonId/time", verifyToken, getVideoProgress);
 
 // 获取最近学习进度

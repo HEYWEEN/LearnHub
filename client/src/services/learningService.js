@@ -8,13 +8,13 @@ export const getCourseChapters = async (courseId) => {
 
 // 获取视频进度
 export const getVideoProgress = async (courseId, chapterId) => {
-  const response = await axios.get(`/learning/progress/${courseId}/${chapterId}`)
+  const response = await axios.get(`/learning/progress/${courseId}/${chapterId}/time`)
   return response.data // 返回进度数据
 }
 
 // 保存视频进度
 export const saveVideoProgress = async (courseId, chapterId, progressData) => {
-  const response = await axios.post(`/learning/progress/${courseId}/${chapterId}`, progressData)
+  const response = await axios.post(`/learning/progress/${courseId}/${chapterId}/time`, progressData)
   return response // 返回完整响应
 }
 

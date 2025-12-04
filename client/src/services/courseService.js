@@ -40,24 +40,24 @@ export const submitReview = async (courseId, reviewData) => {
 
 // 获取教师课程列表
 export const getTeacherCourses = async (teacherId) => {
-  const response = await axios.get(`/teacher/${teacherId}/courses`)
+  const response = await axios.get(`/teacher/courses`)
   return response.data // 返回课程列表数据
 }
 
 // 创建课程
 export const createCourse = async (courseData) => {
-  const response = await axios.post('/teacher/courses', courseData)
+  const response = await axios.post('/courses', courseData)
   return response.data // 返回创建的课程数据
 }
 
 // 更新课程
 export const updateCourse = async (courseId, courseData) => {
-  const response = await axios.put(`/teacher/courses/${courseId}`, courseData)
+  const response = await axios.post(`/courses/${courseId}`, courseData)
   return response.data // 返回更新后的课程数据
 }
 
 // 删除课程
 export const deleteCourse = async (courseId) => {
-  const response = await axios.delete(`/teacher/courses/${courseId}`)
+  const response = await axios.delete(`/courses/${courseId}`)
   return response // 返回完整响应
 }
