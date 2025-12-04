@@ -24,7 +24,7 @@ export async function getCourses({
       repo.countCourses(conn, { filters }),
     ])
   );
-  
+
   return {
     courses,
     pagination: {
@@ -122,7 +122,7 @@ export async function releaseReview({
 }) {
   const id = uuidv4();
   const created = await withTransaction(async (conn) => {
-    await reviewRepo.insertReview({
+    await reviewRepo.insertReview(conn, {
       id,
       course_id: courseId,
       user_id: user.id,
@@ -131,7 +131,7 @@ export async function releaseReview({
       parent_id: parentId,
       created_at: new Date(),
     });
-    return await reviewRepo.findReviewById(id);
+    return await reviewRepo.findReviewById(conn, id);
   });
   return created;
 }

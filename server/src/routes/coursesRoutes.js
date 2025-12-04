@@ -68,10 +68,10 @@ router.delete(
 router.get("/:courseId", getCourseById);
 
 // 检测报名状态（student）
-// GET /courses/{courseId}/enroll-status
+// GET /courses/{courseId}/enrollment-status
 // 请求头:
 // Authorization: Bearer {token}
-router.get("/:courseId/enroll-status", verifyToken, checkEnrollStatus);
+router.get("/:courseId/enrollment-status", verifyToken, checkEnrollStatus);
 
 //报名课程（student）
 // 请求头:
@@ -107,7 +107,7 @@ router.post(
 router.get("/:courseId/video-preview", streamCoursePreview);
 
 // POST /courses/{courseId}/review
-router.post("/:courseId/review", verifyToken, releaseReview);
+router.post("/:courseId/reviews", verifyToken, releaseReview);
 
 // 删除课时（teacher）
 // DELETE /courses/{courseId}/lesson/{lessonId}

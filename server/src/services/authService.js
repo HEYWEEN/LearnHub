@@ -108,7 +108,7 @@ export async function refreshToken({ user }) {
   return { token: newToken };
 }
 
-export async function changePassword({ user, oldPassword, newPassword }) {
+export async function changePassword({ user, currentPassword, newPassword }) {
   const existing = await withConnection((conn) =>
     authRepo.findUserById(conn, user.id)
   );
@@ -117,7 +117,7 @@ export async function changePassword({ user, oldPassword, newPassword }) {
     e.status = STATUS.NOT_FOUND;
     throw e;
   }
-  const ok = await comparePassword(oldPassword, existing.password);
+  const ok = await comparePassword(currentPassword, existing.password);
   if (!ok) {
     const e = new Error("旧密码错误");
     e.status = STATUS.UNAUTHORIZED;

@@ -24,7 +24,7 @@ const addCourse = asyncHandler(async (req, res) => {
   const payload = req.body;
   const user = req.user;
   const course = await courseService.addCourse({ user, payload });
-  return sendSuccess(res, "课程添加成功", { course });
+  return sendSuccess(res, "课程添加成功", course );
 });
 
 const removeCourse = asyncHandler(async (req, res) => {
@@ -75,15 +75,15 @@ const updateVideoPreview = asyncHandler(async (req, res) => {
 const releaseReview = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
   const user = req.user;
-  const { content, rating, parentId = null } = req.body;
-  const comment = await courseService.releaseReview({
+  const { comment, rating, parentId = null } = req.body;
+  const newComment = await courseService.releaseReview({
     courseId,
     user,
-    content,
+    content:comment,
     rating,
     parentId,
   });
-  return sendSuccess(res, "评论发表成功", { comment });
+  return sendSuccess(res, "评论发表成功", newComment);
 });
 
 export {

@@ -9,6 +9,8 @@ import { connectDB } from './config/db.js';
 
 await connectDB();
 
+global.detailedLogging = (process.env.DETAILED_LOGGING === 'true');
+
 import checkConfig from './utils/configChecker.js';
 
 await checkConfig();

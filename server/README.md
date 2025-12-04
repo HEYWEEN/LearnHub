@@ -18,6 +18,8 @@
 
 请检查当前.env文件结构是否与.env.example一致
 
+添加了detail log选项设置为true即可开启超详细的请求报文信息和返回数据信息
+
 # 依赖安装
 
 Node.js, npm, MySQL, ffmpeg（用于 HLS 生成）（可选）

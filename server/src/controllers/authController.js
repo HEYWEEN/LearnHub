@@ -5,7 +5,7 @@ import * as authService from "../services/authService.js";
 const register = asyncHandler(async (req, res) => {
   const payload = req.body;
   const user = await authService.register(payload);
-  return sendSuccess(res, "注册成功", { user });
+  return sendSuccess(res, "注册成功",  user );
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -29,8 +29,8 @@ const refreshToken = asyncHandler(async (req, res) => {
 
 const changePassword = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { oldPassword, newPassword } = req.body;
-  await authService.changePassword({ user, oldPassword, newPassword });
+  const { currentPassword, newPassword } = req.body;
+  await authService.changePassword({ user, currentPassword, newPassword });
   return sendSuccess(res, "修改密码成功");
 });
 

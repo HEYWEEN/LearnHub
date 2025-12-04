@@ -24,7 +24,14 @@ export async function insertReview(
 }
 
 export async function findReviewById(pool, id) {
-  const [rows] = await pool.query("SELECT * FROM reviews WHERE id = ?", [id]);
+  const [rows] = await pool.query(
+    `SELECT r.*, u.username as user_name, u.avatar as user_avatar 
+    FROM reviews r 
+    LEFT JOIN users u ON r.user_id = u.id 
+    WHERE r.id = ? 
+    ORDER BY r.created_at DESC`,
+    [id]
+  );
   return rows[0];
 }
 
