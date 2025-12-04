@@ -207,13 +207,13 @@
                 class="review-item"
               >
                 <img 
-                  :src="review.user.avatar" 
-                  :alt="review.user.name"
+                  :src="review.user_avatar" 
+                  :alt="review.user_name"
                   class="review-avatar"
                 />
                 <div class="review-content">
                   <div class="review-header">
-                    <span class="review-user">{{ review.user.name }}</span>
+                    <span class="review-user">{{ review.user_name }}</span>
                     <el-rate 
                       v-model="review.rating" 
                       disabled 
@@ -222,7 +222,7 @@
                     />
                   </div>
                   <p class="review-comment">{{ review.comment }}</p>
-                  <span class="review-time">{{ formatDate(review.createdAt) }}</span>
+                  <span class="review-time">{{ formatDate(review.created_at) }}</span>
                 </div>
               </div>
 
@@ -406,8 +406,8 @@ const handleSubmitReview = async () => {
       ElMessage.success(result.message || '评论发表成功！')
       
       // 将新评论添加到列表顶部
-      if (result.review) {
-        courseDetail.value.reviews.unshift(result.review)
+      if (result.data) {
+        courseDetail.value.reviews.unshift(result.data)
       }
       
       // 重置表单
