@@ -1,15 +1,15 @@
 import axios from './axios'
 
-// 获取课程章节列表
+// 获取课程章节列表 (使用lesson接口)
 export const getCourseChapters = async (courseId) => {
-  const response = await axios.get(`/courses/${courseId}/lesson/`)
-  return response.data // 返回章节数据
+  const response = await axios.get(`/courses/${courseId}/lesson`)
+  return response // 返回完整响应
 }
 
 // 获取视频进度
 export const getVideoProgress = async (courseId, lessonId) => {
   const response = await axios.get(`/learning/progress/${courseId}/${lessonId}/time`)
-  return response.data // 返回进度数据
+  return response // 返回完整响应
 }
 
 // 保存视频进度
@@ -20,13 +20,13 @@ export const saveVideoProgress = async (courseId, lessonId, progressData) => {
 
 // 获取章节笔记
 export const getChapterNotes = async (courseId, lessonId) => {
-  const response = await axios.get(`/learning/notes?courseId=${courseId}&lessonId=${lessonId}`)
-  return response.data // 返回笔记数据
+  const response = await axios.get(`/notes/${courseId}/${lessonId}`)
+  return response // 返回完整响应
 }
 
 // 保存章节笔记
 export const saveChapterNotes = async (courseId, lessonId, content) => {
-  const response = await axios.post(`/learning/notes/${courseId}/${lessonId}`, { content })
+  const response = await axios.post(`/notes/${courseId}/${lessonId}`, { content })
   return response // 返回完整响应
 }
 

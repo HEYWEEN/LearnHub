@@ -39,20 +39,36 @@ export const submitReview = async (courseId, reviewData) => {
 }
 
 // 获取教师课程列表
-export const getTeacherCourses = async (teacherId) => {
-  const response = await axios.get(`/teacher/courses`)
-  return response.data // 返回课程列表数据
+export const getTeacherCourses = async (params = {}) => {
+  const response = await axios.get(`/teacher/courses`, { params })
+  return response // 返回完整响应 { success, message, data }
 }
 
 // 创建课程
 export const createCourse = async (courseData) => {
-  const response = await axios.post('/courses', courseData)
+  // 转换前端字段名到后端字段名
+  const payload = {
+    title: courseData.title,
+    description: courseData.description,
+    category: courseData.category,
+    cover_image: courseData.coverImage || courseData.cover_image || null,
+    video_preview: courseData.videoPreview || courseData.video_preview || null
+  }
+  const response = await axios.post('/courses', payload)
   return response.data // 返回创建的课程数据
 }
 
 // 更新课程
 export const updateCourse = async (courseId, courseData) => {
-  const response = await axios.post(`/courses/${courseId}`, courseData)
+  // 转换前端字段名到后端字段名
+  const payload = {
+    title: courseData.title,
+    description: courseData.description,
+    category: courseData.category,
+    cover_image: courseData.coverImage || courseData.cover_image || null,
+    video_preview: courseData.videoPreview || courseData.video_preview || null
+  }
+  const response = await axios.post(`/courses/${courseId}`, payload)
   return response.data // 返回更新后的课程数据
 }
 

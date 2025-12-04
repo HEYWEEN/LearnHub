@@ -62,10 +62,11 @@
                   取消报名
                 </el-button>
                 <el-button
+                  v-if="courseDetail.lessons && courseDetail.lessons.length > 0"
                   type="primary"
                   size="large"
                   class="action-button start-button"
-                  @click="handleStartLearning(courseDetail.chapters[0])"
+                  @click="handleStartLearning(courseDetail.lessons[0])"
                 >
                   开始学习
                 </el-button>
@@ -109,20 +110,21 @@
             </template>
             <div class="lessons-list">
               <div 
-                v-for="(chapter, index) in courseDetail.chapters" 
-                :key="chapter.id"
+                v-if="courseDetail.lessons && courseDetail.lessons.length > 0"
+                v-for="(lesson, index) in courseDetail.lessons" 
+                :key="lesson.id"
                 class="lesson-item"
               >
                 <div class="lesson-number">{{ index + 1 }}</div>
                 <div class="lesson-info">
-                  <div class="lesson-title">{{ chapter.title }}</div>
+                  <div class="lesson-title">{{ lesson.title }}</div>
                   <div class="lesson-meta">
                     <span class="lesson-duration">
                       <el-icon><Clock /></el-icon>
-                      {{ formatDuration(chapter.duration) }}
+                      {{ formatDuration(lesson.duration) }}
                     </span>
-                    <span v-if="chapter.description" class="lesson-description">
-                      {{ chapter.description }}
+                    <span v-if="lesson.description" class="lesson-description">
+                      {{ lesson.description }}
                     </span>
                   </div>
                 </div>
@@ -132,7 +134,7 @@
                   type="primary"
                   size="small"
                   class="start-learning-btn"
-                  @click="handleStartLearning(chapter)"
+                  @click="handleStartLearning(lesson)"
                 >
                   查看视频
                 </el-button>
@@ -142,7 +144,7 @@
                   type="primary"
                   size="small"
                   class="start-learning-btn"
-                  @click="handleStartLearning(chapter)"
+                  @click="handleStartLearning(lesson)"
                 >
                   开始学习
                 </el-button>
@@ -155,6 +157,9 @@
                 >
                   请先报名
                 </el-button>
+              </div>
+              <div v-else class="empty-lessons">
+                <el-empty description="该课程暂无章节内容" />
               </div>
             </div>
           </el-card>
@@ -345,14 +350,14 @@ const handleEnroll = async () => {
 }
 
 // 处理开始学习
-const handleStartLearning = (chapter) => {
+const handleStartLearning = (lesson) => {
   const courseId = route.params.id
   // 跳转到学习空间页面，指定具体章节
   router.push({
     name: 'Learning',
     params: {
       courseId: courseId,
-      chapterId: chapter.id
+      lessonId: lesson.id
     }
   })
 }
@@ -822,7 +827,8 @@ onMounted(() => {
   color: #909399;
 }
 
-.empty-reviews {
+.empty-reviews,
+.empty-lessons {
   padding: 40px 0;
   text-align: center;
 }
