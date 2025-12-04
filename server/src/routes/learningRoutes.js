@@ -32,7 +32,6 @@ router.post("/progress/:courseId/:lessonId/complete", verifyToken, markCompleted
 // Authorization: Bearer {token}
 router.post("/progress/:courseId/:lessonId/time", verifyToken, saveVideoProgress);
 
-
 // 获取视频进度
 // GET /learning/progress/{courseId}/{lessonId}/time
 // 请求头:
