@@ -151,13 +151,13 @@ const handleSubmit = async () => {
     submitting.value = true
     
     try {
+      // 直接传递表单数据，不需要包含instructor（后端从token获取）
       const courseData = {
-        ...courseForm,
-        instructor: {
-          id: userStore.user.id,
-          name: userStore.user.username,
-          avatar: userStore.user.avatar
-        }
+        title: courseForm.title,
+        description: courseForm.description,
+        category: courseForm.category,
+        coverImage: courseForm.coverImage,
+        videoPreview: courseForm.videoPreview
       }
       
       if (isEditMode.value) {
@@ -171,7 +171,7 @@ const handleSubmit = async () => {
       router.push('/teacher/courses/manage')
     } catch (error) {
       console.error('操作失败:', error)
-      ElMessage.error(error.message || '操作失败，请稍后重试')
+      ElMessage.error(error.response?.data?.message || error.message || '操作失败，请稍后重试')
     } finally {
       submitting.value = false
     }

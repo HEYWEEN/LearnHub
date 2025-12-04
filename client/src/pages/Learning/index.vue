@@ -21,11 +21,11 @@
       <!-- 左侧：章节导航栏 -->
       <div class="sidebar-section">
         <ChapterSidebar
-          :chapters="chapters"
-          :current-chapter-id="currentChapterId"
-          :completed-chapters="completedChapters"
+          :chapters="lessons"
+          :current-chapter-id="currentLessonId"
+          :completed-chapters="completedLessons"
           :course-title="courseTitle"
-          @chapter-change="handleChapterChange"
+          @chapter-change="handleLessonChange"
         />
       </div>
 
@@ -37,9 +37,9 @@
             ref="videoPlayerRef"
             :video-url="currentVideoUrl"
             :initial-progress="currentVideoProgress"
-            :chapter-id="currentChapterId"
+            :chapter-id="currentLessonId"
             @progress-save="handleProgressSave"
-            @chapter-complete="handleChapterComplete"
+            @chapter-complete="handleLessonComplete"
           />
         </div>
 
@@ -48,7 +48,7 @@
           <NotesEditor
             ref="notesEditorRef"
             :content="currentNotes"
-            :chapter-id="currentChapterId"
+            :chapter-id="currentLessonId"
             @save="handleNotesSave"
             @content-change="handleNotesChange"
           />
@@ -90,9 +90,9 @@ const error = ref(null)
 // 课程数据
 const courseId = ref('')
 const courseTitle = ref('')
-const chapters = ref([])
-const currentChapterId = ref('')
-const completedChapters = ref([])
+const lessons = ref([])
+const currentLessonId = ref('')
+const completedLessons = ref([])
 
 // 视频数据
 const currentVideoProgress = ref(0)
@@ -103,8 +103,8 @@ const notesChanged = ref(false)
 
 // 计算当前视频URL
 const currentVideoUrl = computed(() => {
-  const chapter = chapters.value.find(c => c.id === currentChapterId.value)
-  return chapter ? chapter.videoUrl : ''
+  const lesson = lessons.value.find(l => l.id === currentLessonId.value)
+  return lesson ? lesson.videoUrl : ''
 })
 
 // 初始化页面
@@ -125,36 +125,36 @@ const initPage = async () => {
     courseTitle.value = courseData.title
 
     // 获取章节列表
-    const chaptersData = await getCourseChapters(courseId.value)
-    chapters.value = chaptersData.data.chapters
+    const lessonsResponse = await getCourseChapters(courseId.value)
+    lessons.value = lessonsResponse.data?.lessons || []
 
-    if (chapters.value.length === 0) {
+    if (lessons.value.length === 0) {
       error.value = '该课程暂无章节内容'
       return
     }
 
     // 获取课程进度
     const progressData = await getCourseProgress(courseId.value)
-    completedChapters.value = progressData.data.completedChapters || []
+    completedLessons.value = progressData.data?.completedLessons || []
 
     // 确定当前章节ID
-    if (route.params.chapterId) {
-      currentChapterId.value = route.params.chapterId
+    if (route.params.lessonId) {
+      currentLessonId.value = route.params.lessonId
     } else {
       // 默认选择第一章节
-      currentChapterId.value = chapters.value[0].id
+      currentLessonId.value = lessons.value[0].id
       // 更新路由，但不触发页面重载
       router.replace({
         name: 'Learning',
         params: {
           courseId: courseId.value,
-          chapterId: currentChapterId.value
+          lessonId: currentLessonId.value
         }
       })
     }
 
     // 加载当前章节数据
-    await loadChapterData(currentChapterId.value)
+    await loadLessonData(currentLessonId.value)
 
   } catch (err) {
     console.error('初始化页面失败:', err)
@@ -165,15 +165,15 @@ const initPage = async () => {
 }
 
 // 加载章节数据
-const loadChapterData = async (chapterId) => {
+const loadLessonData = async (lessonId) => {
   try {
     // 获取视频进度
-    const progressData = await getVideoProgress(courseId.value, chapterId)
-    currentVideoProgress.value = progressData.data.currentTime || 0
+    const progressData = await getVideoProgress(courseId.value, lessonId)
+    currentVideoProgress.value = progressData.data?.currentTime || 0
 
     // 获取笔记内容
-    const notesData = await getChapterNotes(courseId.value, chapterId)
-    currentNotes.value = notesData.data.content || ''
+    const notesData = await getChapterNotes(courseId.value, lessonId)
+    currentNotes.value = notesData.data?.content || ''
     notesChanged.value = false
 
   } catch (err) {
@@ -183,7 +183,7 @@ const loadChapterData = async (chapterId) => {
 }
 
 // 处理章节切换
-const handleChapterChange = async (chapter) => {
+const handleLessonChange = async (lesson) => {
   // 检查笔记是否未保存
   if (notesEditorRef.value && notesEditorRef.value.isDirty()) {
     try {
@@ -213,19 +213,19 @@ const handleChapterChange = async (chapter) => {
   }
 
   // 切换章节
-  currentChapterId.value = chapter.id
+  currentLessonId.value = lesson.id
   
   // 更新路由
   router.push({
     name: 'Learning',
     params: {
       courseId: courseId.value,
-      chapterId: chapter.id
+      lessonId: lesson.id
     }
   })
 
   // 加载新章节数据
-  await loadChapterData(chapter.id)
+  await loadLessonData(lesson.id)
 }
 
 // 处理视频进度保存
@@ -242,9 +242,9 @@ const handleProgressSave = async (data) => {
 }
 
 // 处理章节完成
-const handleChapterComplete = (chapterId) => {
-  if (!completedChapters.value.includes(chapterId)) {
-    completedChapters.value.push(chapterId)
+const handleLessonComplete = (lessonId) => {
+  if (!completedLessons.value.includes(lessonId)) {
+    completedLessons.value.push(lessonId)
   }
 }
 
@@ -265,10 +265,10 @@ const handleNotesChange = (content) => {
 }
 
 // 监听路由参数变化
-watch(() => route.params.chapterId, (newChapterId) => {
-  if (newChapterId && newChapterId !== currentChapterId.value) {
-    currentChapterId.value = newChapterId
-    loadChapterData(newChapterId)
+watch(() => route.params.lessonId, (newLessonId) => {
+  if (newLessonId && newLessonId !== currentLessonId.value) {
+    currentLessonId.value = newLessonId
+    loadLessonData(newLessonId)
   }
 })
 

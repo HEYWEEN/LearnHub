@@ -13,9 +13,9 @@ export async function findCourses(pool,{ offset = 0, limit = 12, filters = {} })
     params.push(`%${filters.search}%`);
     params.push(`%${filters.search}%`);
   }
-  if(filters.instructorId) {
+  if(filters.instructorId || filters.instructor_id) {
     where.push("c.instructor_id = ?");
-    params.push(filters.instructorId);
+    params.push(filters.instructorId || filters.instructor_id);
   }
   const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
   

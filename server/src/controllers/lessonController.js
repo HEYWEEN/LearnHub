@@ -52,7 +52,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const getLesson = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
-  const lessons = await lessonService.getLessonByCourseId({ lessonId });
+  const lessons = await lessonService.getLessonByCourseId({ courseId });
   return sendSuccess(res, "获取章节成功", { lessons });
 });
 

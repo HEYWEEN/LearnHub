@@ -70,13 +70,14 @@ const courses = ref([])
 const loadCourses = async () => {
   loading.value = true
   try {
-    const result = await getTeacherCourses(userStore.user.id)
+    const result = await getTeacherCourses()
     if (result.success) {
-      courses.value = result.courses
+      // 后端返回的数据结构可能是 data.courses 或 data 本身包含课程列表
+      courses.value = result.data?.courses || result.data || []
     }
   } catch (error) {
     console.error('加载课程列表失败:', error)
-    ElMessage.error('加载课程列表失败')
+    ElMessage.error(error.response?.data?.message || '加载课程列表失败')
   } finally {
     loading.value = false
   }
