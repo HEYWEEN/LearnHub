@@ -90,6 +90,10 @@ export async function countCourses(pool,{ filters = {} }) {
     params.push(`%${filters.search}%`);
     params.push(`%${filters.search}%`);
   }
+  if(filters.instructorId || filters.instructor_id) {
+    where.push("instructor_id = ?");
+    params.push(filters.instructorId || filters.instructor_id);
+  }
   const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
   const sql = `SELECT COUNT(*) as total FROM courses ${whereSQL}`;
   const [rows] = await pool.query(sql, params);

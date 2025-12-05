@@ -3,7 +3,7 @@ import axios from './axios'
 // 获取教师统计数据
 export const getTeacherStatistics = async (teacherId) => {
   const response = await axios.get(`/teacher/statistics`)
-  return response.data // 返回统计数据
+  return response // 返回统计数据
 }
 
 // 获取已选课学生列表

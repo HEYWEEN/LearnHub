@@ -49,7 +49,14 @@ export async function getCourseLearning({ user, courseId }) {
   return { total, completed, rate, progress: progressRows };
 }
 
-export async function getRecentLearning({ user, page, limit }) {
+export async function getRecentLearning({ user }) {
+  const Progress = await withConnection((conn) =>
+    learningRepo.findRecentProgress(conn, user.id)
+  );
+  return Progress;
+}
+
+export async function getHistoryLearning({ user, page, limit }) {
   const allProgress = await withConnection((conn) =>
     learningRepo.findAllProgress(conn, user.id)
   );

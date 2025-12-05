@@ -33,9 +33,9 @@ const getCourseByTeacherId = asyncHandler(async (req, res) => {
 const getStatistics = asyncHandler(async (req, res) => {
   const user = req.user;
   const statistics = await teacherService.getStatistics({
-    instructor_id: user.id,
+    user
   });
-  return sendSuccess(res, "获取数据成功", { statistics });
+  return sendSuccess(res, "获取数据成功", statistics);
 });
 
 export {

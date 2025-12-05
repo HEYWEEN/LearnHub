@@ -78,6 +78,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useUserStore } from "@/store/slices/user";
 import { getTeacherCourses, deleteCourse } from "@/services/courseService";
 import defaultCourse from "../../assets/images/default-course.png";
+import { FILE_UPLOAD_URL } from "../../services/axios";
 const router = useRouter();
 const userStore = useUserStore();
 

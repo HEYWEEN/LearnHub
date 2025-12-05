@@ -8,6 +8,14 @@ export async function findAllProgress(pool, userId) {
   return rows;
 }
 
+export async function findRecentProgress(pool, userId) {
+  const [rows] = await pool.query(
+    "SELECT * FROM progress WHERE user_id = ? ORDER BY updated_at DESC limit 1",
+    [userId]
+  );
+  return rows[0];
+}
+
 export async function findProgressByUserCourse(pool, userId, courseId) {
   const [rows] = await pool.query(
     `SELECT l.duration as total_time,p.watch_time,l.title,l.created_at as lesson_created_at,p.lesson_id,p.completed,p.updated_at

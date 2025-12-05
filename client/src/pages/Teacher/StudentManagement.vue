@@ -170,6 +170,7 @@ import { useUserStore } from "@/store/slices/user";
 import { getTeacherCourses } from "@/services/courseService";
 import { getEnrolledStudents } from "@/services/teacherService";
 import defaultAvatar from "@/assets/images/default-avatar.png";
+import { FILE_UPLOAD_URL } from "../../services/axios";
 
 const userStore = useUserStore();
 
@@ -207,7 +208,7 @@ const loadStudents = async () => {
         student: {
           username: enrollment.username,
           email: enrollment.email,
-          avatar: enrollment.avatar || defaultAvatar,
+          avatar: enrollment.avatar,
         },
         course: {
           title: enrollment.course_title,
@@ -219,7 +220,6 @@ const loadStudents = async () => {
         notesCount: 0, // 同上
         lastStudyTime: enrollment.student_created_at, // 可以用学生创建时间作为学习的开始时间
       }));
-      console.log(students.value)
     }
   } catch (error) {
     console.error("加载学生列表失败:", error);

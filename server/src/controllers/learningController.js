@@ -30,7 +30,14 @@ const getCourseLearning = asyncHandler(async (req, res) => {
 const getRecentLearning = asyncHandler(async (req, res) => {
   const user = req.user;
   const { page = 1, limit = 12 } = req.query;
-  const data = await learningService.getRecentLearning({ user, page, limit });
+  const data = await learningService.getRecentLearning({ user });
+  return sendSuccess(res, "获取学习数据成功", data);
+});
+
+const getHistoryLearning = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { page = 1, limit = 12 } = req.query;
+  const data = await learningService.getHistoryLearning({ user, page, limit });
   return sendSuccess(res, "获取学习数据成功", data);
 });
 
@@ -64,4 +71,5 @@ export {
   markCompleted,
   getCourseLearning,
   getRecentLearning,
+  getHistoryLearning,
 };

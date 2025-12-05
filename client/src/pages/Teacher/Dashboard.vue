@@ -43,11 +43,11 @@
         <h2>数据概览</h2>
         <div class="stat-cards" v-loading="loading">
           <div class="stat-card">
-            <div class="stat-value">{{ statistics.courseCount }}</div>
+            <div class="stat-value">{{ statistics.totalCourses }}</div>
             <div class="stat-label">课程数量</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">{{ statistics.studentCount }}</div>
+            <div class="stat-value">{{ statistics.totalStudents }}</div>
             <div class="stat-label">学生人数</div>
           </div>
           <div class="stat-card">

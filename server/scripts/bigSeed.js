@@ -203,7 +203,142 @@ async function run() {
       }
     }
 
-    // ... 其他部分（评论、学习进度、笔记、AI 会话等）不变 ...
+    //
+    // 7) 评论
+    //
+    console.log("⭐ 创建评论 1000~2000 条...");
+    const reviewCount = rand(1000, 2000);
+    for (let i = 0; i < reviewCount; i++) {
+      await conn.query(
+        `INSERT INTO reviews (id, course_id, user_id, comment, rating)
+         VALUES (?, ?, ?, ?, ?)`,
+
+        [randomUUID(), pick(courses), pick(students), pick(lorem), rand(3, 5)]
+      );
+    }
+
+    //
+    // 8) 学习进度 progress
+    //
+    console.log("📈 创建 progress 数据...");
+
+    // 建立一个 courseId -> lessons[] 的映射表，加速查询
+    const courseLessonMap = new Map();
+    for (const lid of allLessons) {
+      const [courseId] = []; // 将 courseId 从 lessons 插入结构中取出来
+    }
+    // 更优：我们直接查询数据库一次构建映射
+    const [lessonRows] = await conn.query("SELECT id, course_id FROM lessons");
+
+    lessonRows.forEach((lesson) => {
+      if (!courseLessonMap.has(lesson.course_id)) {
+        courseLessonMap.set(lesson.course_id, []);
+      }
+      courseLessonMap.get(lesson.course_id).push(lesson.id);
+    });
+
+    // 开始生成 progress
+    for (const student of students) {
+      const enrolledCourses = enrollmentsMap.get(student) || [];
+
+      for (const courseId of enrolledCourses) {
+        const lessons = courseLessonMap.get(courseId);
+
+        if (!lessons || lessons.length === 0) continue;
+
+        // 学生可能观看 1~30% 的课时
+        const count = rand(1, Math.max(1, Math.floor(lessons.length * 0.3)));
+
+        // 随机抽课时
+        const pickedLessons = new Set();
+        while (pickedLessons.size < count) {
+          pickedLessons.add(pick(lessons));
+        }
+
+        for (const lessonId of pickedLessons) {
+          await conn.query(
+            `INSERT INTO progress (id, user_id, course_id, lesson_id, watch_time, completed)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+
+            [
+              randomUUID(),
+              student,
+              courseId,
+              lessonId,
+              rand(20, 400), // 随机观看进度
+              Math.random() < 0.4, // 40% 概率完成
+            ]
+          );
+        }
+      }
+    }
+
+    //
+    // 9) notes 笔记
+    //
+    console.log("📝 创建 notes 数据...");
+    const noteCount = rand(300, 600);
+    for (let i = 0; i < noteCount; i++) {
+      await conn.query(
+        `INSERT INTO notes (id, user_id, course_id, lesson_id, content)
+         VALUES (?, ?, ?, ?, ?)`,
+
+        [
+          randomUUID(),
+          pick(students),
+          pick(courses),
+          pick(allLessons),
+          "随堂笔记：" + pick(lorem),
+        ]
+      );
+    }
+
+    //
+    // 10) AI 会话
+    //
+    console.log("🤖 创建 AI 会话与消息...");
+    const convCount = rand(200, 400);
+    const conversations = [];
+
+    for (let i = 0; i < convCount; i++) {
+      const id = randomUUID();
+      conversations.push(id);
+
+      await conn.query(
+        `INSERT INTO ai_conversation (id, title, user_id, course_id, lesson_id)
+         VALUES (?, ?, ?, ?, ?)`,
+
+        [
+          id,
+          "AI 会话 " + rand(1, 999),
+          pick(students),
+          pick(courses),
+          pick(allLessons),
+        ]
+      );
+    }
+
+    //
+    // 11) AI 消息
+    //
+    console.log("📨 创建 AI 消息...");
+    for (const cid of conversations) {
+      const messageCount = rand(1, 5);
+
+      for (let i = 0; i < messageCount; i++) {
+        await conn.query(
+          `INSERT INTO ai_messages (id, conversation_id, sender, context)
+           VALUES (?, ?, ?, ?)`,
+
+          [
+            randomUUID(),
+            cid,
+            i % 2 === 0 ? "user" : "assistant",
+            i % 2 === 0 ? "你好，AI！" : "你好！我已经收到你的消息。",
+          ]
+        );
+      }
+    }
 
     console.log("\n🎉 全表数据填充完成！");
   } catch (e) {

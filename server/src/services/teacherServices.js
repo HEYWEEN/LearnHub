@@ -38,7 +38,7 @@ export async function getCourseByTeacherId({
   };
 }
 
-export async function getStatistics(user) {
+export async function getStatistics({user}) {
     const instructor_id = user.id;
     const [totalCourses, totalStudents, totalLessons, totalReviews] = await withTransaction(
       (conn) =>

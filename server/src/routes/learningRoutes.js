@@ -6,6 +6,7 @@ import {
   markCompleted,
   saveVideoProgress,
   getVideoProgress,
+  getHistoryLearning,
 } from "../controllers/learningController.js";
 const router = express.Router();
 
@@ -43,5 +44,11 @@ router.get("/progress/:courseId/:lessonId/time", verifyToken, getVideoProgress);
 // 请求头:
 // Authorization: Bearer {token}
 router.get("/recent", verifyToken, getRecentLearning);
+
+// 获取学习进度历史
+// GET /history
+// 请求头:
+// Authorization: Bearer {token}
+router.get("/history", verifyToken, getHistoryLearning);
 
 export default router;

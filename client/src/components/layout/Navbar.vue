@@ -114,13 +114,13 @@ const handleLearningSpaceClick = async () => {
     // 获取最近学习记录
     const result = await getRecentLearning()
     
-    if (result && result.progress.length>0) {
+    if (result && result.course_id && result.lesson_id) {
       // 有最近学习记录，跳转到最近学习的课程和章节
       router.push({
         name: 'Learning',
         params: {
-          courseId: result[0].courseId,
-          chapterId: result[0].chapterId
+          courseId: result.course_id,
+          chapterId: result.lesson_id
         }
       })
     } else {
