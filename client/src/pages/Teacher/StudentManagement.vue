@@ -35,7 +35,11 @@
               <template #default="{ row }">
                 <div class="student-info">
                   <img
-                    :src="row.student.avatar?FILE_UPLOAD_URL + row.student.avatar: defaultAvatar"
+                    :src="
+                      row.student.avatar
+                        ? FILE_UPLOAD_URL + row.student.avatar
+                        : defaultAvatar
+                    "
                     :alt="row.student.username"
                     class="student-avatar"
                   />
@@ -171,6 +175,8 @@ import { getTeacherCourses } from "@/services/courseService";
 import { getEnrolledStudents } from "@/services/teacherService";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 import { FILE_UPLOAD_URL } from "../../services/axios";
+import { getStudentDetailedProgress } from "../../services/teacherService";
+import { de } from "element-plus/es/locale/index.mjs";
 
 const userStore = useUserStore();
 
@@ -201,25 +207,35 @@ const loadStudents = async () => {
       userStore.user.id,
       selectedCourseId.value || null
     );
-    console.log(result)
+    console.log(result);
     if (result.success) {
-      // 转换数据格式以适应前端展示
-      students.value = result.data.enrollments.map((enrollment) => ({
-        student: {
-          username: enrollment.username,
-          email: enrollment.email,
-          avatar: enrollment.avatar,
-        },
-        course: {
-          title: enrollment.course_title,
-        },
-        enrolledAt: enrollment.enrolled_at,
-        progress: 0, // 这里可能需要根据实际进度数据来调整
-        completedChapters: 0, // 这里也可能需要调整
-        totalChapters: 0, // 同上
-        notesCount: 0, // 同上
-        lastStudyTime: enrollment.student_created_at, // 可以用学生创建时间作为学习的开始时间
-      }));
+      const detailedData = await Promise.all(
+        result.data.enrollments.map((enrollment) =>
+          getStudentDetailedProgress(
+            enrollment.student_id,
+            enrollment.course_id
+          )
+        )
+      );
+      students.value = result.data.enrollments.map((enrollment, index) => {
+        const detail = detailedData[index];
+        return {
+          student: {
+            username: enrollment.username,
+            email: enrollment.email,
+            avatar: enrollment.avatar,
+          },
+          course: {
+            title: enrollment.course_title,
+          },
+          enrolledAt: enrollment.enrolled_at,
+          progress: detail.rate || 0,
+          completedChapters: detail.completed || 0,
+          totalChapters: detail.total || 0,
+          notesCount: detail.notesCount || 0,
+          lastStudyTime: detail.lastStudyTime || null,
+        };
+      });
     }
   } catch (error) {
     console.error("加载学生列表失败:", error);

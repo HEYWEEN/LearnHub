@@ -1,5 +1,6 @@
 import * as learningRepo from "../repository/learningRepository.js";
 import * as lessonRepo from "../repository/lessonRepository.js";
+import * as noteRepo from "../repository/noteRepository.js";
 import { v4 as uuidv4 } from "uuid";
 import STATUS from "../constants/httpStatus.js";
 import {
@@ -36,17 +37,22 @@ export async function markCompleted({ user, courseId, lessonId }) {
 
 export async function getCourseLearning({ user, courseId }) {
   // 返回课程学习进度汇总：总章节数、已完成数、完成率
-  const [total, progressRows] = await withTransaction(async (conn) =>
-    Promise.all([
-      lessonRepo.countLessonsByCourseId(conn, courseId),
-      learningRepo.findProgressByUserCourse(conn, user.id, courseId),
-    ])
+  const [total, progressRows, notesCount] = await withTransaction(
+    async (conn) =>
+      Promise.all([
+        lessonRepo.countLessonsByCourseId(conn, courseId),
+        learningRepo.findProgressByUserCourse(conn, user.id, courseId),
+        noteRepo.countNotes(conn, { userId: user.id, courseId }),
+      ])
   );
+  const lastStudyTime = progressRows
+    .map((r) => r.updated_at)
+    .sort((a, b) => b - a)[0];
   const completed = progressRows.filter(
     (r) => r.completed === 1 || r.completed === true
   ).length;
   const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
-  return { total, completed, rate, progress: progressRows };
+  return { total, completed, rate, notesCount,lastStudyTime, progress: progressRows };
 }
 
 export async function getRecentLearning({ user }) {
@@ -92,13 +98,19 @@ export async function saveVideoProgress({
       throw e;
     }
     const id = uuidv4();
-    await learningRepo.upsertProgress(conn, {id,course_id: courseId,lesson_id: lessonId,user_id: user.id,watch_time: progress});
+    await learningRepo.upsertProgress(conn, {
+      id,
+      course_id: courseId,
+      lesson_id: lessonId,
+      user_id: user.id,
+      watch_time: progress,
+    });
   });
 }
 
 export async function getVideoProgress({ user, lessonId }) {
   const row = await withConnection((conn) =>
-    learningRepo.findProgressByUserLesson(conn, user.id,  lessonId)
+    learningRepo.findProgressByUserLesson(conn, user.id, lessonId)
   );
   return row ? row.watch_time : 0;
 }
