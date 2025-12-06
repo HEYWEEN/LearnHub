@@ -7,6 +7,7 @@ import {
   saveVideoProgress,
   getVideoProgress,
   getHistoryLearning,
+  getComplete,
 } from "../controllers/learningController.js";
 const router = express.Router();
 
@@ -15,6 +16,12 @@ const router = express.Router();
 // 请求头:
 // Authorization: Bearer {token}
 router.get("/progress/:courseId", verifyToken, getProgress);
+
+// 获取课程完成状态
+// GET /learning/progress/{courseId}/complete
+// 请求头:
+// Authorization: Bearer {token}
+router.get("/progress/:courseId/complete", verifyToken, getComplete);
 
 // 更新学习进度
 // POST /learning/progress/{lessonId}

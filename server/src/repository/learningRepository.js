@@ -28,6 +28,14 @@ export async function findProgressByUserCourse(pool, userId, courseId) {
   return rows;
 }
 
+export async function findCompletedLessonId(pool, userId, courseId) {
+  const [rows] = await pool.query(
+    "SELECT id FROM progress WHERE user_id = ? AND course_id = ? AND completed = 1",
+    [userId, courseId]
+  );
+  return rows;
+}
+
 export async function findProgressByUserLesson(pool, userId, lessonId) {
   const [rows] = await pool.query(
     "SELECT * FROM progress WHERE user_id = ? AND lesson_id = ?",

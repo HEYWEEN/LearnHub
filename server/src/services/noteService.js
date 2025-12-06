@@ -46,6 +46,30 @@ export async function updateNote({ user, noteId, payload }) {
   return await withConnection((pool) => noteRepo.findNoteById(pool, noteId));
 }
 
+export async function saveNote({ user, courseId, lessonId, payload }) {
+  return await withTransaction(async (conn) => {
+    const existing = await noteRepo.findNote(conn, user.id, courseId, lessonId);
+    if (!existing) {
+      const id = uuidv4();
+      const note = {
+        id,
+        user_id: user.id,
+        course_id: courseId || null,
+        lesson_id: lessonId || null,
+        content: payload.content || "",
+      };
+      await noteRepo.insertNote(conn, note);
+      return await noteRepo.findNoteById(conn, id);
+    }
+    const noteId = existing.id;
+    const update = {};
+    if (typeof payload.content !== "undefined")
+      update.content = payload.content;
+    await noteRepo.updateNoteById(conn, noteId, update);
+    return await noteRepo.findNoteById(conn, noteId);
+  });
+}
+
 export async function deleteNote({ user, noteId }) {
   const existing = await withConnection((pool) =>
     noteRepo.findNoteById(pool, noteId)

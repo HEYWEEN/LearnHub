@@ -20,19 +20,19 @@ export const saveVideoProgress = async (courseId, lessonId, progressData) => {
 
 // 获取章节笔记
 export const getChapterNotes = async (courseId, lessonId) => {
-  const response = await axios.get(`/learning/notes?courseId=${courseId}&lessonId=${lessonId}`)
-  return response.data // 返回笔记数据
+  const response = await axios.get(`/note?courseId=${courseId}&lessonId=${lessonId}`)
+  return response.data// 返回笔记数据
 }
 
 // 保存章节笔记
 export const saveChapterNotes = async (courseId, lessonId, content) => {
-  const response = await axios.post(`/notes/${courseId}/${lessonId}`, { content })
+  const response = await axios.post(`/note/${courseId}/${lessonId}`, { content })
   return response // 返回完整响应
 }
 
 // 获取课程整体进度
 export const getCourseProgress = async (courseId) => {
-  const response = await axios.get(`/learning/progress/${courseId}`)
+  const response = await axios.get(`/learning/progress/${courseId}/complete`)
   return response.data // 返回进度数据
 }
 

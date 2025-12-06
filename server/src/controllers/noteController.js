@@ -17,6 +17,14 @@ const updateNote = asyncHandler(async (req, res) => {
   return sendSuccess(res, "笔记更新成功", { note: updated });
 });
 
+const saveNote = asyncHandler(async (req, res) => {
+  const { courseId,lessonId } = req.params;
+  const user = req.user;
+  const payload = req.body;
+  const updated = await noteService.saveNote({ user, courseId,lessonId, payload });
+  return sendSuccess(res, "笔记更新成功", { note: updated });
+});
+
 const deleteNote = asyncHandler(async (req, res) => {
   const { noteId } = req.params;
   const user = req.user;
@@ -37,4 +45,4 @@ const listNotes = asyncHandler(async (req, res) => {
   return sendSuccess(res, "获取笔记列表成功", result);
 });
 
-export { createNote, updateNote, deleteNote, listNotes };
+export { createNote, updateNote, deleteNote, listNotes,saveNote };

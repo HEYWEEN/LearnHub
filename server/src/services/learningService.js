@@ -15,6 +15,13 @@ export async function getProgress({ user, courseId }) {
   return rows;
 }
 
+export async function getComplete({ user, courseId }) {
+  const complete = await withConnection((conn) =>
+    learningRepo.findCompletedLessonId(conn, user.id, courseId)
+  );
+  return {complete};
+}
+
 export async function markCompleted({ user, courseId, lessonId }) {
   return withTransaction(async (conn) => {
     const lesson = await lessonRepo.findLessonById(conn, lessonId);
@@ -88,7 +95,8 @@ export async function saveVideoProgress({
   user,
   courseId,
   lessonId,
-  progress,
+  currentTime,
+  completed = false,
 }) {
   return withTransaction(async (conn) => {
     const lesson = await lessonRepo.findLessonById(conn, lessonId);
@@ -103,7 +111,8 @@ export async function saveVideoProgress({
       course_id: courseId,
       lesson_id: lessonId,
       user_id: user.id,
-      watch_time: progress,
+      watch_time: currentTime,
+      completed,
     });
   });
 }

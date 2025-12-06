@@ -16,6 +16,27 @@ export async function findNoteById(pool, id) {
   return rows[0];
 }
 
+export async function findNote(pool, { userId, courseId, lessonId }) {
+  const where = ["user_id = ?"];
+  const params = [userId];
+  if (courseId) {
+    where.push("course_id = ?");
+    params.push(courseId);
+  } else {
+    where.push("course_id IS NULL");
+  }
+  if (lessonId) {
+    where.push("lesson_id = ?");
+    params.push(lessonId);
+  } else {
+    where.push("lesson_id IS NULL");
+  }
+  const whereSQL = where.join(" AND ");
+  const sql = `SELECT * FROM notes WHERE ${whereSQL} LIMIT 1`;
+  const [rows] = await pool.query(sql, params);
+  return rows[0];
+}
+
 export async function updateNoteById(pool, id, fields = {}) {
   const keys = Object.keys(fields);
   if (!keys.length) return;

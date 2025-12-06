@@ -135,7 +135,7 @@ const initPage = async () => {
 
     // 获取课程进度
     const progressData = await getCourseProgress(courseId.value)
-    completedLessons.value = progressData.data?.completedLessons || []
+    completedLessons.value = progressData?.complete || []
 
     // 确定当前章节ID
     if (route.params.lessonId) {
@@ -173,7 +173,11 @@ const loadLessonData = async (lessonId) => {
 
     // 获取笔记内容
     const notesData = await getChapterNotes(courseId.value, lessonId)
-    currentNotes.value = notesData.data?.content || ''
+    if (notesData.notes.length > 0) {
+      currentNotes.value = notesData.notes[0].content || ''
+    } else {
+      currentNotes.value = ''
+    }
     notesChanged.value = false
 
   } catch (err) {

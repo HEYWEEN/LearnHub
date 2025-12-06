@@ -9,6 +9,13 @@ const getProgress = asyncHandler(async (req, res) => {
   return sendSuccess(res, "获取学习进度成功", { progress });
 });
 
+const getComplete = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { courseId } = req.params;
+  const complete = await learningService.getComplete({ user, courseId });
+  return sendSuccess(res, "获取学习进度成功", complete);
+});
+
 const markCompleted = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId, lessonId } = req.params;
@@ -44,12 +51,13 @@ const getHistoryLearning = asyncHandler(async (req, res) => {
 const saveVideoProgress = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId, lessonId } = req.params;
-  const { progress } = req.body;
+  const { currentTime,completed } = req.body;
   const result = await learningService.saveVideoProgress({
     user,
     courseId,
     lessonId,
-    progress,
+    currentTime,
+    completed
   });
   return sendSuccess(res, "保存视频进度成功", result);
 });
@@ -72,4 +80,5 @@ export {
   getCourseLearning,
   getRecentLearning,
   getHistoryLearning,
+  getComplete
 };
