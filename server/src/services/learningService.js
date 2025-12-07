@@ -16,9 +16,10 @@ export async function getProgress({ user, courseId }) {
 }
 
 export async function getComplete({ user, courseId }) {
-  const complete = await withConnection((conn) =>
+  let complete = await withConnection((conn) =>
     learningRepo.findCompletedLessonId(conn, user.id, courseId)
   );
+  complete = complete.map((c) => c.id);
   return {complete};
 }
 
@@ -96,7 +97,7 @@ export async function saveVideoProgress({
   courseId,
   lessonId,
   currentTime,
-  completed = false,
+  completed = undefined,
 }) {
   return withTransaction(async (conn) => {
     const lesson = await lessonRepo.findLessonById(conn, lessonId);

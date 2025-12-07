@@ -65,11 +65,11 @@ const saveVideoProgress = asyncHandler(async (req, res) => {
 const getVideoProgress = asyncHandler(async (req, res) => {
   const user = req.user;
   const { courseId, lessonId } = req.params;
-  const progress = await learningService.getVideoProgress({
+  const currentTime = await learningService.getVideoProgress({
     user,
     lessonId,
   });
-  return sendSuccess(res, "获取视频进度成功", { progress });
+  return sendSuccess(res, "获取视频进度成功", { currentTime });
 });
 
 export {

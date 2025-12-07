@@ -75,6 +75,7 @@ import {
   getCourseProgress
 } from '../../services/learningService'
 import { getCourseById } from '../../services/courseService'
+import instance from '../../services/axios'
 
 const route = useRoute()
 const router = useRouter()
@@ -104,7 +105,7 @@ const notesChanged = ref(false)
 // 计算当前视频URL
 const currentVideoUrl = computed(() => {
   const lesson = lessons.value.find(l => l.id === currentLessonId.value)
-  return lesson ? lesson.videoUrl : ''
+  return lesson ? instance.defaults.baseURL + `/courses/${courseId.value}/lesson/${lesson.id}/stream` : ''
 })
 
 // 初始化页面
@@ -135,6 +136,7 @@ const initPage = async () => {
 
     // 获取课程进度
     const progressData = await getCourseProgress(courseId.value)
+    console.log('课程进度数据:', progressData)
     completedLessons.value = progressData?.complete || []
 
     // 确定当前章节ID
