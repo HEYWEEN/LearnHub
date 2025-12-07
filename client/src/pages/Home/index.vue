@@ -150,15 +150,15 @@ onMounted(() => {
 
 /* 主视觉区 */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-  border-radius: 16px;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
   margin-top: 20px;
   position: relative;
   z-index: 5;
   padding: 60px 24px;
   text-align: center;
-  color: white;
+  color: #303133;
 }
 
 .hero-content {
@@ -198,24 +198,24 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background-color: white;
-  color: #667eea;
+  background-color: #667eea;
+  color: white;
 }
 
 .btn-primary:hover {
-  background-color: #f0f0f0;
+  background-color: #764ba2;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: white;
-  border: 2px solid white;
+  color: #667eea;
+  border: 2px solid #667eea;
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
 }
 
