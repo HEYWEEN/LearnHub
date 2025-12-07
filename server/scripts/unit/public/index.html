@@ -90,6 +90,13 @@
       .collapse.open .collapse-content {
         display: block;
       }
+      .prettyView {
+        margin-top: 10px;
+        background: #fff6df;
+        border: 1px solid #e7d9aa;
+        padding: 10px;
+        border-radius: 6px;
+      }
     </style>
 
     <!-- HLS.js CDN -->
@@ -137,6 +144,9 @@
 
         <label>密码</label>
         <input id="login_password" type="password" />
+
+        <label>角色 role（student/teacher）</label>
+        <input id="login_role" type="text" placeholder="admin（留空默认）" />
 
         <button onclick="loginUser()">登录并获取 Token</button>
 
@@ -505,6 +515,72 @@
         <pre id="note_delete_result">删除结果将显示在这里</pre>
       </div>
     </div>
+    <div class="collapse" id="sec-teacher">
+      <div class="collapse-header" onclick="toggleCollapse('sec-teacher')">
+        7. Teacher
+      </div>
+
+      <div class="collapse-content">
+        <!-- 1. 查看报名学生 -->
+        <h3 class="collapsible">
+          1. 获取报名学生 GET /api/teacher/enrollments
+        </h3>
+        <div class="content">
+          <label>可选：筛选 courseId</label>
+          <input id="t_enroll_courseId" placeholder="不填代表所有课程" />
+          <button onclick="tGetEnrollments()">获取报名学生</button>
+
+          <pre id="t_enroll_raw">{ 原始 JSON 会显示在这里 }</pre>
+          <div id="t_enroll_view" class="prettyView"></div>
+        </div>
+
+        <!-- 2. 获取学生某课程的进度 -->
+        <h3 class="collapsible">
+          2. 学生进度 GET /api/teacher/enrollments/:courseId/:studentId
+        </h3>
+        <div class="content">
+          <label>courseId</label>
+          <input id="t_progress_course" />
+          <label>studentId</label>
+          <input id="t_progress_student" />
+          <button onclick="tGetStudentProgress()">获取进度</button>
+
+          <pre id="t_progress_raw">{ 原始 JSON }</pre>
+          <div id="t_progress_view" class="prettyView"></div>
+        </div>
+
+        <!-- 3. 获取老师名下的课程 -->
+        <h3 class="collapsible">3. 老师课程 GET /api/teacher/courses</h3>
+        <div class="content">
+          <label>page</label>
+          <input id="t_course_page" value="1" />
+          <label>limit</label>
+          <input id="t_course_limit" value="12" />
+
+          <label>category</label>
+          <input id="t_course_category" />
+
+          <label>search</label>
+          <input id="t_course_search" />
+
+          <button onclick="tGetTeacherCourses()">查询课程</button>
+
+          <pre id="t_course_raw">{ 原始 JSON }</pre>
+          <div id="t_course_view" class="prettyView"></div>
+        </div>
+
+        <!-- 4. 获取教师统计 -->
+        <h3 class="collapsible">4. 教师统计 GET /api/teacher/statistics</h3>
+        <div class="content">
+          <button onclick="tGetStatistics()">获取统计</button>
+
+          <pre id="t_stat_raw">{ 原始 JSON }</pre>
+          <div id="t_stat_view" class="prettyView"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
 
     <h3>控制台输出</h3>
     <pre id="log">日志会显示在这里</pre>
@@ -595,6 +671,7 @@
         const body = {
           email: document.getElementById("login_email").value.trim(),
           password: document.getElementById("login_password").value.trim(),
+          role: document.getElementById("login_role").value.trim() || undefined,
         };
 
         log("登录 ->", JSON.stringify(body));
@@ -1350,6 +1427,124 @@
         const json = await res.json().catch(() => {});
         document.getElementById("learning_recent_result").textContent =
           prettyJSON(json);
+      }
+
+      async function tGetEnrollments() {
+        const base = getBase();
+        const courseId = document
+          .getElementById("t_enroll_courseId")
+          .value.trim();
+        const url = courseId
+          ? `${base}/api/teacher/enrollments?courseId=${courseId}`
+          : `${base}/api/teacher/enrollments`;
+
+        const res = await fetch(url, { headers: getTokenHeader() });
+        const json = await res.json().catch(() => ({}));
+
+        document.getElementById("t_enroll_raw").textContent = prettyJSON(json);
+
+        // 结构化展示
+        if (json.success && json.data?.enrollments) {
+          const list = json.data.enrollments
+            .map(
+              (e) => `
+      <div>
+        <b>${e.username}</b> (${e.email})  
+        课程: <i>${e.course_title}</i>  
+      </div>
+    `
+            )
+            .join("");
+          document.getElementById("t_enroll_view").innerHTML = list || "无记录";
+        }
+      }
+
+      async function tGetStudentProgress() {
+        const base = getBase();
+
+        const courseId = document
+          .getElementById("t_progress_course")
+          .value.trim();
+        const studentId = document
+          .getElementById("t_progress_student")
+          .value.trim();
+
+        if (!courseId || !studentId)
+          return alert("必须填写 courseId 与 studentId");
+
+        const url = `${base}/api/teacher/enrollments/${courseId}/${studentId}`;
+
+        const res = await fetch(url, { headers: getTokenHeader() });
+        const json = await res.json().catch(() => ({}));
+
+        document.getElementById("t_progress_raw").textContent =
+          prettyJSON(json);
+
+        // 提取信息
+        if (json.success && json.data) {
+          const d = json.data;
+          const view = `
+      <div>总章节: ${d.total}</div>
+      <div>已完成: ${d.completed}</div>
+      <div>完成率: ${d.rate}%</div>
+      <div>笔记数: ${d.notesCount}</div>
+      <div>最近学习: ${d.lastStudyTime || "无"}</div>
+    `;
+          document.getElementById("t_progress_view").innerHTML = view;
+        }
+      }
+      async function tGetTeacherCourses() {
+        const base = getBase();
+
+        const page = document.getElementById("t_course_page").value;
+        const limit = document.getElementById("t_course_limit").value;
+        const category = document
+          .getElementById("t_course_category")
+          .value.trim();
+        const search = document.getElementById("t_course_search").value.trim();
+
+        const url = `${base}/api/teacher/courses?page=${page}&limit=${limit}&category=${category}&search=${search}`;
+
+        const res = await fetch(url, { headers: getTokenHeader() });
+        const json = await res.json().catch(() => ({}));
+
+        document.getElementById("t_course_raw").textContent = prettyJSON(json);
+
+        if (json.success && json.data?.courses) {
+          const rows = json.data.courses
+            .map(
+              (c) => `
+      <div>
+        <b>${c.title}</b>
+        (${c.lessonCount} 节 | ${c.enrollmentCount} 学生)
+      </div>
+    `
+            )
+            .join("");
+          document.getElementById("t_course_view").innerHTML = rows || "无课程";
+        }
+      }
+
+      async function tGetStatistics() {
+        const base = getBase();
+
+        const res = await fetch(`${base}/api/teacher/statistics`, {
+          headers: getTokenHeader(),
+        });
+        const json = await res.json().catch(() => ({}));
+
+        document.getElementById("t_stat_raw").textContent = prettyJSON(json);
+
+        if (json.success && json.data) {
+          const d = json.data;
+          const view = `
+      <div>课程数量: ${d.totalCourses}</div>
+      <div>学生数量: ${d.totalStudents}</div>
+      <div>章节总数: ${d.totalLessons}</div>
+      <div>评价总数: ${d.totalReviews}</div>
+    `;
+          document.getElementById("t_stat_view").innerHTML = view;
+        }
       }
     </script>
   </body>
