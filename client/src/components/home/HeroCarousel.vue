@@ -45,22 +45,22 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import laboratoryImg from '../../assets/images/laboratory.jpg'
-import libraryImg from '../../assets/images/library.jpg'
+import Img1 from '../../assets/images/大礼堂.jpeg'
+import Img2 from '../../assets/images/北大楼.jpg'
 
 // 轮播图片数据
 const images = [
   {
-    src: laboratoryImg,
-    alt: '实验室',
-    title: '实践出真知',
-    description: '在实践中探索知识的奥秘'
+    src: Img1,
+    alt: '大礼堂',
+    title: '玉兰栖黛瓦，春香浸古檐',
+    description: '把春日的柔婉缀满百年建筑的檐角'
   },
   {
-    src: libraryImg,
-    alt: '图书馆',
-    title: '知识的海洋',
-    description: '在书海中遨游，汲取智慧'
+    src: Img2,
+    alt: '北大楼',
+    title: '藤蔓裹旧檐，新厦接云巅',
+    description: '用青藤织就时光交错'
   }
 ]
 
