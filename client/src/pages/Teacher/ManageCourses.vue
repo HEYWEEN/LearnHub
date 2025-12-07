@@ -1,7 +1,7 @@
 <template>
   <div class="manage-courses-page">
     <div class="page-container">
-      <div class="page-header">
+      <div class="page-header fade-in">
         <h1>课程管理</h1>
         <el-button type="primary" @click="handleCreateCourse">
           <span class="button-icon">➕</span>
@@ -9,7 +9,7 @@
         </el-button>
       </div>
 
-      <div v-loading="loading" class="courses-section">
+      <div v-loading="loading" class="courses-section fade-in" style="animation-delay: 0.1s">
         <div v-if="courses.length === 0" class="empty-state">
           <div class="empty-icon">📚</div>
           <p class="empty-text">您还没有创建课程</p>
@@ -19,7 +19,12 @@
         </div>
 
         <div v-else class="courses-grid">
-          <div v-for="course in courses" :key="course.id" class="course-card">
+          <div 
+            v-for="(course, index) in courses" 
+            :key="course.id" 
+            class="course-card"
+            :style="{ animationDelay: `${0.2 + index * 0.05}s` }"
+          >
             <div class="course-cover">
               <img
                 :src="
@@ -221,6 +226,8 @@ const handleDeleteCourse = async (course) => {
   display: flex;
   flex-direction: column;
   height: 100%; /* 让卡片填满网格单元格 */
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 .course-card:hover {
@@ -256,6 +263,7 @@ const handleDeleteCourse = async (course) => {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -267,6 +275,7 @@ const handleDeleteCourse = async (course) => {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.6;
@@ -301,6 +310,23 @@ const handleDeleteCourse = async (course) => {
 
 .course-actions .el-button {
   flex: 1;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 /* 响应式设计 */

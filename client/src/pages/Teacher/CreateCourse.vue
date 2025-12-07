@@ -1,12 +1,12 @@
 <template>
   <div class="create-course-page">
     <div class="page-container">
-      <div class="page-header">
+      <div class="page-header fade-in">
         <h1>{{ isEditMode ? '编辑课程' : '创建课程' }}</h1>
         <el-button @click="handleBack">返回</el-button>
       </div>
 
-      <div class="form-container">
+      <div class="form-container fade-in" style="animation-delay: 0.1s">
         <el-form
           ref="formRef"
           :model="courseForm"
@@ -339,6 +339,23 @@ const handleBack = () => {
 
 :deep(.el-select) {
   width: 100%;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 /* 响应式设计 */

@@ -80,7 +80,7 @@
       <div class="main-content">
         <div class="content-left">
           <!-- 教师信息卡片 -->
-          <el-card class="teacher-card" shadow="hover">
+          <el-card class="teacher-card fade-in" shadow="hover" style="animation-delay: 0.2s">
             <template #header>
               <div class="card-header">
                 <el-icon><UserFilled /></el-icon>
@@ -101,7 +101,7 @@
           </el-card>
 
           <!-- 课程章节列表 -->
-          <el-card class="lessons-card" shadow="hover">
+          <el-card class="lessons-card fade-in" shadow="hover" style="animation-delay: 0.3s">
             <template #header>
               <div class="card-header">
                 <div class="header-left">
@@ -299,7 +299,7 @@
           </el-dialog>
 
           <!-- 评论区 -->
-          <el-card class="reviews-card" shadow="hover">
+          <el-card class="reviews-card fade-in" shadow="hover" style="animation-delay: 0.4s">
             <template #header>
               <div class="card-header">
                 <el-icon><ChatDotRound /></el-icon>
@@ -1197,6 +1197,23 @@ onMounted(() => {
 .empty-lessons {
   padding: 40px 0;
   text-align: center;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 /* 响应式设计 */

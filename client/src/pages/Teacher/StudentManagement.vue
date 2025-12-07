@@ -1,11 +1,11 @@
 <template>
   <div class="student-management-page">
     <div class="page-container">
-      <div class="page-header">
+      <div class="page-header fade-in">
         <h1>学生管理</h1>
       </div>
 
-      <div class="filter-section">
+      <div class="filter-section fade-in" style="animation-delay: 0.1s">
         <el-select
           v-model="selectedCourseId"
           placeholder="选择课程筛选"
@@ -23,7 +23,7 @@
         </el-select>
       </div>
 
-      <div v-loading="loading" class="students-section">
+      <div v-loading="loading" class="students-section fade-in" style="animation-delay: 0.2s">
         <div v-if="students.length === 0" class="empty-state">
           <div class="empty-icon">👥</div>
           <p class="empty-text">暂无学生报名</p>
@@ -445,6 +445,23 @@ const handleViewDetails = (student) => {
   font-size: 18px;
   font-weight: 600;
   color: #409eff;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 /* 响应式设计 */
