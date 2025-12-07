@@ -96,7 +96,6 @@ const loadCourses = async () => {
   try {
     const result = await getTeacherCourses();
     if (result.success) {
-      // 后端返回的数据结构可能是 data.courses 或 data 本身包含课程列表
       courses.value = result.data?.courses || result.data || [];
     }
   } catch (error) {

@@ -256,7 +256,7 @@ const markAsCompleted = () => {
   
   isCompleted.value = true
   emit('chapter-complete', props.chapterId)
-  ElMessage.success('恭喜完成本章节学习！')
+  ElMessage.success('你已完成本章节的学习！')
 }
 
 // 暴露方法供父组件调用
@@ -318,6 +318,8 @@ defineExpose({
   background-color: #000;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  z-index: 0;
 }
 
 .video-wrapper {
@@ -329,7 +331,8 @@ defineExpose({
 .video-element {
   width: 100%;
   display: block;
-  max-height: 600px;
+  max-height: 50vh;  /* 限制视频最大高度为视口高度的50% */
+  object-fit: contain;
 }
 
 .loading-overlay,

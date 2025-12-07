@@ -388,6 +388,9 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  position: relative;
+  z-index: 0;
+  max-height: 50vh;  /* 限制视频区域最大高度为视口高度的50% */
 }
 
 .notes-section {
@@ -396,6 +399,9 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
+  min-height: 400px;  /* 确保笔记区域有最小高度 */
 }
 
 /* 响应式布局 */
@@ -420,6 +426,14 @@ onBeforeUnmount(() => {
     height: auto;
     padding: 12px;
     gap: 12px;
+  }
+
+  .video-section {
+    max-height: 40vh;  /* 移动端视频区域更小 */
+  }
+
+  .notes-section {
+    min-height: 300px;  /* 移动端笔记区域最小高度 */
   }
 }
 </style>

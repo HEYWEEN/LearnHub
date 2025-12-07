@@ -43,6 +43,8 @@
           class="editor-textarea"
           placeholder="在此输入Markdown格式的笔记...&#10;&#10;支持语法：&#10;# 标题&#10;**粗体** *斜体*&#10;- 列表项&#10;```代码块```&#10;[链接](url)"
           @input="onContentChange"
+          @focus="onTextareaFocus"
+          @blur="onTextareaBlur"
         />
       </div>
 
@@ -139,6 +141,19 @@ const onContentChange = () => {
       handleAutoSave()
     }
   }, 10000)
+}
+
+// textarea 获得焦点
+const onTextareaFocus = () => {
+  // 确保 textarea 可以正常输入
+  if (textareaRef.value) {
+    textareaRef.value.style.pointerEvents = 'auto'
+  }
+}
+
+// textarea 失去焦点
+const onTextareaBlur = () => {
+  // 可以在这里添加失去焦点时的处理
 }
 
 // 手动保存
@@ -249,6 +264,8 @@ defineExpose({
   background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .editor-header {
@@ -309,6 +326,8 @@ defineExpose({
   flex-direction: column;
   background-color: #fff;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .panel-header {
@@ -334,6 +353,13 @@ defineExpose({
   line-height: 1.6;
   color: #303133;
   overflow-y: auto;
+  background-color: #fff;
+  /* 确保可以正常输入 */
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .editor-textarea::placeholder {

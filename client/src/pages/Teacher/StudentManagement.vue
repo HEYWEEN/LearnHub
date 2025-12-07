@@ -193,7 +193,6 @@ const loadTeacherCourses = async () => {
     const result = await getTeacherCourses();
     console.log('教师课程列表:', result);
     if (result.success) {
-      // 后端返回的数据结构可能是 data.courses 或 data 本身包含课程列表
       teacherCourses.value = result.data?.courses || result.data || [];
     }
   } catch (error) {
