@@ -38,7 +38,7 @@ export async function insertMessage(pool,{ id, conversation_id, sender, context 
 export async function listMessages(pool,conversationId,{ page = 1, limit = 50 }) {
   const offset = (Number(page) - 1) * Number(limit);
   const [rows] = await pool.query(
-    `SELECT * FROM ai_messages WHERE conversation_id = ? ORDER BY send_at ASC, id ASC LIMIT ?, ?`,
+    `SELECT * FROM ai_messages WHERE conversation_id = ? ORDER BY send_at ASC, id DESC LIMIT ?, ?`,
     [conversationId, offset, Number(limit)]
   );
   return rows;
