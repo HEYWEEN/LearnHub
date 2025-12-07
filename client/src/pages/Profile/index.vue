@@ -385,7 +385,7 @@ onMounted(() => {
 <style scoped>
 .profile-page {
   min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   padding: 40px 20px;
 }
 
@@ -401,15 +401,23 @@ onMounted(() => {
 .user-info-card,
 .account-settings-card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.user-info-card:hover,
+.account-settings-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: white;
+  color: #2c3e50;
   padding: 24px 32px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .card-header h2 {
