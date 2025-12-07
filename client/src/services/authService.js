@@ -30,3 +30,15 @@ export const changePassword = async (passwordData) => {
   const response = await axios.post('/auth/password', passwordData)
   return response
 }
+
+// 上传头像
+export const uploadAvatar = async (avatarFile) => {
+  const formData = new FormData()
+  formData.append('image', avatarFile)
+  const response = await axios.put('/users/me/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return response
+}

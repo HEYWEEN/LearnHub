@@ -11,12 +11,25 @@
           <div class="user-info-content" :key="isEditing ? 'editing' : 'viewing'">
           <!-- 头像区域 -->
           <div class="avatar-section">
-            <div class="avatar-wrapper">
-              <img :src="userAvatar" alt="用户头像" class="user-avatar" />
-              <div v-if="isEditing" class="avatar-overlay">
+            <div class="avatar-wrapper" @click="!uploadingAvatar && handleAvatarClick()">
+              <img :src="userAvatar" alt="用户头像" class="user-avatar" :class="{ uploading: uploadingAvatar }" />
+              <div v-if="!uploadingAvatar" class="avatar-overlay">
                 <span class="change-avatar-text">更换头像</span>
               </div>
+              <div v-if="uploadingAvatar" class="avatar-loading">
+                <span class="loading-spinner"></span>
+                <span class="loading-text">上传中...</span>
+              </div>
+              <input
+                ref="avatarInputRef"
+                type="file"
+                accept="image/*"
+                style="display: none"
+                @change="handleAvatarChange"
+                :disabled="uploadingAvatar"
+              />
             </div>
+            <p class="avatar-hint">点击头像更换</p>
           </div>
 
           <!-- 信息展示/编辑 -->
@@ -189,6 +202,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/slices/user'
 import defaultAvatar from '../../assets/images/default-avatar.png'
 import * as authService from '../../services/authService'
@@ -202,6 +216,8 @@ const isEditing = ref(false)
 const saving = ref(false)
 const showPasswordForm = ref(false)
 const changingPassword = ref(false)
+const uploadingAvatar = ref(false)
+const avatarInputRef = ref(null)
 
 // 用户信息
 const userInfo = ref({
@@ -362,6 +378,58 @@ const cancelPasswordChange = () => {
   }
 }
 
+// 点击头像
+const handleAvatarClick = () => {
+  if (avatarInputRef.value) {
+    avatarInputRef.value.click()
+  }
+}
+
+// 头像文件选择
+const handleAvatarChange = async (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  // 验证文件类型
+  if (!file.type.startsWith('image/')) {
+    ElMessage.error('请选择图片文件')
+    return
+  }
+
+  // 验证文件大小（限制为5MB）
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.error('图片大小不能超过5MB')
+    return
+  }
+
+  uploadingAvatar.value = true
+  try {
+    // 上传头像
+    const response = await authService.uploadAvatar(file)
+    
+    if (response.success) {
+      // 更新用户信息
+      const newAvatar = response.data?.user?.avatar
+      if (newAvatar) {
+        userInfo.value.avatar = newAvatar
+        // 更新 store
+        userStore.user.avatar = newAvatar
+        localStorage.setItem('user', JSON.stringify(userStore.user))
+        ElMessage.success('头像上传成功！')
+      }
+    }
+  } catch (error) {
+    console.error('上传头像失败:', error)
+    ElMessage.error(error.errorMessage || '上传头像失败，请稍后重试')
+  } finally {
+    uploadingAvatar.value = false
+    // 清空input，以便可以重复选择同一文件
+    if (avatarInputRef.value) {
+      avatarInputRef.value.value = ''
+    }
+  }
+}
+
 // 退出登录
 const handleLogout = async () => {
   if (!confirm('确定要退出登录吗？')) {
@@ -442,6 +510,8 @@ onMounted(() => {
   position: relative;
   width: 120px;
   height: 120px;
+  cursor: pointer;
+  margin: 0 auto;
 }
 
 .user-avatar {
@@ -450,6 +520,11 @@ onMounted(() => {
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.avatar-wrapper:hover .user-avatar {
+  border-color: #667eea;
 }
 
 .avatar-overlay {
@@ -463,7 +538,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -475,6 +549,40 @@ onMounted(() => {
 .change-avatar-text {
   color: white;
   font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.avatar-hint {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.user-avatar.uploading {
+  opacity: 0.6;
+}
+
+.avatar-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-text {
+  color: white;
+  font-size: 12px;
   font-weight: 500;
 }
 
