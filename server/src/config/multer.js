@@ -2,6 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import STATUS from "../constants/httpStatus";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,14 +25,16 @@ const storage = multer.diskStorage({
 
 // 只允许上传图片和视频，其他类型文件会被拒绝
 const fileFilter = (req, file, cb) => {
-  const fileTypes = /jpeg|jpg|png|gif|mp4|avi/;
+  const fileTypes = /jpeg|jpg|png|gif|mp4|mov|webm|mkv|m4v|flv|avi|ts|mpeg|mpg/;
   const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = fileTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    return cb(new Error("只支持图片和视频文件！"), false);
+    const err =new Error(`文件格式不支持：${file.originalname}`);
+    err.status = STATUS.BAD_REQUEST; 
+    return cb(err, false);
   }
 };
 
