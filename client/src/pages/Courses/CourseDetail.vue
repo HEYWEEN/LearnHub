@@ -104,8 +104,20 @@
           <el-card class="lessons-card" shadow="hover">
             <template #header>
               <div class="card-header">
-                <el-icon><List /></el-icon>
-                <span>课程章节</span>
+                <div class="header-left">
+                  <el-icon><List /></el-icon>
+                  <span>课程章节</span>
+                </div>
+                <!-- 教师管理按钮 -->
+                <el-button
+                  v-if="isTeacherOfCourse"
+                  type="primary"
+                  size="small"
+                  @click="handleAddLesson"
+                >
+                  <el-icon><Plus /></el-icon>
+                  添加章节
+                </el-button>
               </div>
             </template>
             <div class="lessons-list">
@@ -128,9 +140,41 @@
                     </span>
                   </div>
                 </div>
-                <!-- 教师显示查看视频按钮 -->
+                <!-- 教师显示管理按钮 -->
+                <div v-if="isTeacherOfCourse" class="lesson-actions">
+                  <el-button
+                    type="primary"
+                    size="small"
+                    @click="handleStartLearning(lesson)"
+                  >
+                    查看视频
+                  </el-button>
+                  <el-button
+                    size="small"
+                    @click="handleEditLesson(lesson)"
+                  >
+                    <el-icon><Edit /></el-icon>
+                    编辑
+                  </el-button>
+                  <el-button
+                    size="small"
+                    @click="handleUploadVideo(lesson)"
+                  >
+                    <el-icon><Upload /></el-icon>
+                    更换视频
+                  </el-button>
+                  <el-button
+                    type="danger"
+                    size="small"
+                    @click="handleDeleteLesson(lesson)"
+                  >
+                    <el-icon><Delete /></el-icon>
+                    删除
+                  </el-button>
+                </div>
+                <!-- 教师（非课程创建者）显示查看视频按钮 -->
                 <el-button
-                  v-if="userStore.isTeacher"
+                  v-else-if="userStore.isTeacher"
                   type="primary"
                   size="small"
                   class="start-learning-btn"
@@ -163,6 +207,96 @@
               </div>
             </div>
           </el-card>
+
+          <!-- 章节编辑对话框 -->
+          <el-dialog
+            v-model="lessonDialogVisible"
+            :title="lessonDialogMode === 'add' ? '添加章节' : '编辑章节'"
+            width="600px"
+            :close-on-click-modal="false"
+          >
+            <el-form
+              ref="lessonFormRef"
+              :model="lessonForm"
+              :rules="lessonFormRules"
+              label-width="100px"
+            >
+              <el-form-item label="章节标题" prop="title">
+                <el-input
+                  v-model="lessonForm.title"
+                  placeholder="请输入章节标题"
+                  maxlength="100"
+                  show-word-limit
+                />
+              </el-form-item>
+              <el-form-item label="章节描述" prop="description">
+                <el-input
+                  v-model="lessonForm.description"
+                  type="textarea"
+                  :rows="4"
+                  placeholder="请输入章节描述（可选）"
+                  maxlength="500"
+                  show-word-limit
+                />
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <el-button @click="lessonDialogVisible = false">取消</el-button>
+              <el-button
+                type="primary"
+                :loading="lessonSubmitting"
+                @click="handleLessonSubmit"
+              >
+                确定
+              </el-button>
+            </template>
+          </el-dialog>
+
+          <!-- 视频上传对话框 -->
+          <el-dialog
+            v-model="videoDialogVisible"
+            title="上传/更换视频"
+            width="500px"
+            :close-on-click-modal="false"
+          >
+            <div class="video-upload-container">
+              <el-upload
+                ref="videoUploadRef"
+                :auto-upload="false"
+                :limit="1"
+                :on-change="handleVideoChange"
+                :on-exceed="handleVideoExceed"
+                accept="video/*"
+                drag
+              >
+                <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+                <div class="el-upload__text">
+                  将视频文件拖到此处，或<em>点击上传</em>
+                </div>
+                <template #tip>
+                  <div class="el-upload__tip">
+                    支持 MP4, AVI, MOV 等格式，建议大小不超过 500MB
+                  </div>
+                </template>
+              </el-upload>
+              <el-progress
+                v-if="videoUploadProgress > 0"
+                :percentage="videoUploadProgress"
+                :status="videoUploadProgress === 100 ? 'success' : undefined"
+              />
+            </div>
+            <template #footer>
+              <el-button @click="videoDialogVisible = false">取消</el-button>
+              <el-button
+                type="primary"
+                :loading="videoUploading"
+                :disabled="!selectedVideoFile"
+                @click="handleVideoUploadSubmit"
+              >
+                上传
+              </el-button>
+            </template>
+          </el-dialog>
 
           <!-- 评论区 -->
           <el-card class="reviews-card" shadow="hover">
@@ -257,19 +391,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   Loading, User, Document, Folder, UserFilled, List, Clock, 
-  ChatDotRound 
+  ChatDotRound, Plus, Edit, Delete, Upload, UploadFilled
 } from '@element-plus/icons-vue'
 import { 
   getCourseById, 
   enrollCourse, 
   cancelEnrollment, 
   checkEnrollmentStatus,
-  submitReview 
+  submitReview,
+  addLesson,
+  updateLesson,
+  deleteLesson,
+  uploadLessonVideo
 } from '../../services/courseService'
 import { useUserStore } from '../../store/slices/user'
 import { FILE_UPLOAD_URL } from '../../services/axios'
@@ -288,6 +426,39 @@ const reviewLoading = ref(false)
 const reviewForm = ref({
   rating: 5,
   comment: ''
+})
+
+// 章节管理相关状态
+const lessonDialogVisible = ref(false)
+const lessonDialogMode = ref('add') // 'add' 或 'edit'
+const currentLesson = ref(null) // 当前编辑的章节
+const lessonSubmitting = ref(false)
+const lessonFormRef = ref(null)
+const lessonForm = ref({
+  title: '',
+  description: ''
+})
+const lessonFormRules = {
+  title: [
+    { required: true, message: '请输入章节标题', trigger: 'blur' },
+    { min: 2, max: 100, message: '标题长度在 2 到 100 个字符', trigger: 'blur' }
+  ]
+}
+
+// 视频上传相关状态
+const videoDialogVisible = ref(false)
+const videoUploading = ref(false)
+const videoUploadProgress = ref(0)
+const selectedVideoFile = ref(null)
+const currentVideoLesson = ref(null) // 当前要上传视频的章节
+const videoUploadRef = ref(null)
+
+// 计算属性：判断当前用户是否是课程创建者
+const isTeacherOfCourse = computed(() => {
+  return userStore.isTeacher && 
+         courseDetail.value && 
+         courseDetail.value.instructor && 
+         courseDetail.value.instructor.id === userStore.user?.id
 })
 
 // 获取课程详情
@@ -464,6 +635,157 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('zh-CN')
 }
 
+// 打开添加章节对话框
+const handleAddLesson = () => {
+  lessonDialogMode.value = 'add'
+  lessonForm.value = {
+    title: '',
+    description: ''
+  }
+  currentLesson.value = null
+  lessonDialogVisible.value = true
+}
+
+// 打开编辑章节对话框
+const handleEditLesson = (lesson) => {
+  lessonDialogMode.value = 'edit'
+  lessonForm.value = {
+    title: lesson.title,
+    description: lesson.description || ''
+  }
+  currentLesson.value = lesson
+  lessonDialogVisible.value = true
+}
+
+// 提交章节表单（添加或编辑）
+const handleLessonSubmit = async () => {
+  if (!lessonFormRef.value) return
+  
+  await lessonFormRef.value.validate(async (valid) => {
+    if (!valid) return
+    
+    lessonSubmitting.value = true
+    try {
+      const courseId = route.params.id
+      
+      if (lessonDialogMode.value === 'add') {
+        // 添加章节
+        const result = await addLesson(courseId, lessonForm.value)
+        if (result.success) {
+          ElMessage.success('章节添加成功！')
+          lessonDialogVisible.value = false
+          // 重新获取课程详情以刷新章节列表
+          await fetchCourseDetail()
+        }
+      } else {
+        // 编辑章节
+        const result = await updateLesson(courseId, currentLesson.value.id, lessonForm.value)
+        if (result.success) {
+          ElMessage.success('章节更新成功！')
+          lessonDialogVisible.value = false
+          // 重新获取课程详情以刷新章节列表
+          await fetchCourseDetail()
+        }
+      }
+    } catch (error) {
+      console.error('章节操作失败:', error)
+      ElMessage.error(error.message || '操作失败，请稍后重试')
+    } finally {
+      lessonSubmitting.value = false
+    }
+  })
+}
+
+// 删除章节
+const handleDeleteLesson = async (lesson) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除章节"${lesson.title}"吗？此操作不可恢复。`,
+      '确认删除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+    
+    const courseId = route.params.id
+    const result = await deleteLesson(courseId, lesson.id)
+    if (result.success) {
+      ElMessage.success('章节删除成功！')
+      // 重新获取课程详情以刷新章节列表
+      await fetchCourseDetail()
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除章节失败:', error)
+      ElMessage.error(error.message || '删除失败，请稍后重试')
+    }
+  }
+}
+
+// 打开视频上传对话框
+const handleUploadVideo = (lesson) => {
+  currentVideoLesson.value = lesson
+  selectedVideoFile.value = null
+  videoUploadProgress.value = 0
+  videoDialogVisible.value = true
+}
+
+// 处理视频文件选择
+const handleVideoChange = (file) => {
+  selectedVideoFile.value = file.raw
+}
+
+// 处理视频文件超出限制
+const handleVideoExceed = () => {
+  ElMessage.warning('只能上传一个视频文件')
+}
+
+// 提交视频上传
+const handleVideoUploadSubmit = async () => {
+  if (!selectedVideoFile.value) {
+    ElMessage.warning('请选择要上传的视频文件')
+    return
+  }
+  
+  videoUploading.value = true
+  videoUploadProgress.value = 0
+  
+  try {
+    const courseId = route.params.id
+    const lessonId = currentVideoLesson.value.id
+    
+    const result = await uploadLessonVideo(
+      courseId, 
+      lessonId, 
+      selectedVideoFile.value,
+      (progressEvent) => {
+        // 计算上传进度
+        videoUploadProgress.value = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        )
+      }
+    )
+    
+    if (result.success) {
+      ElMessage.success('视频上传成功！')
+      videoDialogVisible.value = false
+      // 清理上传组件
+      if (videoUploadRef.value) {
+        videoUploadRef.value.clearFiles()
+      }
+      // 重新获取课程详情以刷新章节列表
+      await fetchCourseDetail()
+    }
+  } catch (error) {
+    console.error('视频上传失败:', error)
+    ElMessage.error(error.message || '视频上传失败，请稍后重试')
+  } finally {
+    videoUploading.value = false
+  }
+}
+
 // 页面加载时获取课程详情
 onMounted(() => {
   fetchCourseDetail()
@@ -628,10 +950,17 @@ onMounted(() => {
 .card-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-size: 18px;
   font-weight: bold;
   color: #333;
+}
+
+.card-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .card-header .el-icon {
@@ -741,6 +1070,41 @@ onMounted(() => {
 
 .start-learning-btn {
   flex-shrink: 0;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.lesson-actions .el-button {
+  padding: 5px 10px;
+}
+
+/* 视频上传容器 */
+.video-upload-container {
+  padding: 20px 0;
+}
+
+.video-upload-container .el-progress {
+  margin-top: 20px;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #eee;
+  padding: 20px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+:deep(.el-dialog__footer) {
+  border-top: 1px solid #eee;
+  padding: 15px 20px;
 }
 
 /* 评论区 */
@@ -865,6 +1229,7 @@ onMounted(() => {
 
   .lesson-item {
     gap: 12px;
+    flex-wrap: wrap;
   }
 
   .lesson-number {
@@ -873,8 +1238,19 @@ onMounted(() => {
     font-size: 14px;
   }
 
+  .lesson-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .review-item {
     flex-direction: column;
+    gap: 12px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
   }
 }

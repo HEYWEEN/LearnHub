@@ -89,3 +89,55 @@ export const uploadCoverImage = async (courseId, file) => {
   })
   return response.data
 }
+
+// 获取课程章节列表
+export const getLessons = async (courseId) => {
+  const response = await axios.get(`/courses/${courseId}/lesson`)
+  return response.data // 返回章节列表
+}
+
+// 添加章节
+export const addLesson = async (courseId, lessonData) => {
+  const payload = {
+    title: lessonData.title,
+    description: lessonData.description || null,
+    video_url: lessonData.videoUrl || null,
+    duration: lessonData.duration || null
+  }
+  const response = await axios.post(`/courses/${courseId}/lesson`, payload)
+  return response // 返回完整响应 { success, message, data }
+}
+
+// 更新章节信息
+export const updateLesson = async (courseId, lessonId, lessonData) => {
+  const payload = {
+    title: lessonData.title,
+    description: lessonData.description || null
+  }
+  const response = await axios.post(`/courses/${courseId}/lesson/${lessonId}`, payload)
+  return response // 返回完整响应 { success, message, data }
+}
+
+// 删除章节
+export const deleteLesson = async (courseId, lessonId) => {
+  const response = await axios.delete(`/courses/${courseId}/lesson/${lessonId}`)
+  return response // 返回完整响应 { success, message, data }
+}
+
+// 上传/更换章节视频
+export const uploadLessonVideo = async (courseId, lessonId, videoFile, onUploadProgress) => {
+  const formData = new FormData()
+  formData.append('video', videoFile)
+  
+  const response = await axios.post(
+    `/courses/${courseId}/lesson/${lessonId}/video`, 
+    formData, 
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: onUploadProgress // 支持上传进度回调
+    }
+  )
+  return response // 返回完整响应 { success, message, data }
+}

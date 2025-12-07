@@ -15,7 +15,7 @@ export async function addLesson({ user, courseId, payload }) {
       err.status = STATUS.NOT_FOUND;
       throw err;
     }
-    if (course.instructor_id !== user.id && user.role !== "admin") {
+    if (course.instructor.id !== user.id && user.role !== "admin") {
       const err = new Error("只能为自己创建的课程添加章节");
       err.status = STATUS.FORBIDDEN;
       throw err;
@@ -49,7 +49,7 @@ export async function removeLesson({ user, lessonId }) {
       err.status = STATUS.NOT_FOUND;
       throw err;
     }
-    if (course.instructor_id !== user.id && user.role !== "admin") {
+    if (course.instructor.id !== user.id && user.role !== "admin") {
       const err = new Error("只能删除自己创建的课程的章节");
       err.status = STATUS.FORBIDDEN;
       throw err;
@@ -66,7 +66,7 @@ export async function modifyLesson({ user, courseId, lessonId, payload }) {
       err.status = STATUS.NOT_FOUND;
       throw err;
     }
-    if (course.instructor_id !== user.id && user.role !== "admin") {
+    if (course.instructor.id !== user.id && user.role !== "admin") {
       const err = new Error("只能修改自己创建的课程的章节");
       err.status = STATUS.FORBIDDEN;
       throw err;
