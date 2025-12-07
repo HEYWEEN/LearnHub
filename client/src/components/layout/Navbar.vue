@@ -191,9 +191,8 @@ onUnmounted(() => {
 }
 
 .navbar.scrolled {
-  background: var(--color-white);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  color: var(--color-gray-800);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  color: var(--color-white);
 }
 
 .navbar-container {
