@@ -1,6 +1,6 @@
 import app from './app.js';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4004;
 
 import LOG_COLOR from './constants/logColor.js';
 console.log(
