@@ -49,20 +49,25 @@
           </el-form-item>
 
           <el-form-item label="课程封面" prop="coverImage">
-            <el-input
-              v-model="courseForm.coverImage"
-              placeholder="请输入课程封面URL（可选，留空使用默认封面）"
-            />
-            <div v-if="courseForm.coverImage" class="cover-preview">
-              <img :src="courseForm.coverImage" alt="课程封面预览" @error="handleImageError" />
-            </div>
-          </el-form-item>
-
-          <el-form-item label="预览视频" prop="videoPreview">
-            <el-input
-              v-model="courseForm.videoPreview"
-              placeholder="请输入预览视频URL（可选）"
-            />
+            <el-upload
+              class="cover-uploader"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="handleCoverChange"
+              accept="image/*"
+            >
+              <div v-if="coverPreview" class="cover-preview">
+                <img :src="coverPreview" alt="课程封面预览" />
+                <div class="preview-overlay">
+                  <span>点击更换封面</span>
+                </div>
+              </div>
+              <div v-else class="upload-placeholder">
+                <el-icon class="upload-icon"><Plus /></el-icon>
+                <div class="upload-text">点击上传课程封面</div>
+                <div class="upload-hint">支持 JPG、PNG 格式，建议尺寸 800x450</div>
+              </div>
+            </el-upload>
           </el-form-item>
 
           <el-form-item>
@@ -81,8 +86,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/slices/user'
-import { createCourse, updateCourse, getCourseById } from '@/services/courseService'
+import { createCourse, updateCourse, getCourseById, uploadCoverImage } from '@/services/courseService'
+import { FILE_UPLOAD_URL } from '@/services/axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -96,9 +103,12 @@ const courseForm = reactive({
   title: '',
   description: '',
   category: '',
-  coverImage: '',
-  videoPreview: ''
+  coverImage: ''
 })
+
+// 文件上传相关
+const coverFile = ref(null)
+const coverPreview = ref('')
 
 const formRules = {
   title: [
@@ -114,6 +124,17 @@ const formRules = {
   ]
 }
 
+// 文件上传处理
+const handleCoverChange = (uploadFile) => {
+  coverFile.value = uploadFile.raw
+  // 生成预览
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    coverPreview.value = e.target.result
+  }
+  reader.readAsDataURL(uploadFile.raw)
+}
+
 // 加载课程数据（编辑模式）
 const loadCourseData = async (courseId) => {
   try {
@@ -122,7 +143,11 @@ const loadCourseData = async (courseId) => {
     courseForm.description = result.description
     courseForm.category = result.category
     courseForm.coverImage = result.coverImage
-    courseForm.videoPreview = result.videoPreview || ''
+    
+    // 如果有封面，显示预览
+    if (result.coverImage) {
+      coverPreview.value = FILE_UPLOAD_URL + result.coverImage
+    }
   } catch (error) {
     console.error('加载课程数据失败:', error)
     ElMessage.error('加载课程数据失败')
@@ -155,19 +180,29 @@ const handleSubmit = async () => {
       const courseData = {
         title: courseForm.title,
         description: courseForm.description,
-        category: courseForm.category,
-        coverImage: courseForm.coverImage,
-        videoPreview: courseForm.videoPreview
+        category: courseForm.category
       }
+      
+      let courseId = route.query.courseId
       
       if (isEditMode.value) {
-        await updateCourse(route.query.courseId, courseData)
-        ElMessage.success('课程更新成功！')
+        await updateCourse(courseId, courseData)
       } else {
-        await createCourse(courseData)
-        ElMessage.success('课程创建成功！')
+        const result = await createCourse(courseData)
+        courseId = result.id || result.course_id
       }
       
+      // 上传封面图片
+      if (coverFile.value) {
+        try {
+          await uploadCoverImage(courseId, coverFile.value)
+        } catch (error) {
+          console.error('封面上传失败:', error)
+          ElMessage.warning('课程保存成功，但封面上传失败')
+        }
+      }
+      
+      ElMessage.success(isEditMode.value ? '课程更新成功！' : '课程创建成功！')
       router.push('/teacher/courses/manage')
     } catch (error) {
       console.error('操作失败:', error)
@@ -215,19 +250,81 @@ const handleBack = () => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* 上传组件样式 */
+.cover-uploader,
+.video-uploader {
+  width: 100%;
+}
+
+.upload-placeholder {
+  width: 100%;
+  height: 180px;
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background-color: #fafafa;
+}
+
+.upload-placeholder:hover {
+  border-color: #667eea;
+  background-color: #f5f7ff;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #8c939d;
+  margin-bottom: 12px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #606266;
+  margin-bottom: 4px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #909399;
+}
+
 .cover-preview {
-  margin-top: 12px;
-  width: 200px;
-  height: 120px;
+  position: relative;
+  width: 100%;
+  height: 180px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+  cursor: pointer;
 }
 
 .cover-preview img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: white;
+  font-size: 14px;
+}
+
+.cover-preview:hover .preview-overlay {
+  opacity: 1;
 }
 
 :deep(.el-form-item__label) {

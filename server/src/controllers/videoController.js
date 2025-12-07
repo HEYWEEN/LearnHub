@@ -5,13 +5,6 @@ import * as videoService from "../services/videoService.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const streamCoursePreview = asyncHandler(async (req, res) => {
-  const { courseId } = req.params;
-  const filePath = await videoService.getCourseVideoPath(courseId);
-  // 直接流式响应（支持 Range）
-  await videoService.streamFileByRange(filePath, req, res);
-});
-
 const streamLessonVideo = asyncHandler(async (req, res) => {
   const { lessonId } = req.params;
   const filePath = await videoService.getLessonVideoPath(lessonId);
@@ -45,4 +38,4 @@ const createLessonHls = asyncHandler(async (req, res) => {
   }
 });
 
-export { streamCoursePreview, streamLessonVideo, createLessonHls };
+export { streamLessonVideo, createLessonHls };

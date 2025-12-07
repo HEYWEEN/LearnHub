@@ -28,16 +28,6 @@
         </div>
       </section>
 
-      <!-- 我的课程 -->
-      <section class="my-courses fade-in" style="animation-delay: 0.5s">
-        <h2>我的课程</h2>
-        <div class="courses-placeholder">
-          <div class="placeholder-icon">📖</div>
-          <p class="placeholder-text">您还没有创建课程</p>
-          <el-button type="primary" @click="handleAddCourse">创建第一个课程</el-button>
-        </div>
-      </section>
-
       <!-- 统计信息 -->
       <section class="statistics fade-in" style="animation-delay: 0.6s">
         <h2>数据概览</h2>
@@ -149,7 +139,6 @@ function handleViewStudents() {
 
 /* 快捷操作 */
 .quick-actions h2,
-.my-courses h2,
 .statistics h2 {
   font-size: 24px;
   font-weight: 600;
@@ -193,26 +182,6 @@ function handleViewStudents() {
 .action-card p {
   font-size: 14px;
   color: #7f8c8d;
-}
-
-/* 我的课程 */
-.courses-placeholder {
-  background: white;
-  border-radius: 12px;
-  padding: 80px 24px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.placeholder-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-}
-
-.placeholder-text {
-  font-size: 16px;
-  color: #7f8c8d;
-  margin-bottom: 24px;
 }
 
 /* 统计信息 */

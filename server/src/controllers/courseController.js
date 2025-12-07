@@ -58,20 +58,6 @@ const updateCoverImage = asyncHandler(async (req, res) => {
   return sendSuccess(res, "封面更新成功", { course: updated });
 });
 
-const updateVideoPreview = asyncHandler(async (req, res) => {
-  const user = req.user;
-  const { courseId } = req.params;
-  // 等待上传并获取文件对象
-  const file = await fileService.uploadFileAsync("video")(req, res);
-  const coverVideoUrl = fileService.getUploadedFilePath(file);
-  const updated = await courseService.modifyCourse({
-    user,
-    courseId,
-    payload: { video_preview: coverVideoUrl },
-  });
-  return sendSuccess(res, "更新成功", { course: updated });
-});
-
 const releaseReview = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
   const user = req.user;
@@ -93,6 +79,5 @@ export {
   removeCourse,
   modifyCourse,
   releaseReview,
-  updateCoverImage,
-  updateVideoPreview
+  updateCoverImage
 };

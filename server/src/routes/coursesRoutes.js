@@ -7,9 +7,7 @@ import {
   modifyCourse,
   releaseReview,
   removeCourse,
-  updateCoverImage,
-  updateVideoPreview,
-  
+  updateCoverImage
 } from "../controllers/courseController.js";
 import {
   cancelEnrollCourse,
@@ -25,7 +23,6 @@ import {
 } from "../controllers/lessonController.js";
 import {
   createLessonHls,
-  streamCoursePreview,
   streamLessonVideo,
 } from "../controllers/videoController.js";
 const router = express.Router();
@@ -92,19 +89,6 @@ router.post(
   authorize(["teacher", "admin"]),
   updateCoverImage
 );
-
-// 修改课程导览视频（teacher）
-// POST /courses/{courseId}/video-preview
-// 请求头:
-// Authorization: Bearer {token}
-router.post(
-  "/:courseId/video-preview",
-  verifyToken,
-  authorize(["teacher", "admin"]),
-  updateVideoPreview
-);
-
-router.get("/:courseId/video-preview", streamCoursePreview);
 
 // POST /courses/{courseId}/review
 router.post("/:courseId/reviews", verifyToken, releaseReview);

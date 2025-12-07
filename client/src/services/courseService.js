@@ -77,3 +77,15 @@ export const deleteCourse = async (courseId) => {
   const response = await axios.delete(`/courses/${courseId}`)
   return response // 返回完整响应
 }
+
+// 上传课程封面
+export const uploadCoverImage = async (courseId, file) => {
+  const formData = new FormData()
+  formData.append('image', file)
+  const response = await axios.post(`/courses/${courseId}/cover-img`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return response.data
+}
