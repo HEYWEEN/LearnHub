@@ -9,7 +9,7 @@
     </div>
 
     <!-- 搜索栏 -->
-    <div class="search-section">
+    <div class="search-section fade-in" style="animation-delay: 0.1s">
       <div class="search-container">
         <el-input
           v-model="searchKeyword"
@@ -37,14 +37,17 @@
     <div class="courses-container">
       <el-row :gutter="24" v-loading="loading">
         <el-col
-          v-for="course in courses"
+          v-for="(course, index) in courses"
           :key="course.id"
           :xs="24"
           :sm="12"
           :md="8"
           :lg="6"
         >
-          <div class="course-card">
+          <div 
+            class="course-card fade-in"
+            :style="{ animationDelay: `${0.2 + index * 0.05}s` }"
+          >
             <!-- 封面图 -->
             <div class="course-cover">
               <img :src="course.coverImage? FILE_UPLOAD_URL + course.coverImage : defaultCourse" :alt="course.title" />
@@ -129,7 +132,7 @@
     </div>
 
     <!-- 分页 -->
-    <div class="pagination-section" v-if="pagination.total > 0">
+    <div class="pagination-section fade-in" v-if="pagination.total > 0" style="animation-delay: 0.3s">
       <el-pagination
         v-model:current-page="pagination.page"
         v-model:page-size="pagination.limit"
@@ -436,6 +439,7 @@ onMounted(() => {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
 }
 
 .course-description {
@@ -449,6 +453,7 @@ onMounted(() => {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  line-clamp: 3;
 }
 
 /* 课程元数据 */
@@ -601,6 +606,23 @@ onMounted(() => {
 
 :deep(.el-pagination.is-background .el-pager li:not(.disabled):hover) {
   color: #667eea;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 </style>
 

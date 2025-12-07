@@ -34,20 +34,6 @@
             />
           </el-form-item>
 
-          <el-form-item label="课程类别" prop="category">
-            <el-select v-model="courseForm.category" placeholder="请选择课程类别">
-              <el-option label="前端开发" value="前端开发" />
-              <el-option label="后端开发" value="后端开发" />
-              <el-option label="移动开发" value="移动开发" />
-              <el-option label="数据科学" value="数据科学" />
-              <el-option label="人工智能" value="人工智能" />
-              <el-option label="数据库" value="数据库" />
-              <el-option label="DevOps" value="DevOps" />
-              <el-option label="网络安全" value="网络安全" />
-              <el-option label="其他" value="其他" />
-            </el-select>
-          </el-form-item>
-
           <el-form-item label="课程封面" prop="coverImage">
             <el-upload
               class="cover-uploader"
@@ -102,7 +88,6 @@ const isEditMode = ref(false)
 const courseForm = reactive({
   title: '',
   description: '',
-  category: '',
   coverImage: ''
 })
 
@@ -118,9 +103,6 @@ const formRules = {
   description: [
     { required: true, message: '请输入课程描述', trigger: 'blur' },
     { min: 10, max: 500, message: '描述长度在 10 到 500 个字符', trigger: 'blur' }
-  ],
-  category: [
-    { required: true, message: '请选择课程类别', trigger: 'change' }
   ]
 }
 
@@ -141,7 +123,6 @@ const loadCourseData = async (courseId) => {
     const result = await getCourseById(courseId)
     courseForm.title = result.title
     courseForm.description = result.description
-    courseForm.category = result.category
     courseForm.coverImage = result.coverImage
     
     // 如果有封面，显示预览
@@ -179,8 +160,7 @@ const handleSubmit = async () => {
       // 直接传递表单数据，不需要包含instructor（后端从token获取）
       const courseData = {
         title: courseForm.title,
-        description: courseForm.description,
-        category: courseForm.category
+        description: courseForm.description
       }
       
       let courseId = route.query.courseId

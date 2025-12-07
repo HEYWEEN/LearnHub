@@ -23,35 +23,63 @@
       </div>
     </section>
 
-    <!-- 推荐课程区 -->
+    <!-- 热门课程推荐区 -->
     <section class="courses-section">
       <div class="container">
         <h2 class="section-title">热门课程推荐</h2>
-        <div class="courses-placeholder">
-          <div class="placeholder-icon">📚</div>
-          <p class="placeholder-text">精彩课程即将上线，敬请期待...</p>
-        </div>
-      </div>
-    </section>
+        <div v-loading="loading" class="courses-grid">
+          <div
+            v-for="(course, index) in hotCourses"
+            :key="course.id"
+            class="course-card fade-in"
+            :style="{ animationDelay: `${0.1 + index * 0.05}s` }"
+            @click="handleViewDetails(course.id)"
+          >
+            <!-- 封面图 -->
+            <div class="course-cover">
+              <img
+                :src="course.coverImage ? FILE_UPLOAD_URL + course.coverImage : defaultCourse"
+                :alt="course.title"
+              />
+            </div>
 
-    <!-- 特色功能区 -->
-    <section class="features-section">
-      <div class="container">
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <h3>个性化学习</h3>
-            <p>根据您的学习进度和兴趣，智能推荐适合的课程</p>
+            <!-- 课程信息 -->
+            <div class="course-info">
+              <h3 class="course-title" :title="course.title">
+                {{ course.title }}
+              </h3>
+              <p class="course-description" :title="course.description">
+                {{ course.description }}
+              </p>
+
+              <!-- 课程元数据 -->
+              <div class="course-meta">
+                <div class="meta-item">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">{{ course.enrollmentCount }}人报名</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">📚</span>
+                  <span class="meta-text">{{ course.lessonCount }}课时</span>
+                </div>
+              </div>
+
+              <!-- 授课教师 -->
+              <div class="course-instructor">
+                <img
+                  :src="course.instructor.avatar ? FILE_UPLOAD_URL + course.instructor.avatar : defaultAvatar"
+                  :alt="course.instructor.name"
+                  class="instructor-avatar"
+                />
+                <span class="instructor-name">{{ course.instructor.name }}</span>
+              </div>
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-icon">🏆</div>
-            <h3>实时进度跟踪</h3>
-            <p>清晰了解学习进度，激励自己不断前进</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">💬</div>
-            <h3>互动社区</h3>
-            <p>与其他学习者交流，分享学习心得与经验</p>
+
+          <!-- 空状态 -->
+          <div v-if="!loading && hotCourses.length === 0" class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p class="empty-text">暂无热门课程</p>
           </div>
         </div>
       </div>
@@ -63,11 +91,54 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/slices/user'
 import HeroCarousel from '../../components/home/HeroCarousel.vue'
 import Footer from '../../components/layout/Footer.vue'
+import { getCourses } from '../../services/courseService'
+import { FILE_UPLOAD_URL } from '../../services/axios'
+import defaultAvatar from '../../assets/images/default-avatar.png'
+import defaultCourse from '../../assets/images/default-course.png'
 
+const router = useRouter()
 const userStore = useUserStore()
+
+// 数据状态
+const loading = ref(false)
+const hotCourses = ref([])
+
+// 获取热门课程（按报名人数排序，取前8个）
+const fetchHotCourses = async () => {
+  loading.value = true
+  try {
+    const data = await getCourses({
+      page: 1,
+      limit: 6
+    })
+    
+    // 按报名人数排序，取前8个作为热门课程
+    hotCourses.value = (data.courses || []).sort((a, b) => {
+      return (b.enrollmentCount || 0) - (a.enrollmentCount || 0)
+    }).slice(0, 8)
+  } catch (error) {
+    console.error('获取热门课程失败:', error)
+    ElMessage.error('获取热门课程失败，请稍后重试')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 查看课程详情
+const handleViewDetails = (courseId) => {
+  router.push(`/courses/${courseId}`)
+}
+
+// 页面加载时获取热门课程
+onMounted(() => {
+  fetchHotCourses()
+})
 </script>
 
 <style scoped>
@@ -167,6 +238,142 @@ const userStore = useUserStore()
   color: #2c3e50;
 }
 
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.course-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.course-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+}
+
+.course-cover {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.course-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.course-card:hover .course-cover img {
+  transform: scale(1.1);
+}
+
+.course-info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  height: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+}
+
+.course-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  height: 66px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+}
+
+.course-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+}
+
+.meta-icon {
+  font-size: 16px;
+}
+
+.course-instructor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.instructor-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+}
+
+.instructor-name {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
 .courses-placeholder {
   text-align: center;
   padding: 80px 24px;
@@ -261,6 +468,12 @@ const userStore = useUserStore()
   }
 }
 
+/* 进入动画 */
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .hero-title {
@@ -285,8 +498,12 @@ const userStore = useUserStore()
     font-size: 28px;
   }
 
-  .features-grid {
+  .courses-grid {
     grid-template-columns: 1fr;
+  }
+
+  .course-cover {
+    height: 200px;
   }
 }
 </style>
