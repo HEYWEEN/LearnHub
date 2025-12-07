@@ -211,24 +211,24 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background-color: #667eea;
+  background-color: #000;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #764ba2;
+  background-color: #333;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #000;
+  border: 2px solid #000;
 }
 
 .btn-secondary:hover {
-  background-color: rgba(102, 126, 234, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
