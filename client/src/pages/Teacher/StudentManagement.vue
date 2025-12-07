@@ -190,12 +190,15 @@ const selectedStudent = ref(null);
 // 加载教师的课程
 const loadTeacherCourses = async () => {
   try {
-    const result = await getTeacherCourses(userStore.user.id);
+    const result = await getTeacherCourses();
+    console.log('教师课程列表:', result);
     if (result.success) {
-      teacherCourses.value = result.courses;
+      // 后端返回的数据结构可能是 data.courses 或 data 本身包含课程列表
+      teacherCourses.value = result.data?.courses || result.data || [];
     }
   } catch (error) {
     console.error("加载课程列表失败:", error);
+    ElMessage.error("加载课程列表失败");
   }
 };
 
