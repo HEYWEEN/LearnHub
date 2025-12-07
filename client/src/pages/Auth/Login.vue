@@ -1,6 +1,6 @@
 <template>
     <div class="login-page">
-      <el-card class="login-card">
+      <el-card class="login-card fade-in">
       <h2>登录 LearnHub</h2>
       <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent="handleLogin">
         <el-form-item label="邮箱" prop="email">
@@ -154,6 +154,23 @@ const loading = computed(() => userStore.loading)
 :deep(.el-radio-group) {
   display: flex;
   gap: 20px;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
   </style>
   

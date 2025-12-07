@@ -1,6 +1,6 @@
 <template>
   <div class="register-page">
-    <el-card class="register-card">
+    <el-card class="register-card fade-in">
       <h2>创建 LearnHub 账号</h2>
       <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent="handleRegister">
         <el-form-item label="用户名" prop="username">
@@ -193,6 +193,23 @@ async function handleRegister() {
 :deep(.el-radio-group) {
   display: flex;
   gap: 20px;
+}
+
+/* 进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 </style>
 
