@@ -1,6 +1,10 @@
 <template>
   <div class="carousel-container">
-    <div class="carousel">
+    <div 
+      class="carousel"
+      @mouseenter="pauseAutoPlay"
+      @mouseleave="resumeAutoPlay"
+    >
       <!-- 轮播图片 -->
       <div 
         v-for="(image, index) in images" 
@@ -66,6 +70,7 @@ const images = [
 
 const currentIndex = ref(0)
 let autoPlayTimer = null
+const isPaused = ref(false)
 
 // 下一张
 const nextSlide = () => {
@@ -85,9 +90,14 @@ const goToSlide = (index) => {
 
 // 自动播放
 const startAutoPlay = () => {
-  autoPlayTimer = setInterval(() => {
-    nextSlide()
-  }, 5000) // 每5秒切换一次
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer)
+  }
+  if (!isPaused.value) {
+    autoPlayTimer = setInterval(() => {
+      nextSlide()
+    }, 5000) // 每5秒切换一次
+  }
 }
 
 // 重置自动播放
@@ -95,6 +105,21 @@ const resetAutoPlay = () => {
   if (autoPlayTimer) {
     clearInterval(autoPlayTimer)
   }
+  startAutoPlay()
+}
+
+// 暂停自动播放
+const pauseAutoPlay = () => {
+  isPaused.value = true
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer)
+    autoPlayTimer = null
+  }
+}
+
+// 恢复自动播放
+const resumeAutoPlay = () => {
+  isPaused.value = false
   startAutoPlay()
 }
 

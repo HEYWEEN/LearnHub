@@ -40,6 +40,8 @@
               <img
                 :src="course.coverImage ? FILE_UPLOAD_URL + course.coverImage : defaultCourse"
                 :alt="course.title"
+                loading="lazy"
+                @error="handleImageError"
               />
             </div>
 
@@ -70,6 +72,8 @@
                   :src="course.instructor.avatar ? FILE_UPLOAD_URL + course.instructor.avatar : defaultAvatar"
                   :alt="course.instructor.name"
                   class="instructor-avatar"
+                  loading="lazy"
+                  @error="handleAvatarError"
                 />
                 <span class="instructor-name">{{ course.instructor.name }}</span>
               </div>
@@ -133,6 +137,15 @@ const fetchHotCourses = async () => {
 // 查看课程详情
 const handleViewDetails = (courseId) => {
   router.push(`/courses/${courseId}`)
+}
+
+// 图片加载错误处理
+const handleImageError = (event) => {
+  event.target.src = defaultCourse
+}
+
+const handleAvatarError = (event) => {
+  event.target.src = defaultAvatar
 }
 
 // 页面加载时获取热门课程

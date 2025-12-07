@@ -1,28 +1,71 @@
 import axios from './axios'
+import apiCache from '../utils/cache'
 
-// 获取课程列表
+// 获取课程列表（带缓存）
 export const getCourses = async (params) => {
+  // 生成缓存键（排除分页参数，因为分页数据会变化）
+  const cacheKey = apiCache.generateKey('/courses', { 
+    search: params?.search || '' 
+  })
+  
+  // 尝试从缓存获取
+  const cachedData = apiCache.get(cacheKey)
+  if (cachedData && !params?.page) {
+    // 如果有缓存且不是分页请求，返回缓存数据
+    return cachedData
+  }
+  
   // axios拦截器返回 res.data，即 { success, message, data, code }
   // 我们需要返回 data 字段中的内容
   const response = await axios.get('/courses', { params })
-  return response.data // 返回 { courses: [...], pagination: {...} }
+  const data = response.data // 返回 { courses: [...], pagination: {...} }
+  
+  // 缓存第一页数据（5分钟）
+  if (!params?.page || params.page === 1) {
+    apiCache.set(cacheKey, data, 5 * 60 * 1000)
+  }
+  
+  return data
 }
 
-// 根据ID获取课程详情
+// 根据ID获取课程详情（带缓存）
 export const getCourseById = async (courseId) => {
+  const cacheKey = apiCache.generateKey(`/courses/${courseId}`)
+  
+  // 尝试从缓存获取
+  const cachedData = apiCache.get(cacheKey)
+  if (cachedData) {
+    return cachedData
+  }
+  
   const response = await axios.get(`/courses/${courseId}`)
-  return response.data // 返回课程对象
+  const data = response.data // 返回课程对象
+  
+  // 缓存课程详情（10分钟）
+  apiCache.set(cacheKey, data, 10 * 60 * 1000)
+  
+  return data
 }
 
 // 选课
 export const enrollCourse = async (courseId) => {
   const response = await axios.post(`/courses/${courseId}/enroll`)
+  
+  // 清除相关缓存
+  apiCache.delete(apiCache.generateKey(`/courses/${courseId}`))
+  apiCache.delete(apiCache.generateKey('/courses', { search: '' }))
+  
   return response // 返回完整响应 { success, message, data }
 }
 
 // 退课
 export const cancelEnrollment = async (courseId) => {
   const response = await axios.post(`/courses/${courseId}/cancel`)
+  
+  // 清除相关缓存
+  apiCache.delete(apiCache.generateKey(`/courses/${courseId}`))
+  apiCache.delete(apiCache.generateKey('/courses', { search: '' }))
+  
   return response // 返回完整响应 { success, message, data }
 }
 
@@ -55,6 +98,10 @@ export const createCourse = async (courseData) => {
     video_preview: courseData.videoPreview || courseData.video_preview || null
   }
   const response = await axios.post('/courses', payload)
+  
+  // 清除课程列表缓存
+  apiCache.delete(apiCache.generateKey('/courses', { search: '' }))
+  
   return response.data // 返回创建的课程数据
 }
 
@@ -69,12 +116,22 @@ export const updateCourse = async (courseId, courseData) => {
     video_preview: courseData.videoPreview || courseData.video_preview || null
   }
   const response = await axios.post(`/courses/${courseId}`, payload)
+  
+  // 清除相关缓存
+  apiCache.delete(apiCache.generateKey(`/courses/${courseId}`))
+  apiCache.delete(apiCache.generateKey('/courses', { search: '' }))
+  
   return response.data // 返回更新后的课程数据
 }
 
 // 删除课程
 export const deleteCourse = async (courseId) => {
   const response = await axios.delete(`/courses/${courseId}`)
+  
+  // 清除相关缓存
+  apiCache.delete(apiCache.generateKey(`/courses/${courseId}`))
+  apiCache.delete(apiCache.generateKey('/courses', { search: '' }))
+  
   return response // 返回完整响应
 }
 

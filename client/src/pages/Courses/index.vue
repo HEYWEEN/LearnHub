@@ -50,7 +50,12 @@
           >
             <!-- 封面图 -->
             <div class="course-cover">
-              <img :src="course.coverImage? FILE_UPLOAD_URL + course.coverImage : defaultCourse" :alt="course.title" />
+              <img 
+                :src="course.coverImage? FILE_UPLOAD_URL + course.coverImage : defaultCourse" 
+                :alt="course.title"
+                loading="lazy"
+                @error="handleImageError"
+              />
               <div class="course-overlay">
                 <el-button
                   type="primary"
@@ -89,6 +94,8 @@
                   :src="course.instructor.avatar? FILE_UPLOAD_URL + course.instructor.avatar : defaultAvatar"
                   :alt="course.instructor.name"
                   class="instructor-avatar"
+                  loading="lazy"
+                  @error="handleAvatarError"
                 />
                 <span class="instructor-name">{{ course.instructor.name }}</span>
               </div>
@@ -153,6 +160,7 @@ import { ElMessage } from 'element-plus'
 import { getCourses, enrollCourse, cancelEnrollment, checkEnrollmentStatus } from '../../services/courseService'
 import { useUserStore } from '../../store/slices/user'
 import { FILE_UPLOAD_URL } from '../../services/axios'
+import { debounce } from '../../utils/debounce'
 import defaultAvatar from '../../assets/images/default-avatar.png'
 import defaultCourse from '../../assets/images/default-course.png'
 const router = useRouter()
@@ -191,7 +199,7 @@ const fetchCourses = async () => {
     }
   } catch (error) {
     console.error('获取课程列表失败:', error)
-    ElMessage.error('获取课程列表失败，请稍后重试')
+    ElMessage.error(error.errorMessage || '获取课程列表失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -212,11 +220,11 @@ const checkAllEnrollmentStatus = async () => {
   await Promise.all(statusPromises)
 }
 
-// 搜索处理
-const handleSearch = () => {
+// 搜索处理（使用防抖）
+const handleSearch = debounce(() => {
   pagination.value.page = 1 // 重置到第一页
   fetchCourses()
-}
+}, 500)
 
 // 分页处理
 const handlePageChange = (page) => {
@@ -283,6 +291,15 @@ const handleCancelEnroll = async (courseId) => {
     console.error('取消报名失败:', error)
     ElMessage.error(error.message || '取消报名失败，请稍后重试')
   }
+}
+
+// 图片加载错误处理
+const handleImageError = (event) => {
+  event.target.src = defaultCourse
+}
+
+const handleAvatarError = (event) => {
+  event.target.src = defaultAvatar
 }
 
 // 初始化加载

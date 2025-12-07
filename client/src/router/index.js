@@ -1,54 +1,72 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../pages/Home/index.vue'
-import Login from '../pages/Auth/Login.vue'
-import Register from '../pages/Auth/Register.vue'
-import TeacherDashboard from '../pages/Teacher/Dashboard.vue'
-import CreateCourse from '../pages/Teacher/CreateCourse.vue'
-import ManageCourses from '../pages/Teacher/ManageCourses.vue'
-import StudentManagement from '../pages/Teacher/StudentManagement.vue'
-import Profile from '../pages/Profile/index.vue'
-import Courses from '../pages/Courses/index.vue'
-import CourseDetail from '../pages/Courses/CourseDetail.vue'
-import Learning from '../pages/Learning/index.vue'
 import { useUserStore } from '../store/slices/user'
 import { ElMessage } from 'element-plus'
 
+// 路由懒加载
 const routes = [
-  { path: '/', name: 'Home', component: Home },
-  { path: '/home', name: 'StudentHome', component: Home },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/register', name: 'Register', component: Register },
+  { 
+    path: '/', 
+    name: 'Home', 
+    component: () => import('../pages/Home/index.vue')
+  },
+  { 
+    path: '/home', 
+    name: 'StudentHome', 
+    component: () => import('../pages/Home/index.vue')
+  },
+  { 
+    path: '/login', 
+    name: 'Login', 
+    component: () => import('../pages/Auth/Login.vue')
+  },
+  { 
+    path: '/register', 
+    name: 'Register', 
+    component: () => import('../pages/Auth/Register.vue')
+  },
   { 
     path: '/teacher', 
     name: 'TeacherDashboard', 
-    component: TeacherDashboard,
+    component: () => import('../pages/Teacher/Dashboard.vue'),
     meta: { requiresAuth: true, role: 'teacher' }
   },
   { 
     path: '/teacher/courses/create', 
     name: 'CreateCourse', 
-    component: CreateCourse,
+    component: () => import('../pages/Teacher/CreateCourse.vue'),
     meta: { requiresAuth: true, role: 'teacher' }
   },
   { 
     path: '/teacher/courses/manage', 
     name: 'ManageCourses', 
-    component: ManageCourses,
+    component: () => import('../pages/Teacher/ManageCourses.vue'),
     meta: { requiresAuth: true, role: 'teacher' }
   },
   { 
     path: '/teacher/students', 
     name: 'StudentManagement', 
-    component: StudentManagement,
+    component: () => import('../pages/Teacher/StudentManagement.vue'),
     meta: { requiresAuth: true, role: 'teacher' }
   },
-  { path: '/profile', name: 'Profile', component: Profile },
-  { path: '/courses', name: 'Courses', component: Courses },
-  { path: '/courses/:id', name: 'CourseDetail', component: CourseDetail },
+  { 
+    path: '/profile', 
+    name: 'Profile', 
+    component: () => import('../pages/Profile/index.vue')
+  },
+  { 
+    path: '/courses', 
+    name: 'Courses', 
+    component: () => import('../pages/Courses/index.vue')
+  },
+  { 
+    path: '/courses/:id', 
+    name: 'CourseDetail', 
+    component: () => import('../pages/Courses/CourseDetail.vue')
+  },
   { 
     path: '/learning/:courseId/:chapterId?', 
     name: 'Learning', 
-    component: Learning,
+    component: () => import('../pages/Learning/index.vue'),
     meta: { requiresAuth: true }
   }
 ]
