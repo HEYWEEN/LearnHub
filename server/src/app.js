@@ -36,7 +36,7 @@ const app = express();
 //   next();
 // });
 app.use(cors({
-  origin: 'http://localhost:4004',
+  origin: 'http://localhost:3004',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
