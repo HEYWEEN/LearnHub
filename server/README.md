@@ -1,71 +1,63 @@
-# 更新
-
-1. **表结构发生变化**
-
-**运行``npm run db:update``更新表结构**
-
-2. **用于填充测试数据的脚本更新**
-
-**同时再运行一遍``npm run db:test``重新填充数据**
-
-3. **关于ffmpeg**
-
-如果没有在环境里安装ffmpeg
-
-那么数据库在上传课程视频时不会填充视频时长字段（watch_time）并且无法启用hls
-
-4. **.env结构变化**
-
-请检查当前.env文件结构是否与.env.example一致
-
-添加了detail log选项设置为true即可开启超详细的请求报文信息和返回数据信息
-
 # 依赖安装
 
-Node.js, npm, MySQL, ffmpeg（用于 HLS 生成）（可选）
+Node.js, npm, MySQL, ffmpeg
 
 ```bash
 cd server
 npm install
 ```
-- **ffmpeg（可选）**: 如果要启用 HLS 生成，需要在系统中安装 `ffmpeg`，例如在 Ubuntu 上：
 
+- **关于ffmpeg**
+
+需要在系统中安装 `ffmpeg`，例如在 Ubuntu 上
 ```bash
 sudo apt update && sudo apt install -y ffmpeg
 ```
+如果没有在环境里安装ffmpeg
+
+那么数据库在上传课程视频时不会填充视频时长字段并且无法启用hls
+
 # 运行前配置
 
 **运行刚需mysql，并请准备好账号和密码**
 
 1. 初始化数据库
 
-运行initDatabase.sql
+运行scipts/initDatabase.sql
 
 2. 配置config
 
-    在/.env文件中修改：
+    复制一份.env.example并改名为.env文件，并进行以下修改：
 
-- mysql账号和密码
+- DB_USER、DB_PASSWORD：mysql账号和密码
 
-- 如果要开启/api/ai下的所有功能需要准备一个api密钥
+- API_KEY、AI_URL：如果要开启/api/ai下的所有功能需要准备一个api密钥，和对应接口网站
 
-- 为了安全性考虑，建议给SECERT_KEY设置一个较复杂的字符串
+- SECRET_KEY：为了安全性考虑，建议给SECERT_KEY设置一个较复杂的字符串
 
     可以参考.env.example
-```
+```bash
+PORT=4004 #后端端口号
 DB_HOST=localhost
-DB_USER=admin_user
-DB_PASSWORD=123456
+DB_USER=admin_user #数据库账号名
+DB_PASSWORD=123456 #数据库账号密码
 DB_NAME=learnhub
-SECRET_KEY=
+SECRET_KEY= #用于jwt的公钥
 AI_URL=https://api.deepseek.com/v1
 API_KEY=
 AI_MODEL=deepseek-chat
+DETAILED_LOGGING=false #改为true开启详细log
 ```
 
 3. 导入测试数据(可选)
 
 运行``npm run db:test``
+
+注：这个指令不会自动导入图片和视频，如需显示请在/server/uploads文件夹下填充以下几个文件
+
+- 图片： testImg01.jpg ~ testImg06.jpg
+
+- 视频： testVideo01.mp4 ~ testVideo.mp4
 
 # 运行
 ```bash
@@ -78,47 +70,6 @@ node src/index.js
 ```bash
 npm test
 ```
-这个指令会打开一个用于测试视频流、hls和视频图片上传的测试界面
+这个指令会打开一个测试界面
 
 需同时运行``npm start``或``node src/index.js``才能使用
-
-
-# other
-
-视频流（Range）与 HLS 使用
-------------------------
-
-后端支持两类视频访问方式：直接的字节范围（HTTP Range）流式传输，以及可选的 HLS（m3u8 + ts 段）生成。
-
-- 字节范围流（适用于直接播放 MP4）
-  - 路径示例：`GET /uploads/{path_to_video}.mp4`（由静态文件中间件托管）
-  - 客户端播放器会发起 `Range` 请求。也可以使用 curl 测试部分内容：
-
-```bash
-# 请求文件的前 1KB
-curl -H "Range: bytes=0-1023" \
-  -H "Authorization: Bearer $TOKEN" \
-  -v http://localhost:3000/uploads/path/to/video.mp4 --output - | head -c 200 > part.bin
-```
-
-  - 服务器会返回 `206 Partial Content` 与 `Content-Range`，播放器将根据返回流式播放。
-
-- HLS（可选）
-  - API 设计示例（可由后端提供触发 HLS 生成的接口）：
-    - `POST /api/courses/:courseId/lesson/:lessonId/hls` —— 触发将课时视频转为 HLS（m3u8 + ts 段）。
-  - 生成成功后，HLS 文件通常写在 `uploads/hls/{courseId}/{lessonId}/index.m3u8`，播放地址例如：
-
-```
-http://localhost:3000/uploads/hls/{courseId}/{lessonId}/index.m3u8
-```
-
-  - 使用浏览器或 HLS 支持的播放器（如 hls.js）播放该 m3u8 即可。
-  - 注意：HLS 生成需要 `ffmpeg` 可用；生成过程可能较慢且占用资源，建议在生产环境中使用后台任务/队列（例如 Bull + Redis）异步处理。
-
-
-静态文件访问说明
-----------------
-
-- 所有上传的静态文件（图片、原始视频、HLS 输出等）默认保存在项目根目录下的 `uploads/` 目录，服务会将 `uploads` 目录作为静态文件目录对外暴露。
-- 访问示例：`http://localhost:3000/uploads/{filename}`。
-

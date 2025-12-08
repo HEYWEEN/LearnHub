@@ -7,8 +7,7 @@
   "scripts": {
     "test": "nodemon scripts/unit/app.js",
     "start": "nodemon ./src/index.js",
-    "db:test": "node scripts/bigSeed.js",
-    "db:update": "node scripts/update.js"
+    "db:test": "node scripts/bigSeed.js"
   },
   "keywords": [],
   "author": "",

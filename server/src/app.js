@@ -23,18 +23,24 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use((req, res, next) => {
-  // 允许所有域（仅开发环境）
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Credentials", "true");
-  // 处理 OPTIONS 预检
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   // 允许所有域（仅开发环境）
+//   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+//   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   // 处理 OPTIONS 预检
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(200);
+//   }
+//   next();
+// });
+app.use(cors({
+  origin: 'http://localhost:4004',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 import routes from './routes/index.js';
@@ -53,7 +59,6 @@ app.use('/api/note'     , routes.noteRouter    );
 app.use('/api/teacher'  , routes.teacherRouter );
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-app.use('/public', express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
     res.send('LearnHub API is running...');

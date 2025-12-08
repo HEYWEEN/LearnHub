@@ -57,7 +57,7 @@ const lorem = [
 async function run() {
   const conn = await pool.getConnection();
   try {
-    console.log("\n🚀 正在开始大型数据填充...\n");
+    console.log("\n正在开始大型数据填充...\n");
 
     //
     // 1) 清空所有表
@@ -76,12 +76,12 @@ async function run() {
     ];
     for (const t of tables) await conn.query(`TRUNCATE TABLE ${t}`);
     await conn.query("SET FOREIGN_KEY_CHECKS = 1");
-    console.log("🧹 已清空全部表");
+    console.log("已清空全部表");
 
     //
     // 2) 创建教师
     //
-    console.log("👨‍🏫 创建 50 个教师");
+    console.log("创建 50 个教师");
     const teachers = [];
     for (let i = 0; i < 50; i++) {
       const id = randomUUID();
@@ -103,7 +103,7 @@ async function run() {
     //
     // 3) 创建学生
     //
-    console.log("👨‍🎓 创建 300 个学生");
+    console.log("创建 300 个学生");
     const students = [];
     for (let i = 0; i < 300; i++) {
       const id = randomUUID();
@@ -125,7 +125,7 @@ async function run() {
     //
     // 4) 创建课程
     //
-    console.log("📚 创建 200 门课程");
+    console.log("创建 200 门课程");
     const courses = [];
     for (let i = 0; i < 200; i++) {
       const id = randomUUID();
@@ -150,7 +150,7 @@ async function run() {
     //
     // 5) 创建课时
     //
-    console.log("🎞️ 创建课时...");
+    console.log("创建课时...");
     const allLessons = [];
     for (const c of courses) {
       const count = rand(8, 15);
@@ -178,7 +178,7 @@ async function run() {
     //
     // 6) 报名记录
     //
-    console.log("📝 创建报名数据...");
+    console.log("创建报名数据...");
     const enrollmentsMap = new Map(); // 用于 progress 生成
     for (const s of students) {
       const count = rand(3, 10);
@@ -206,7 +206,7 @@ async function run() {
     //
     // 7) 评论
     //
-    console.log("⭐ 创建评论 1000~2000 条...");
+    console.log("创建评论 1000~2000 条...");
     const reviewCount = rand(1000, 2000);
     for (let i = 0; i < reviewCount; i++) {
       await conn.query(
@@ -220,7 +220,7 @@ async function run() {
     //
     // 8) 学习进度 progress
     //
-    console.log("📈 创建 progress 数据...");
+    console.log("创建 progress 数据...");
 
     // 建立一个 courseId -> lessons[] 的映射表，加速查询
     const courseLessonMap = new Map();
@@ -276,7 +276,7 @@ async function run() {
     //
     // 9) notes 笔记
     //
-    console.log("📝 创建 notes 数据...");
+    console.log("创建 notes 数据...");
     const noteCount = rand(300, 600);
     for (let i = 0; i < noteCount; i++) {
       await conn.query(
@@ -296,7 +296,7 @@ async function run() {
     //
     // 10) AI 会话
     //
-    console.log("🤖 创建 AI 会话与消息...");
+    console.log("创建 AI 会话与消息...");
     const convCount = rand(200, 400);
     const conversations = [];
 
@@ -321,7 +321,7 @@ async function run() {
     //
     // 11) AI 消息
     //
-    console.log("📨 创建 AI 消息...");
+    console.log("创建 AI 消息...");
     for (const cid of conversations) {
       const messageCount = rand(1, 5);
 
@@ -340,12 +340,13 @@ async function run() {
       }
     }
 
-    console.log("\n🎉 全表数据填充完成！");
+    console.log("\n全表数据填充完成！");
   } catch (e) {
-    console.error("❌ 出错：", e);
+    console.error("出错：", e);
   } finally {
     conn.release();
   }
+  process.exit(0);
 }
 
 run();
