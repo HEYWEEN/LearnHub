@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/response.js";
 import * as lessonService from "../services/lessonService.js";
+import * as videoService from "../services/videoService.js";
 import fileService from "../services/fileService.js";
 
 const addLesson = asyncHandler(async (req, res) => {
@@ -39,7 +40,7 @@ const updateVideo = asyncHandler(async (req, res) => {
   // 获取上传后的文件路径
   const coverVideoUrl = fileService.getUploadedFilePath(file);
 
-  const duration = await fileService.getVideoDuration(file.path);
+  const duration = await videoService.getVideoDuration(file.path);
   // 更新课程封面
   const updated = await lessonService.modifyLesson({
     user,

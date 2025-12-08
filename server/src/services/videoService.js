@@ -8,7 +8,8 @@ import * as lessonsRepo from "../repository/lessonRepository.js";
 import { withConnection } from "../repository/transactionRepository.js";
 import { sendError } from "../utils/response.js";
 import STATUS from "../constants/httpStatus.js";
-
+import ffmpeg from "fluent-ffmpeg";
+import LOG_COLOR  from "../constants/logColor.js";
 const UPLOADS_DIR = path.join(process.cwd(), "uploads"); // 以运行目录为准（通常为 server 根）
 
 function normalizeStoredPath(stored) {
@@ -17,6 +18,21 @@ function normalizeStoredPath(stored) {
   if (stored.startsWith("/")) stored = stored.slice(1);
   if (path.isAbsolute(stored)) return stored;
   return path.join(process.cwd(), stored);
+}
+
+// 获取视频时长，单位秒
+export async function getVideoDuration(filePath){
+  if(global.HAS_FFMPEG===false){
+    console.warn(LOG_COLOR.FG_RED+ "[err]当前环境未安装 ffmpeg，无法获取视频时长" + LOG_COLOR.RESET);
+    return Promise.resolve(0);
+  }
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, data) => {
+      if (err) return reject(err);
+      const duration = data.format.duration; // 秒
+      resolve(duration);
+    });
+  });
 }
 
 export async function getCourseVideoPath(courseId) {
