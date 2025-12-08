@@ -7,7 +7,9 @@
   "scripts": {
     "test": "nodemon scripts/unit/app.js",
     "start": "nodemon ./src/index.js",
-    "db:test": "node scripts/bigSeed.js"
+    "db:test": "node scripts/bigSeed.js",
+    "uploads:clean": "node scripts/cleanUploads.js",
+    "uploads:dry": "node scripts/cleanUploads.js --dry-run"
   },
   "keywords": [],
   "author": "",

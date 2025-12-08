@@ -73,3 +73,18 @@ npm test
 这个指令会打开一个测试界面
 
 需同时运行``npm start``或``node src/index.js``才能使用
+
+# 清理文件
+
+由于uploads下文件会留下一些未被引用的垃圾文件，可用以下指令清理
+
+1. 正式清理
+```bash
+npm run uploads:clean
+```
+2. 模拟清理
+
+列出会删除文件，但不会真正删除
+```bash
+npm run uploads:dry
+```
