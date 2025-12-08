@@ -57,7 +57,7 @@ DETAILED_LOGGING=false #改为true开启详细log
 
 - 图片： testImg01.jpg ~ testImg06.jpg
 
-- 视频： testVideo01.mp4 ~ testVideo.mp4
+- 视频： testVideo01.mp4 ~ testVideo04.mp4
 
 # 运行
 ```bash
